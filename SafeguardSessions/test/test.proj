@@ -4,21 +4,10 @@
     <OutputPath Condition="'$(OutputPath)' == ''">$(MSBuildProjectDirectory)\bin\</OutputPath>
     <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">$(MSBuildProjectDirectory)\obj\</IntermediateOutputPath>
     <MezIntermediatePath>$(IntermediateOutputPath)MEZ\</MezIntermediatePath>
-    <MezOutputPath>$(OutputPath)$(MsBuildProjectName).mez</MezOutputPath>
+    <MezOutputPath>$(OutputPath)UnitTestFramework.mez</MezOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <MezContent Include="BaseAuthentication.pqm" />
-    <MezContent Include="Request.pqm" />
-    <MezContent Include="SafeguardSessions.pq" />
-    <MezContent Include="SafeguardSessions16.png" />
-    <MezContent Include="SafeguardSessions20.png" />
-    <MezContent Include="SafeguardSessions24.png" />
-    <MezContent Include="SafeguardSessions32.png" />
-    <MezContent Include="SafeguardSessions40.png" />
-    <MezContent Include="SafeguardSessions48.png" />
-    <MezContent Include="SafeguardSessions64.png" />
-    <MezContent Include="SafeguardSessions80.png" />
-    <MezContent Include="resources.resx" />
+    <MezContent Include="UnitTestFramework.pq" />
   </ItemGroup>
   <Target Name="BuildMez" AfterTargets="Build" Inputs="@(MezContent)" Outputs="$(MezOutputPath)">
     <RemoveDir Directories="$(MezIntermediatePath)" />
