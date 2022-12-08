@@ -1,0 +1,47 @@
+let
+    Request.GetAuthParameters = (encodedCredentails as text) as record =>
+        let
+            parameters = [
+                RelativePath = "authentication",
+                Query = [return = "/api/authentication"],
+                Headers = [
+                    #"Authorization" = Text.Combine({"Basic ", encodedCredentails}),
+                    #"Accept" = "*/*",
+                    #"Connection" = "keep-alive",
+                    #"Cache-Control" = "no-cache, no-store, must-revalidate"
+                ]
+            ]
+        in
+            parameters,
+    Request.GetDefaultParameters = (path as text, sessionId as text) as record =>
+        let
+            parameters = [
+                RelativePath = path,
+                Headers = [
+                    #"Accept" = "application/json",
+                    #"Connection" = "keep-alive",
+                    #"Cookie" = sessionId
+                ],
+                IsRetry = true
+            ]
+        in
+            parameters,
+    Request.Generate = (url as text, parameters as record) as record =>
+        let
+            response = Web.Contents(url, parameters),
+            jsonResponse = Json.Document(response),
+            table = Table.FromRecords({jsonResponse})
+        in
+            [
+                Data = table,
+                RequestMetaData = Value.Metadata(response)
+            ],
+    Request.GetHeader = (requestMetaData as record, headerName as text) as text =>
+        Record.Field(requestMetaData[Headers], headerName)
+in
+    [
+        GetAuthParameters = Request.GetAuthParameters,
+        GetDefaultParameters = Request.GetDefaultParameters,
+        Generate = Request.Generate,
+        GetHeader = Request.GetHeader
+    ]
