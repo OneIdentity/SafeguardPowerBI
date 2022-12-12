@@ -76,12 +76,12 @@ Extension.LoadFunction = (name as text) =>
 
 BaseAuthentication = Extension.LoadFunction("BaseAuthentication.pqm");
 
-BaseAuthentication.EncodeCredentials = BaseAuthentication[EncodeCredentials];
-BaseAuthentication.GetSessionId = BaseAuthentication[GetSessionId];
+shared BaseAuthentication.EncodeCredentials = BaseAuthentication[EncodeCredentials];
+shared BaseAuthentication.GetSessionId = BaseAuthentication[GetSessionId];
 
 Request = Extension.LoadFunction("Request.pqm");
 
-Request.GetAuthParameters = Request[GetAuthParameters];
-Request.GetDefaultParameters = Request[GetDefaultParameters];
-Request.Generate = Request[Generate];
-Request.GetHeader = Request[GetHeader];
+shared Request.GetAuthParameters = Request[GetAuthParameters];
+shared Request.GetDefaultParameters = Request[GetDefaultParameters];
+shared Request.Generate = Request[Generate];
+shared Request.GetHeader = Request[GetHeader];
