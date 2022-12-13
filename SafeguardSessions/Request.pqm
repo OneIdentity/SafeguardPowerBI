@@ -26,15 +26,19 @@ let
             ]
         in
             parameters,
-    Request.Generate = (url as text, parameters as record) as record =>
+    Request.Generate = (url as text, parameters as record, optional mocks as record) as record =>
         let
-            response = Web.Contents(url, parameters),
-            jsonResponse = Json.Document(response),
-            table = Table.FromRecords({jsonResponse})
+            response =
+                if Record.HasFields(mocks, "Response") then
+                    mocks[Response]
+                else
+                    Json.Document(Web.Contents(url, parameters)),
+            _meta = Value.Metadata(response),
+            _table = Table.FromRecords({response})
         in
             [
-                Data = table,
-                RequestMetaData = Value.Metadata(response)
+                Data = _table,
+                RequestMetaData = _meta
             ],
     Request.GetHeader = (requestMetaData as record, headerName as text) as text =>
         Record.Field(requestMetaData[Headers], headerName)

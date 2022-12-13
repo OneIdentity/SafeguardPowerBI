@@ -1,9 +1,9 @@
 ﻿// Microsoft's Fact framework was used as the core of the Unit Test Framework.
 // References: https://github.com/microsoft/DataConnectors/blob/master/samples/UnitTesting/UnitTesting.query.pq,
 // https://learn.microsoft.com/en-us/power-query/handlingunittesting
-// Version 1.0.0 was exactly the same as Microsoft's framework. Above this version number, 
+// Version 1.0.0 was exactly the same as Microsoft's framework. Above this version number,
 // it includes our changes and additions
-[Version = "1.0.1"]
+[Version = "1.1.0"]
 section UnitTestFrameork;
 
 shared Fact = (_subject as text, _expected, _actual) as record =>
@@ -30,7 +30,7 @@ shared Facts = (_subject as text, _predicates as list) =>
 
 shared Facts.Summarize = (_facts as list) as table =>
     [
-        simplifiedFactsList =  _simplifyFactsList(_facts),
+        simplifiedFactsList = _simplifyFactsList(_facts),
         Fact.CountSuccesses = (count, i) =>
             [
                 result = try i[Result],
@@ -244,3 +244,26 @@ ValueToText = (value, optional depth) =>
                 "[#_unable_to_serialize_#]"
     in
         try Serialize(value) otherwise "<serialization failed>";
+
+shared FakeJsonResponse = (body as text, optional metadata as record) =>
+    let
+        response = Json.Document(body),
+        response_with_meta = Value.ReplaceMetadata(
+            response, if metadata <> null then metadata else [
+                Content.Type = "application/json",
+                Response.Status = 200
+            ]
+        )
+    in
+        response_with_meta;
+
+shared TestErrorIsRaised = (err as record, reason as text, message as text, detail as text) as list =>
+    let
+        facts = {
+            Fact("Error is raised", true, err[HasError]),
+            Fact("Reason is correct", reason, err[Error][Reason]),
+            Fact("Message is correct", message, err[Error][Message]),
+            Fact("Detail is correct", detail, err[Error][Detail])
+        }
+    in
+        facts;
