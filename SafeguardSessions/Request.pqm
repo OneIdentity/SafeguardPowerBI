@@ -29,12 +29,12 @@ let
     Request.Generate = (url as text, parameters as record, optional mocks as record) as record =>
         let
             response =
-                if Record.HasFields(mocks, "Response") then
+                if mocks <> null and Record.HasFields(mocks, "Response") then
                     mocks[Response]
                 else
-                    Json.Document(Web.Contents(url, parameters)),
+                    Web.Contents(url, parameters),
             _meta = Value.Metadata(response),
-            _table = Table.FromRecords({response})
+            _table = Table.FromRecords({Json.Document((response))})
         in
             [
                 Data = _table,

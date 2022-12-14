@@ -245,9 +245,9 @@ ValueToText = (value, optional depth) =>
     in
         try Serialize(value) otherwise "<serialization failed>";
 
-shared FakeJsonResponse = (body as text, optional metadata as record) =>
+shared FakeResponse = (body as text, optional metadata as record) =>
     let
-        response = Json.Document(body),
+        response = Text.ToBinary(body),
         response_with_meta = Value.ReplaceMetadata(
             response, if metadata <> null then metadata else [
                 Content.Type = "application/json",

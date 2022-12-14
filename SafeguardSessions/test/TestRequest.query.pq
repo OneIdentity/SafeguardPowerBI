@@ -39,7 +39,7 @@ requestMetaData = [
 
 TestRequestGeneration = () =>
     let
-        fakeresponse = FakeJsonResponse("{""dummy_field"": ""value"", ""dummy_list"": [0, 1, 2]}"),
+        fakeresponse = FakeResponse("{""dummy_field"": ""value"", ""dummy_list"": [0, 1, 2]}"),
         expected_body = #table(type table [dummy_field = any, dummy_list = any], {{"value", {0, 1, 2}}}),
         expected_meta = [Content.Type = "application/json", Response.Status = 200],
         response = Request.Generate("dummy_url", [], [Response = fakeresponse]),
