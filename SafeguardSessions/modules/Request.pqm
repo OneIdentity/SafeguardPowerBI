@@ -28,13 +28,16 @@ let
             parameters,
     Request.Generate = (url as text, parameters as record, optional mocks as record) as record =>
         let
+            requestUrl = LogWrapper(TraceLevel.Information, "Base url of the http request", url),
+            requestParameters = LogWrapper(TraceLevel.Information, "Request parameters of the http request", parameters),
             response =
                 if mocks <> null and Record.HasFields(mocks, "Response") then
                     mocks[Response]
                 else
-                    Web.Contents(url, parameters),
-            _meta = Value.Metadata(response),
-            _table = Table.FromRecords({Json.Document((response))})
+                    Web.Contents(requestUrl, requestParameters),
+            _meta = LogWrapper(TraceLevel.Information, "Response meta data of the http request", Value.Metadata(response)),
+            _json = LogWrapper(TraceLevel.Information, "Response data of the http request", Json.Document((response))),
+            _table = Table.FromRecords({_json})
         in
             [
                 Data = _table,
