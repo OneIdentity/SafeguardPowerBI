@@ -1,5 +1,12 @@
 section TestRequest;
 
+Request = Extension.ImportModule("Request.pqm");
+
+Request.GetAuthParameters = Request[GetAuthParameters];
+Request.GetDefaultParameters = Request[GetDefaultParameters];
+Request.Generate = Request[Generate];
+Request.GetHeader = Request[GetHeader];
+
 requestMetaData = [
     Content.Type = "application/json",
     Content.Uri = "[Function]",
