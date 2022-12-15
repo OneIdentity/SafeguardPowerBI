@@ -26,7 +26,7 @@ ContentsImpl = (url as text) =>
         authResponse = Request.Generate(url, Request.GetAuthParameters(encodedCredentails)),
         cookie = Request.GetHeader(authResponse[RequestMetaData], "Set-Cookie"),
         sessionId = BaseAuthentication.GetSessionId(cookie),
-        response = Request.Generate(url, Request.GetDefaultParameters("info", sessionId))
+        response = Request.Generate(url, Request.GetDefaultParameters("audit/sessions", sessionId))
     in
         response[Data];
 
