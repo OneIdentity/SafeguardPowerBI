@@ -9,6 +9,7 @@
   </PropertyGroup>
   <ItemGroup>
     <MezContent Include="$(ModulesPath)BaseAuthentication.pqm" />
+    <MezContent Include="$(ModulesPath)Utils.pqm" />
     <MezContent Include="$(ModulesPath)Request.pqm" />
     <MezContent Include="SafeguardSessions.pq" />
     <MezContent Include="SafeguardSessions16.png" />
