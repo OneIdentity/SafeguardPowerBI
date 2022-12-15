@@ -5,10 +5,11 @@
     <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">$(MSBuildProjectDirectory)\obj\</IntermediateOutputPath>
     <MezIntermediatePath>$(IntermediateOutputPath)MEZ\</MezIntermediatePath>
     <MezOutputPath>$(OutputPath)$(MsBuildProjectName).mez</MezOutputPath>
+    <ModulesPath>$(MSBuildProjectDirectory)\modules\</ModulesPath>
   </PropertyGroup>
   <ItemGroup>
-    <MezContent Include="BaseAuthentication.pqm" />
-    <MezContent Include="Request.pqm" />
+    <MezContent Include="$(ModulesPath)BaseAuthentication.pqm" />
+    <MezContent Include="$(ModulesPath)Request.pqm" />
     <MezContent Include="SafeguardSessions.pq" />
     <MezContent Include="SafeguardSessions16.png" />
     <MezContent Include="SafeguardSessions20.png" />
