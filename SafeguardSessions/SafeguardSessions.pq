@@ -28,7 +28,7 @@ ContentsImpl = (url as text) =>
         sessionId = BaseAuthentication.GetSessionId(cookie),
         response = Request.Generate(url, Request.GetDefaultParameters("audit/sessions", sessionId))
     in
-        response[Data];
+        response;
 
 SafeguardSessions = [
     Authentication = [
