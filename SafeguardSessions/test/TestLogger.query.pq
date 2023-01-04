@@ -3,6 +3,9 @@ section TestUtils;
 Utils = Extension.ImportModule("Utils.pqm");
 
 Utils.InfoLog = Utils[InfoLog];
+Utils.ErrorLog = Utils[ErrorLog];
+Utils.SPSResult = Utils[SPSResult];
+Utils.FetchInfo = Utils[FetchInfo];
 
 TestInfoLogWithNumberInput = () =>
     let
@@ -64,18 +67,48 @@ TestInfoLogWithTableInput = () =>
     let
         input = [
             Prefix = "say",
-            Value = #table(type table [#"Number" = number, #"Value" = text], {{1, "Apple Tree"}, {2, "Ladybug"}, {3, "Little ducks"}}),
+            Value = #table(
+                type table [#"Number" = number, #"Value" = text],
+                {{1, "Apple Tree"}, {2, "Ladybug"}, {3, "Little ducks"}}
+            ),
             Delayed = null,
             IsTesting = true
         ],
         expectedLogValues = [
             LogLevel = TraceLevel.Information,
             Output = "say: #table( type table [Number = number, Value = text] , {{1, ""Apple Tree""} , {2, ""Ladybug""} , {3, ""Little ducks""} } ) ",
-            Value = #table({"Number", "Value"}, {{1, "Apple Tree"}, {2, "Ladybug"}, {3, "Little ducks"} }),
+            Value = #table({"Number", "Value"}, {{1, "Apple Tree"}, {2, "Ladybug"}, {3, "Little ducks"}}),
             Delayed = null
         ],
         logValues = Utils.InfoLog(input[Prefix], input[Value], input[Delayed], input[IsTesting]),
         facts = TestLogging(logValues, expectedLogValues, "table")
+    in
+        facts;
+
+TestErrorLogWithSPSResultInput = () =>
+    let
+        input = [
+            Prefix = "error",
+            Value = Utils.SPSResult(
+                "error", Utils.FetchInfo("status", "message", #datetime(2023, 1, 18, 9, 47, 55), 42, true, "query")
+            ),
+            Delayed = null,
+            IsTesting = true
+        ],
+        expectedLogValues = [
+            LogLevel = TraceLevel.Error,
+            Output = "error: [ SessionData = ""error"", FetchInfo = #table( type table [Start = any, Query = any, Status = any, Count = any, Message = any, Failed = any] , {{#datetime(2023, 1, 18, 9, 47, 55), ""query"", ""status"", 42, ""message"", true} } )  ] ",
+            Value = [
+                SessionData = "error",
+                FetchInfo = #table(
+                    type table [Start = any, Query = any, Status = any, Count = any, Message = any, Failed = any],
+                    {{#datetime(2023, 1, 18, 9, 47, 55), "query", "status", 42, "message", true}}
+                )
+            ],
+            Delayed = null
+        ],
+        logValues = Utils.ErrorLog(input[Prefix], input[Value], input[Delayed], input[IsTesting]),
+        facts = TestLogging(logValues, expectedLogValues, "SPSResult")
     in
         facts;
 
@@ -85,7 +118,8 @@ shared TestUtils.UnitTest = [
         TestInfoLogWithTextInput(),
         TestInfoLogWithListInput(),
         TestInfoLogWithRecordInput(),
-        TestInfoLogWithTableInput()
+        TestInfoLogWithTableInput(),
+        TestErrorLogWithSPSResultInput()
     },
     report = Facts.Summarize(facts)
 ][report];

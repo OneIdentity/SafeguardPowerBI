@@ -1,10 +1,10 @@
 let
     IsMocked = Extension.ImportFunction("IsMocked", "Utils.pqm"),
     InfoLog = Extension.ImportFunction("InfoLog", "Utils.pqm"),
+    ErrorCodes = Extension.ImportFunction("ErrorCodes", "CustomErrors.pqm"),
     Request.GetAuthParameters = (encodedCredentails as text) as record =>
         let
             parameters = [
-                RelativePath = "authentication",
                 Query = [return = "/api/authentication"],
                 Headers = [
                     #"Authorization" = Text.Combine({"Basic ", encodedCredentails}),
@@ -15,10 +15,9 @@ let
             ]
         in
             parameters,
-    Request.GetDefaultParameters = (path as text, sessionId as text) as record =>
+    Request.GetDefaultParameters = (sessionId as text) as record =>
         let
             parameters = [
-                RelativePath = path,
                 Headers = [
                     #"Accept" = "application/json",
                     #"Connection" = "keep-alive",
@@ -32,7 +31,11 @@ let
         let
             requestUrl = InfoLog("Base url of the http request", url),
             requestParameters = InfoLog("Request parameters of the http request", parameters),
-            response = if IsMocked(mocks, "Response") then mocks[Response] else Web.Contents(url, parameters),
+            response =
+                if IsMocked(mocks, "Response") then
+                    mocks[Response]
+                else
+                    Web.Contents(url, Record.AddField(parameters, "ManualStatusHandling", ErrorCodes)),
             _meta = InfoLog("Response meta data of the http request", Value.Metadata(response)),
             _json = InfoLog("Response data of the http request", Json.Document((response))),
             _table = Table.FromRecords({_json})

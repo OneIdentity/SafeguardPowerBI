@@ -25,16 +25,53 @@ ContentsImpl = (sps_ip as text) =>
     in
         data;
 
-shared GetData = (url as text, credentials as record, optional mocks as record) =>
+shared GetData = (base_url as text, credentials as record, optional mocks as record) =>
     let
-        authResponse = Authenticate(url, credentials, mocks),
-        response = FetchData(
-            url,
-            BaseAuthentication.MineSessionIdFromCookie(Request.GetHeader(Value.Metadata(authResponse), "Set-Cookie")),
-            mocks
-        )
+        _start_time = DateTime.LocalNow(),
+        auth_url = Uri.Combine(base_url, "authentication"),
+        fetch_url = Uri.Combine(base_url, "audit/sessions"),
+        authResponse = (try Authenticate(auth_url, credentials, mocks)) meta [Url = auth_url],
+        response =
+            if authResponse[HasError] then
+                authResponse
+            else
+                (
+                    try
+                        FetchData(
+                            fetch_url,
+                            BaseAuthentication.MineSessionIdFromCookie(
+                                Request.GetHeader(Value.Metadata(authResponse[Value]), "Set-Cookie")
+                            ),
+                            mocks
+                        )
+                ) meta [Url = fetch_url],
+        result =
+            if response[HasError] then
+                ErrorLog(
+                    "Error response of the http request",
+                    SPSResult(
+                        response[Error],
+                        FetchInfo(
+                            ErrorStatus, response[Error][Message], _start_time, 0, true, Value.Metadata(
+                                response
+                            )[Url]
+                        )
+                    )
+                )
+            else
+                SPSResult(
+                    response[Value],
+                    FetchInfo(
+                        SuccessStatus,
+                        "Data fetch succeeded",
+                        _start_time,
+                        Table.RowCount(response[Value]),
+                        false,
+                        Value.Metadata(response)[Url]
+                    )
+                )
     in
-        response;
+        result;
 
 shared Authenticate = (url as text, credentials as record, optional mocks as nullable record) as table =>
     let
@@ -47,19 +84,17 @@ shared Authenticate = (url as text, credentials as record, optional mocks as nul
             else
                 Request.Generate(url, Request.GetAuthParameters(encodedCredentails))
     in
-        response;
+        RaiseErrorOrReturn(response);
 
 shared FetchData = (url as text, session_id as text, optional mocks as nullable record) as table =>
     let
         response =
             if IsMocked(mocks, "FetchResponse") then
-                Request.Generate(
-                    url, Request.GetDefaultParameters("audit/sessions", session_id), [Response = mocks[FetchResponse]]
-                )
+                Request.Generate(url, Request.GetDefaultParameters(session_id), [Response = mocks[FetchResponse]])
             else
-                Request.Generate(url, Request.GetDefaultParameters("audit/sessions", session_id))
+                Request.Generate(url, Request.GetDefaultParameters(session_id))
     in
-        response;
+        RaiseErrorOrReturn(response);
 
 SafeguardSessions = [
     Authentication = [
@@ -108,11 +143,21 @@ shared Extension.ImportModule = (name as text) =>
 shared Extension.ImportFunction = (function_name as text, module_name as text) =>
     Record.Field(Extension.ImportModule(module_name), function_name);
 
-IsMocked = Extension.ImportFunction("IsMocked", "Utils.pqm");
+Utils = Extension.ImportModule("Utils.pqm");
+
+IsMocked = Utils[IsMocked];
+FetchInfo = Utils[FetchInfo];
+SPSResult = Utils[SPSResult];
+SuccessStatus = Utils[SuccessStatus];
+ErrorStatus = Utils[ErrorStatus];
+ErrorLog = Utils[ErrorLog];
+
 BaseAuthentication = Extension.ImportModule("BaseAuthentication.pqm");
 
 BaseAuthentication.EncodeCredentials = BaseAuthentication[EncodeCredentials];
 BaseAuthentication.MineSessionIdFromCookie = BaseAuthentication[MineSessionIdFromCookie];
+
+RaiseErrorOrReturn = Extension.ImportFunction("RaiseErrorOrReturn", "CustomErrors.pqm");
 
 Request = Extension.ImportModule("Request.pqm");
 
