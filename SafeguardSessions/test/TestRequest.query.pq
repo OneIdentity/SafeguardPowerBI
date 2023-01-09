@@ -51,8 +51,8 @@ TestRequestGeneration = () =>
         expected_meta = [Content.Type = "application/json", Response.Status = 200],
         response = Request.Generate("dummy_url", [], [Response = fakeresponse]),
         facts = {
-            Fact("Response body as table is correct", expected_body, response[Data]),
-            Fact("Response meta is correct", expected_meta, response[RequestMetaData])
+            Fact("Response body as table is correct", expected_body, response),
+            Fact("Response meta is correct", expected_meta, Value.Metadata(response))
         }
     in
         facts;

@@ -28,7 +28,7 @@ let
             ]
         in
             parameters,
-    Request.Generate = (url as text, parameters as record, optional mocks as record) as record =>
+    Request.Generate = (url as text, parameters as record, optional mocks as record) as table =>
         let
             requestUrl = InfoLog("Base url of the http request", url),
             requestParameters = InfoLog("Request parameters of the http request", parameters),
@@ -37,10 +37,7 @@ let
             _json = InfoLog("Response data of the http request", Json.Document((response))),
             _table = Table.FromRecords({_json})
         in
-            [
-                Data = _table,
-                RequestMetaData = _meta
-            ],
+            Value.ReplaceMetadata(_table, _meta),
     Request.GetHeader = (requestMetaData as record, headerName as text) as text =>
         Record.Field(requestMetaData[Headers], headerName)
 in

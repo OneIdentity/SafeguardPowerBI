@@ -5,7 +5,7 @@ let
             encodedCredentials = Binary.ToText(Text.ToBinary(combinedCredentials), BinaryEncoding.Base64)
         in
             encodedCredentials,
-    BaseAuthentication.GetSessionId = (cookieHeader as text) as text =>
+    BaseAuthentication.MineSessionIdFromCookie = (cookieHeader as text) as text =>
         let
             // The M language handles fields in the Cookie header as a string by concatenating them with a comma. If
             // you would like tu use the "raw" extracted cookie header in a request, M will split the header string by
@@ -24,5 +24,5 @@ let
 in
     [
         EncodeCredentials = BaseAuthentication.EncodeCredentials,
-        GetSessionId = BaseAuthentication.GetSessionId
+        MineSessionIdFromCookie = BaseAuthentication.MineSessionIdFromCookie
     ]
