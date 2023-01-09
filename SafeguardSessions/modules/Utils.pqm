@@ -1,7 +1,13 @@
 let
     Utils.IsMocked = (mocks as nullable record, field as text) as logical =>
         mocks <> null and Record.HasFields(mocks, field),
-    Utils.LogWrapper = (logLevel as number, prefix as text, value as any, optional delayed) =>
+    Utils.LogWrapper = (
+        logLevel as number,
+        prefix as text,
+        value as any,
+        optional delayed as nullable logical,
+        optional isTesting as nullable logical
+    ) =>
         let
             //From Microsoft TripPin 8-Diagnostics tutorial
             //Source: https://github.com/microsoft/DataConnectors/blob/master/samples/TripPin/8-Diagnostics/Diagnostics.pqm
@@ -192,11 +198,22 @@ let
                 in
                     try Serialize(value) otherwise "<serialization failed>"
         in
-            Diagnostics.Trace(
-                logLevel, prefix & ": " & (try _valueToText(value) otherwise "<error getting value>"), value, delayed
-            ),
-    Utils.InfoLog = (prefix as text, value as any, optional delayed) =>
-        Utils.LogWrapper(TraceLevel.Information, prefix, value, delayed)
+            if isTesting = null or isTesting = false then
+                Diagnostics.Trace(
+                    logLevel, prefix & ": " & (try _valueToText(value) otherwise "<error getting value>"), value,
+                    delayed
+                )
+            else
+                [
+                    LogLevel = logLevel,
+                    Output = prefix & ": " & (try _valueToText(value) otherwise "<error getting value>"),
+                    Value = value,
+                    Delayed = delayed
+                ],
+    Utils.InfoLog = (
+        prefix as text, value as any, optional delayed as nullable logical, optional isTesting as nullable logical
+    ) =>
+        Utils.LogWrapper(TraceLevel.Information, prefix, value, delayed, isTesting)
 in
     [
         IsMocked = Utils.IsMocked,

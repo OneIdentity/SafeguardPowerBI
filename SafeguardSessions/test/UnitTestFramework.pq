@@ -3,7 +3,7 @@
 // https://learn.microsoft.com/en-us/power-query/handlingunittesting
 // Version 1.0.0 was exactly the same as Microsoft's framework. Above this version number,
 // it includes our changes and additions
-[Version = "1.1.0"]
+[Version = "1.2.0"]
 section UnitTestFrameork;
 
 shared Fact = (_subject as text, _expected, _actual) as record =>
@@ -47,14 +47,14 @@ shared Facts.Summarize = (_facts as list) as table =>
             Details = Text.Format("#{0}% success rate", {rate})
         ],
         report = Table.FromRecords(List.Combine({{header}, simplifiedFactsList})),
-        _simplifyFactsList = (simplifiedFactsList as list) as list =>
+        _simplifyFactsList = (facts as list) as list =>
             let
                 simplifiedList = List.Accumulate(
-                    _facts,
+                    facts,
                     {},
                     (state, current) =>
                         if Value.Is(current, type list) = true then
-                            List.Combine({state, current})
+                            List.Combine({state, @_simplifyFactsList(current)})
                         else
                             List.Combine({state, {current}})
                 )
@@ -264,6 +264,17 @@ shared TestErrorIsRaised = (err as record, reason as text, message as text, deta
             Fact("Reason is correct", reason, err[Error][Reason]),
             Fact("Message is correct", message, err[Error][Message]),
             Fact("Detail is correct", detail, err[Error][Detail])
+        }
+    in
+        facts;
+
+shared TestLogging = (logValues as record, expectedLogValues as record, inputType as text) as list =>
+    let
+        facts = {
+            Fact("Log level is correct with " &  inputType & " input type", logValues[LogLevel], expectedLogValues[LogLevel]),
+            {Fact("Output is correct with " &  inputType & " input type", logValues[Output], expectedLogValues[Output])},
+            Fact("Value is correct with " &  inputType & " input type", logValues[Value], expectedLogValues[Value]),
+            Fact("Delayed is correct with " &  inputType & " input type", logValues[Delayed], expectedLogValues[Delayed])
         }
     in
         facts;
