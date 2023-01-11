@@ -36,7 +36,7 @@ shared GetData = (url as text, credentials as record, optional mocks as record) 
     in
         response;
 
-shared Authenticate = (url as text, credentials as record, optional mocks as record) as table =>
+shared Authenticate = (url as text, credentials as record, optional mocks as nullable record) as table =>
     let
         encodedCredentails = BaseAuthentication.EncodeCredentials(credentials[Username], credentials[Password]),
         response =
@@ -49,7 +49,7 @@ shared Authenticate = (url as text, credentials as record, optional mocks as rec
     in
         response;
 
-shared FetchData = (url as text, session_id as text, mocks as record) as table =>
+shared FetchData = (url as text, session_id as text, optional mocks as nullable record) as table =>
     let
         response =
             if IsMocked(mocks, "FetchResponse") then
