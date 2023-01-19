@@ -1,6 +1,6 @@
 let
     IsMocked = Extension.ImportFunction("IsMocked", "Utils.pqm"),
-    InfoLog = Extension.ImportFunction("InfoLog", "Utils.pqm"),
+    InfoLog = Extension.ImportFunction("InfoLog", "Logger.pqm"),
     ErrorCodes = Extension.ImportFunction("ErrorCodes", "CustomErrors.pqm"),
     Request.GetAuthParameters = (encodedCredentails as text) as record =>
         let
