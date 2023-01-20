@@ -3,8 +3,8 @@
 // https://learn.microsoft.com/en-us/power-query/handlingunittesting
 // Version 1.0.0 was exactly the same as Microsoft's framework. Above this version number,
 // it includes our changes and additions
-[Version = "1.2.0"]
-section UnitTestFrameork;
+[Version = "1.4.0"]
+section UnitTestFramework;
 
 shared Fact = (_subject as text, _expected, _actual) as record =>
     [
@@ -245,7 +245,7 @@ ValueToText = (value, optional depth) =>
     in
         try Serialize(value) otherwise "<serialization failed>";
 
-shared FakeResponse = (body as text, optional metadata as record) =>
+shared FakeResponse = (body as text, optional metadata as record) as binary =>
     let
         response = Text.ToBinary(body),
         response_with_meta = Value.ReplaceMetadata(
@@ -257,7 +257,7 @@ shared FakeResponse = (body as text, optional metadata as record) =>
     in
         response_with_meta;
 
-shared TestErrorIsRaised = (err as record, reason as text, message as text, detail as text) as list =>
+shared TestErrorIsRaised = (err as record, reason as text, message as text, detail as anynonnull) as list =>
     let
         facts = {
             Fact("Error is raised", true, err[HasError]),
@@ -271,10 +271,32 @@ shared TestErrorIsRaised = (err as record, reason as text, message as text, deta
 shared TestLogging = (logValues as record, expectedLogValues as record, inputType as text) as list =>
     let
         facts = {
-            Fact("Log level is correct with " &  inputType & " input type", logValues[LogLevel], expectedLogValues[LogLevel]),
-            {Fact("Output is correct with " &  inputType & " input type", logValues[Output], expectedLogValues[Output])},
-            Fact("Value is correct with " &  inputType & " input type", logValues[Value], expectedLogValues[Value]),
-            Fact("Delayed is correct with " &  inputType & " input type", logValues[Delayed], expectedLogValues[Delayed])
+            Fact(
+                "Log level is correct with " & inputType & " input type",
+                logValues[LogLevel],
+                expectedLogValues[LogLevel]
+            ),
+            {Fact("Output is correct with " & inputType & " input type", logValues[Output], expectedLogValues[Output])},
+            Fact("Value is correct with " & inputType & " input type", logValues[Value], expectedLogValues[Value]),
+            Fact(
+                "Delayed is correct with " & inputType & " input type", logValues[Delayed], expectedLogValues[
+                    Delayed
+                ]
+            )
+        }
+    in
+        facts;
+
+shared ProvideDataForTest = (data as list, func as function) => List.Transform(data, each Function.Invoke(func, _));
+
+shared TestFetchInfoContentWithoutStartTime = (expected_info as table, actual_info as table) =>
+    let
+        facts = {
+            Fact("Status matches", List.First(expected_info[Status]), List.First(actual_info[Status])),
+            Fact("Message matches", List.First(expected_info[Message]), List.First(actual_info[Message])),
+            Fact("Count matches", List.First(expected_info[Count]), List.First(actual_info[Count])),
+            Fact("Failed matches", List.First(expected_info[Failed]), List.First(actual_info[Failed])),
+            Fact("URL matches", List.First(expected_info[Url]), List.First(actual_info[Url]))
         }
     in
         facts;

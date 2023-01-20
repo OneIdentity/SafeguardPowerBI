@@ -213,9 +213,35 @@ let
     Utils.InfoLog = (
         prefix as text, value as any, optional delayed as nullable logical, optional isTesting as nullable logical
     ) =>
-        Utils.LogWrapper(TraceLevel.Information, prefix, value, delayed, isTesting)
+        Utils.LogWrapper(TraceLevel.Information, prefix, value, delayed, isTesting),
+    Utils.ErrorLog = (
+        prefix as text, value as any, optional delayed as nullable logical, optional isTesting as nullable logical
+    ) =>
+        Utils.LogWrapper(TraceLevel.Error, prefix, value, delayed, isTesting),
+    Utils.FetchInfo = (
+        status as text, message as text, start as nullable datetime, count as number, failed as logical, url as text
+    ) as table =>
+        Table.FromRecords(
+            {[
+                Start = start,
+                Url = url,
+                Status = status,
+                Count = count,
+                Message = message,
+                Failed = failed
+            ]}
+        ),
+    Utils.SPSResult = (session_data as anynonnull, additional_info as table) =>
+        [SessionData = session_data, FetchInfo = additional_info],
+    Utils.SuccessStatus = "Success",
+    Utils.ErrorStatus = "Error"
 in
     [
         IsMocked = Utils.IsMocked,
-        InfoLog = Utils.InfoLog
+        InfoLog = Utils.InfoLog,
+        ErrorLog = Utils.ErrorLog,
+        FetchInfo = Utils.FetchInfo,
+        SPSResult = Utils.SPSResult,
+        SuccessStatus = Utils.SuccessStatus,
+        ErrorStatus = Utils.ErrorStatus
     ]

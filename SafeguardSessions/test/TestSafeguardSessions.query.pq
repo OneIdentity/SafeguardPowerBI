@@ -1,6 +1,17 @@
 section TestSafeguardSessions;
 
-TestGetData = () =>
+FetchInfo = Extension.ImportFunction("FetchInfo", "Utils.pqm");
+
+TestResultsContentWithoutStartTime = (response as record, expected_data as any, expected_info as table) =>
+    let
+        facts = {
+            Fact("Data content of response matches", expected_data, response[SessionData]),
+            TestFetchInfoContentWithoutStartTime(expected_info, response[FetchInfo])
+        }
+    in
+        facts;
+
+TestGetDataWithoutError = () =>
     let
         fake_auth_response = FakeResponse(
             "{}",
@@ -12,8 +23,10 @@ TestGetData = () =>
             ]
         ),
         fake_response = FakeResponse("{""dummy_field"": ""value"", ""dummy_list"": [0, 1, 2]}"),
-        expected_body = #table(type table [dummy_field = any, dummy_list = any], {{"value", {0, 1, 2}}}),
-        expected_meta = [Content.Type = "application/json", Response.Status = 200],
+        expected_data = #table(type table [dummy_field = any, dummy_list = any], {{"value", {0, 1, 2}}}),
+        expected_info = FetchInfo(
+            "Success", "Data fetch succeeded", null, 1, false, "http://dummy_url/audit/sessions"
+        ),
         response = GetData(
             "dummy_url",
             [
@@ -24,15 +37,71 @@ TestGetData = () =>
                 AuthResponse = fake_auth_response,
                 FetchResponse = fake_response
             ]
-        ),
-        facts = {
-            Fact("Reponse data is correct", expected_body, response),
-            Fact("Reponse meta is correct", expected_meta, Value.Metadata(response))
-        }
+        )
     in
-        facts;
+        TestResultsContentWithoutStartTime(response, expected_data, expected_info);
 
-TestAuthenticate = () =>
+TestGetDataHandlesAuthenticationError = () =>
+    let
+        fake_auth_response = FakeResponse("{""error"": ""value""}", [
+            Response.Status = 401
+        ]),
+        expected_data = [
+            Reason = "Authentication Error",
+            Message = "Something went wrong while authenticating",
+            Detail = #table(type table [#"error" = any], {{"value"}}),
+            Message.Format = null,
+            Message.Parameters = null
+        ],
+        expected_info = FetchInfo(
+            "Error", "Something went wrong while authenticating", null, 0, true, "http://dummy_url/authentication"
+        ),
+        response = GetData("dummy_url", [
+            Username = "dummy",
+            Password = "pwd"
+        ], [
+            AuthResponse = fake_auth_response
+        ])
+    in
+        TestResultsContentWithoutStartTime(response, expected_data, expected_info);
+
+TestGetDataHandlesBadRequest = () =>
+    let
+        fake_auth_response = FakeResponse(
+            "{}",
+            [
+                Response.Status = 200,
+                Headers = [
+                    #"Set-Cookie" = "session_id=e8e5f0a0d3367043150187f81df3484e91e365d5; expires=Sat, 03 Dec 2022 02:27:48 GMT; HttpOnly; Max-Age=43200; Path=/; Secure"
+                ]
+            ]
+        ),
+        fake_response = FakeResponse("{""error"": ""value""}", [Response.Status = 500]),
+        expected_data = [
+            Reason = "General Error",
+            Message = "SPS responded with server error",
+            Detail = #table(type table [#"error" = any], {{"value"}}),
+            Message.Format = null,
+            Message.Parameters = null
+        ],
+        expected_info = FetchInfo(
+            "Error", "SPS responded with server error", null, 0, true, "http://dummy_url/audit/sessions"
+        ),
+        response = GetData(
+            "dummy_url",
+            [
+                Username = "dummy",
+                Password = "pwd"
+            ],
+            [
+                AuthResponse = fake_auth_response,
+                FetchResponse = fake_response
+            ]
+        )
+    in
+        TestResultsContentWithoutStartTime(response, expected_data, expected_info);
+
+TestAuthenticateIsSuccessful = () =>
     let
         fake_auth_response = FakeResponse(
             "{}",
@@ -67,24 +136,99 @@ TestAuthenticate = () =>
     in
         facts;
 
-TestFetchData = () =>
+TestAuthenticationRaisesErrorForStatusCode = (
+    status_code as number, expected_reason as text, expected_message as text
+) =>
     let
-        fake_response = FakeResponse("{""dummy_field"": ""value"", ""dummy_list"": [0, 1, 2]}", []),
-        response = FetchData("dummy_url", "e8e5f0a0d3367043150187f81df3484e91e365d5", [
-            FetchResponse = fake_response
+        fake_auth_response = FakeResponse("{""error"": ""reason""}", [
+            Response.Status = status_code
         ]),
+        facts = TestErrorIsRaised(
+            try
+                Authenticate(
+                    "dummy_url", [
+                        Username = "dummy",
+                        Password = "pwd"
+                    ], [
+                        AuthResponse = fake_auth_response
+                    ]
+                ),
+            expected_reason,
+            expected_message,
+            #table(type table [#"error" = any], {{"reason"}})
+        )
+    in
+        facts;
+
+TestAuthenticateRaisesError = () =>
+    let
+        cases = {
+            {401, "Authentication Error", "Something went wrong while authenticating"},
+            {500, "General Error", "SPS responded with server error"}
+        },
+        facts = ProvideDataForTest(cases, TestAuthenticationRaisesErrorForStatusCode)
+    in
+        facts;
+
+TestFetchDataIsSuccessful = () =>
+    let
+        fake_response = FakeResponse(
+            "{""dummy_field"": ""value"", ""dummy_list"": [0, 1, 2]}", [Response.Status = 200]
+        ),
+        response = FetchData(
+            "dummy_url", "e8e5f0a0d3367043150187f81df3484e91e365d5", [
+                FetchResponse = fake_response
+            ]
+        ),
         facts = {
             Fact(
                 "Data fetch response is correct",
                 #table(type table [dummy_field = any, dummy_list = any], {{"value", {0, 1, 2}}}),
                 response
             ),
-            Fact("Test data fetch meta is correct", [], Value.Metadata(response))
+            Fact("Test data fetch meta is correct", [Response.Status = 200], Value.Metadata(response))
         }
     in
         facts;
 
+TestFetchDataRaisesErrorForStatusCode = (status_code as number, expected_reason as text, expected_message as text) =>
+    let
+        fake_response = FakeResponse("{""error"": ""reason""}", [
+            Response.Status = status_code
+        ]),
+        facts = TestErrorIsRaised(
+            try FetchData("dummy_url", "e8e5f0a0d3367043150187f81df3484e91e365d5", [
+                FetchResponse = fake_response
+            ]),
+            expected_reason,
+            expected_message,
+            #table(type table [#"error" = any], {{"reason"}})
+        )
+    in
+        facts;
+
+TestFetchDataRaisesError = () =>
+    let
+        cases = {
+            {400, "Bad Request", "SPS interpreted a malformed request"},
+            {401, "Authentication Error", "Something went wrong while authenticating"},
+            {404, "Not Found", "The requested resource cannot be found"},
+            {429, "Snapshot Quota Error", "Snapshot quota exceeded"},
+            {500, "General Error", "SPS responded with server error"}
+        },
+        facts = ProvideDataForTest(cases, TestFetchDataRaisesErrorForStatusCode)
+    in
+        facts;
+
 shared TestSafeguardSessions.UnitTest = [
-    facts = {TestGetData(), TestAuthenticate(), TestFetchData()},
+    facts = {
+        TestGetDataWithoutError(),
+        TestGetDataHandlesAuthenticationError(),
+        TestGetDataHandlesBadRequest(),
+        TestAuthenticateIsSuccessful(),
+        TestAuthenticateRaisesError(),
+        TestFetchDataIsSuccessful(),
+        TestFetchDataRaisesError()
+    },
     report = Facts.Summarize(facts)
 ][report];
