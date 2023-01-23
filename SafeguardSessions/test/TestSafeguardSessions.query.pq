@@ -25,7 +25,7 @@ TestGetDataWithoutError = () =>
         fake_response = FakeResponse("{""dummy_field"": ""value"", ""dummy_list"": [0, 1, 2]}"),
         expected_data = #table(type table [dummy_field = any, dummy_list = any], {{"value", {0, 1, 2}}}),
         expected_info = FetchInfo(
-            "Success", "Data fetch succeeded", null, 1, false, "http://dummy_url/audit/sessions"
+            "Success", "Data fetch succeeded", null, 1, false, "https://dummy_url/api/audit/sessions"
         ),
         response = GetData(
             "dummy_url",
@@ -54,7 +54,7 @@ TestGetDataHandlesAuthenticationError = () =>
             Message.Parameters = null
         ],
         expected_info = FetchInfo(
-            "Error", "Something went wrong while authenticating", null, 0, true, "http://dummy_url/authentication"
+            "Error", "Something went wrong while authenticating", null, 0, true, "https://dummy_url/api/authentication"
         ),
         response = GetData("dummy_url", [
             Username = "dummy",
@@ -85,7 +85,7 @@ TestGetDataHandlesBadRequest = () =>
             Message.Parameters = null
         ],
         expected_info = FetchInfo(
-            "Error", "SPS responded with server error", null, 0, true, "http://dummy_url/audit/sessions"
+            "Error", "SPS responded with server error", null, 0, true, "https://dummy_url/api/audit/sessions"
         ),
         response = GetData(
             "dummy_url",

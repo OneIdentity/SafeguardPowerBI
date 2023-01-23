@@ -20,14 +20,14 @@ ContentsType = type function (
 
 ContentsImpl = (sps_ip as text) =>
     let
-        url = Uri.Combine(Text.Combine({"https://", sps_ip}), "api"),
-        data = GetData(url, Extension.CurrentCredential())
+        data = GetData(sps_ip, Extension.CurrentCredential())
     in
         data;
 
-shared GetData = (base_url as text, credentials as record, optional mocks as record) =>
+shared GetData = (sps_ip as text, credentials as record, optional mocks as record) =>
     let
         _start_time = DateTime.LocalNow(),
+        base_url = Uri.Combine(Text.Combine({"https://", sps_ip}), "api/"),
         auth_url = Uri.Combine(base_url, "authentication"),
         fetch_url = Uri.Combine(base_url, "audit/sessions"),
         authResponse = (try Authenticate(auth_url, credentials, mocks)) meta [Url = auth_url],
