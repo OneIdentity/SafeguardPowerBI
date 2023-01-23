@@ -37,7 +37,8 @@ shared TestRequest.UnitTest = [
                     #"Accept" = "*/*",
                     #"Connection" = "keep-alive",
                     #"Cache-Control" = "no-cache, no-store, must-revalidate"
-                ]
+                ],
+                IsRetry = true
             ],
             Request.GetAuthParameters("YWxtYTpzemlsdmE=")
         ),
