@@ -136,7 +136,7 @@ TestAuthenticateIsSuccessful = () =>
     in
         facts;
 
-TestAuthenticationRaisesErrorForStatusCode = (
+TestAuthenticateRaisesErrorForStatusCode = (
     status_code as number, expected_reason as text, expected_message as text
 ) =>
     let
@@ -164,9 +164,10 @@ TestAuthenticateRaisesError = () =>
     let
         cases = {
             {401, "Authentication Error", "Something went wrong while authenticating"},
+            {403, "Authorization Error", "Not authorized to access the given resource"},
             {500, "General Error", "SPS responded with server error"}
         },
-        facts = ProvideDataForTest(cases, TestAuthenticationRaisesErrorForStatusCode)
+        facts = ProvideDataForTest(cases, TestAuthenticateRaisesErrorForStatusCode)
     in
         facts;
 
@@ -212,6 +213,7 @@ TestFetchDataRaisesError = () =>
         cases = {
             {400, "Bad Request", "SPS interpreted a malformed request"},
             {401, "Authentication Error", "Something went wrong while authenticating"},
+            {403, "Authorization Error", "Not authorized to access the given resource"},
             {404, "Not Found", "The requested resource cannot be found"},
             {429, "Snapshot Quota Error", "Snapshot quota exceeded"},
             {500, "General Error", "SPS responded with server error"}

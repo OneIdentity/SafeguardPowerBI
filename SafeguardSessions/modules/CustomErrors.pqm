@@ -28,6 +28,8 @@ let
         CustomErrors.ErrorBase("Bad Request", "SPS interpreted a malformed request", detail),
     CustomErrors.AuthenticationError = (detail as anynonnull) =>
         CustomErrors.ErrorBase("Authentication Error", "Something went wrong while authenticating", detail),
+    CustomErrors.AuthorizationError = (detail as anynonnull) =>
+        CustomErrors.ErrorBase("Authorization Error", "Not authorized to access the given resource", detail),
     CustomErrors.NotFound = (detail as anynonnull) =>
         CustomErrors.ErrorBase("Not Found", "The requested resource cannot be found", detail),
     CustomErrors.SnapshotQuotaError = (detail as anynonnull) =>
@@ -37,6 +39,7 @@ let
     CustomErrors.ErrorMap = [
         400 = CustomErrors.BadRequest,
         401 = CustomErrors.AuthenticationError,
+        403 = CustomErrors.AuthorizationError,
         404 = CustomErrors.NotFound,
         429 = CustomErrors.SnapshotQuotaError,
         500 = CustomErrors.GeneralError
