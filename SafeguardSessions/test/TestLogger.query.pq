@@ -97,11 +97,11 @@ TestErrorLogWithSPSResultInput = () =>
         ],
         expectedLogValues = [
             LogLevel = TraceLevel.Error,
-            Output = "error: [ SessionData = ""error"", FetchInfo = #table( type table [Start = any, Query = any, Status = any, Count = any, Message = any, Failed = any] , {{#datetime(2023, 1, 18, 9, 47, 55), ""query"", ""status"", 42, ""message"", true} } )  ] ",
+            Output = "error: [ SessionData = ""error"", FetchInfo = #table( type table [Start = any, Url = any, Status = any, Count = any, Message = any, Failed = any] , {{#datetime(2023, 1, 18, 9, 47, 55), ""query"", ""status"", 42, ""message"", true} } )  ] ",
             Value = [
                 SessionData = "error",
                 FetchInfo = #table(
-                    type table [Start = any, Query = any, Status = any, Count = any, Message = any, Failed = any],
+                    type table [Start = any, Url = any, Status = any, Count = any, Message = any, Failed = any],
                     {{#datetime(2023, 1, 18, 9, 47, 55), "query", "status", 42, "message", true}}
                 )
             ],
