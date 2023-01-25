@@ -52,7 +52,7 @@ TestRaiseErrorOrReturnFallbackIsWorking = () =>
 
 TestErrorCodeListIsCorrect = () =>
     let
-        expected_error_code_list = {400, 401, 404, 429, 500},
+        expected_error_code_list = {400, 401, 403, 404, 429, 500},
         fact = Fact("Error code list is correct", expected_error_code_list, ErrorCodes)
     in
         fact;

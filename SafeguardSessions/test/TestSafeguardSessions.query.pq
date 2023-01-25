@@ -25,7 +25,7 @@ TestGetDataWithoutError = () =>
         fake_response = FakeResponse("{""dummy_field"": ""value"", ""dummy_list"": [0, 1, 2]}"),
         expected_data = #table(type table [dummy_field = any, dummy_list = any], {{"value", {0, 1, 2}}}),
         expected_info = FetchInfo(
-            "Success", "Data fetch succeeded", null, 1, false, "http://dummy_url/audit/sessions"
+            "Success", "Data fetch succeeded", null, 1, false, "https://dummy_url/api/audit/sessions"
         ),
         response = GetData(
             "dummy_url",
@@ -54,7 +54,7 @@ TestGetDataHandlesAuthenticationError = () =>
             Message.Parameters = null
         ],
         expected_info = FetchInfo(
-            "Error", "Something went wrong while authenticating", null, 0, true, "http://dummy_url/authentication"
+            "Error", "Something went wrong while authenticating", null, 0, true, "https://dummy_url/api/authentication"
         ),
         response = GetData("dummy_url", [
             Username = "dummy",
@@ -85,7 +85,7 @@ TestGetDataHandlesBadRequest = () =>
             Message.Parameters = null
         ],
         expected_info = FetchInfo(
-            "Error", "SPS responded with server error", null, 0, true, "http://dummy_url/audit/sessions"
+            "Error", "SPS responded with server error", null, 0, true, "https://dummy_url/api/audit/sessions"
         ),
         response = GetData(
             "dummy_url",
@@ -136,7 +136,7 @@ TestAuthenticateIsSuccessful = () =>
     in
         facts;
 
-TestAuthenticationRaisesErrorForStatusCode = (
+TestAuthenticateRaisesErrorForStatusCode = (
     status_code as number, expected_reason as text, expected_message as text
 ) =>
     let
@@ -164,9 +164,10 @@ TestAuthenticateRaisesError = () =>
     let
         cases = {
             {401, "Authentication Error", "Something went wrong while authenticating"},
+            {403, "Authorization Error", "Not authorized to access the given resource"},
             {500, "General Error", "SPS responded with server error"}
         },
-        facts = ProvideDataForTest(cases, TestAuthenticationRaisesErrorForStatusCode)
+        facts = ProvideDataForTest(cases, TestAuthenticateRaisesErrorForStatusCode)
     in
         facts;
 
@@ -212,6 +213,7 @@ TestFetchDataRaisesError = () =>
         cases = {
             {400, "Bad Request", "SPS interpreted a malformed request"},
             {401, "Authentication Error", "Something went wrong while authenticating"},
+            {403, "Authorization Error", "Not authorized to access the given resource"},
             {404, "Not Found", "The requested resource cannot be found"},
             {429, "Snapshot Quota Error", "Snapshot quota exceeded"},
             {500, "General Error", "SPS responded with server error"}
