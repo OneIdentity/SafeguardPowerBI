@@ -49,12 +49,13 @@ TestGetDataHandlesAuthenticationError = () =>
         expected_data = [
             Reason = "Authentication Error",
             Message = "Something went wrong while authenticating",
-            Detail = #table(type table [#"error" = any], {{"value"}}),
+            Detail = [#"error" = "value"],
             Message.Format = null,
             Message.Parameters = null
         ],
         expected_info = FetchInfo(
-            "Error", "Something went wrong while authenticating", null, 0, true, "https://dummy_url/api/authentication"
+            "Error", "Something went wrong while authenticating", null, 0, true,
+            "https://dummy_url/api/authentication"
         ),
         response = GetData("dummy_url", [
             Username = "dummy",
@@ -80,7 +81,7 @@ TestGetDataHandlesBadRequest = () =>
         expected_data = [
             Reason = "General Error",
             Message = "SPS responded with server error",
-            Detail = #table(type table [#"error" = any], {{"value"}}),
+            Detail = [#"error" = "value"],
             Message.Format = null,
             Message.Parameters = null
         ],
@@ -121,7 +122,7 @@ TestAuthenticateIsSuccessful = () =>
             ]
         ),
         facts = {
-            Fact("Authentication response data correct", #table(type table, {{}}), response),
+            Fact("Authentication response data correct", [], response),
             Fact(
                 "Authentication response meta is correct",
                 [
@@ -136,9 +137,7 @@ TestAuthenticateIsSuccessful = () =>
     in
         facts;
 
-TestAuthenticateRaisesErrorForStatusCode = (
-    status_code as number, expected_reason as text, expected_message as text
-) =>
+TestAuthenticateRaisesErrorForStatusCode = (status_code as number, expected_reason as text, expected_message as text) =>
     let
         fake_auth_response = FakeResponse("{""error"": ""reason""}", [
             Response.Status = status_code
@@ -155,7 +154,9 @@ TestAuthenticateRaisesErrorForStatusCode = (
                 ),
             expected_reason,
             expected_message,
-            #table(type table [#"error" = any], {{"reason"}})
+            [
+                #"error" = "reason"
+            ]
         )
     in
         facts;
@@ -182,11 +183,7 @@ TestFetchDataIsSuccessful = () =>
             ]
         ),
         facts = {
-            Fact(
-                "Data fetch response is correct",
-                #table(type table [dummy_field = any, dummy_list = any], {{"value", {0, 1, 2}}}),
-                response
-            ),
+            Fact("Data fetch response is correct", [dummy_field = "value", dummy_list = {0, 1, 2}], response),
             Fact("Test data fetch meta is correct", [Response.Status = 200], Value.Metadata(response))
         }
     in
@@ -203,7 +200,9 @@ TestFetchDataRaisesErrorForStatusCode = (status_code as number, expected_reason 
             ]),
             expected_reason,
             expected_message,
-            #table(type table [#"error" = any], {{"reason"}})
+            [
+                #"error" = "reason"
+            ]
         )
     in
         facts;

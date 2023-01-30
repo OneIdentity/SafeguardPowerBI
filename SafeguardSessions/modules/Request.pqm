@@ -28,7 +28,7 @@ let
             ]
         in
             parameters,
-    Request.Generate = (url as text, parameters as record, optional mocks as record) as table =>
+    Request.Generate = (url as text, parameters as record, optional mocks as record) as record =>
         let
             requestUrl = InfoLog("Base url of the http request", url),
             requestParameters = InfoLog("Request parameters of the http request", parameters),
@@ -36,12 +36,11 @@ let
                 if IsMocked(mocks, "Response") then
                     mocks[Response]
                 else
-                    Web.Contents(url, Record.AddField(parameters, "ManualStatusHandling", ErrorCodes)),
+                    Web.Contents(url, parameters & [ManualStatusHandling = ErrorCodes]),
             _meta = InfoLog("Response meta data of the http request", Value.Metadata(response)),
-            _json = InfoLog("Response data of the http request", Json.Document((response))),
-            _table = Table.FromRecords({_json})
+            _json = InfoLog("Response data of the http request", Json.Document((response)))
         in
-            Value.ReplaceMetadata(_table, _meta),
+            Value.ReplaceMetadata(_json, _meta),
     Request.GetHeader = (requestMetaData as record, headerName as text) as text =>
         Record.Field(requestMetaData[Headers], headerName)
 in
