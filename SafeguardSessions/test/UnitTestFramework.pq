@@ -3,7 +3,7 @@
 // https://learn.microsoft.com/en-us/power-query/handlingunittesting
 // Version 1.0.0 was exactly the same as Microsoft's framework. Above this version number,
 // it includes our changes and additions
-[Version = "1.4.0"]
+[Version = "1.4.1"]
 section UnitTestFramework;
 
 shared Fact = (_subject as text, _expected, _actual) as record =>
@@ -30,6 +30,7 @@ shared Facts = (_subject as text, _predicates as list) =>
 
 shared Facts.Summarize = (_facts as list) as table =>
     [
+        shortOutput = Text.Lower(Environment.FeatureSwitch("short", false)) = "true",
         simplifiedFactsList = _simplifyFactsList(_facts),
         Fact.CountSuccesses = (count, i) =>
             [
@@ -39,6 +40,10 @@ shared Facts.Summarize = (_facts as list) as table =>
         passed = List.Accumulate(simplifiedFactsList, 0, Fact.CountSuccesses),
         total = List.Count(simplifiedFactsList),
         format = if passed = total then "All #{0} Passed !!! ✓" else "#{0} Passed ☺  #{1} Failed ☹",
+        outputFactList = if shortOutput then
+            List.Select(simplifiedFactsList, each not Text.StartsWith([Result], "Success"))
+        else
+            simplifiedFactsList,
         result = if passed = total then "Success" else "⛔",
         rate = Number.IntegerDivide(100 * passed, total),
         header = [
@@ -46,7 +51,7 @@ shared Facts.Summarize = (_facts as list) as table =>
             Notes = Text.Format(format, {passed, total - passed}),
             Details = Text.Format("#{0}% success rate", {rate})
         ],
-        report = Table.FromRecords(List.Combine({{header}, simplifiedFactsList})),
+        report = Table.FromRecords(List.Combine({{header}, outputFactList})),
         _simplifyFactsList = (facts as list) as list =>
             let
                 simplifiedList = List.Accumulate(
