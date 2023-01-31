@@ -18,15 +18,11 @@ ContentsType = type function (
     Documentation.LongDescription = "Enter required paramters to be able to fetch data from SPS."
 ];
 
-ContentsImpl = (sps_ip as text) =>
-    let
-        data = GetData(sps_ip, Extension.CurrentCredential())
-    in
-        data;
+ContentsImpl = (sps_ip as text) => let data = GetData(sps_ip, Extension.CurrentCredential()) in data;
 
 shared GetData = (sps_ip as text, credentials as record, optional mocks as record) =>
     let
-        _start_time = DateTime.LocalNow(),
+        start_time = DateTimeZone.LocalNow(),
         base_url = Uri.Combine(Text.Combine({"https://", sps_ip}), "api/"),
         auth_url = Uri.Combine(base_url, "authentication"),
         fetch_url = Uri.Combine(base_url, "audit/sessions"),
@@ -45,35 +41,11 @@ shared GetData = (sps_ip as text, credentials as record, optional mocks as recor
                             mocks
                         )
                 ) meta [Url = fetch_url],
-        result =
-            if response[HasError] then
-                ErrorLog(
-                    "Error response of the http request",
-                    SPSResult(
-                        response[Error],
-                        FetchInfo(
-                            ErrorStatus, response[Error][Message], _start_time, 0, true, Value.Metadata(
-                                response
-                            )[Url]
-                        )
-                    )
-                )
-            else
-                SPSResult(
-                    response[Value],
-                    FetchInfo(
-                        SuccessStatus,
-                        "Data fetch succeeded",
-                        _start_time,
-                        Table.RowCount(response[Value]),
-                        false,
-                        Value.Metadata(response)[Url]
-                    )
-                )
+        result = BuildSPSResult(response, start_time)
     in
         result;
 
-shared Authenticate = (url as text, credentials as record, optional mocks as nullable record) as table =>
+shared Authenticate = (url as text, credentials as record, optional mocks as nullable record) as record =>
     let
         encodedCredentails = BaseAuthentication.EncodeCredentials(credentials[Username], credentials[Password]),
         response =
@@ -86,7 +58,7 @@ shared Authenticate = (url as text, credentials as record, optional mocks as nul
     in
         RaiseErrorOrReturn(response);
 
-shared FetchData = (url as text, session_id as text, optional mocks as nullable record) as table =>
+shared FetchData = (url as text, session_id as text, optional mocks as nullable record) as record =>
     let
         response =
             if IsMocked(mocks, "FetchResponse") then
@@ -146,11 +118,7 @@ shared Extension.ImportFunction = (function_name as text, module_name as text) =
 Utils = Extension.ImportModule("Utils.pqm");
 
 IsMocked = Utils[IsMocked];
-FetchInfo = Utils[FetchInfo];
-SPSResult = Utils[SPSResult];
-SuccessStatus = Utils[SuccessStatus];
-ErrorStatus = Utils[ErrorStatus];
-ErrorLog = Utils[ErrorLog];
+BuildSPSResult = Utils[BuildSPSResult];
 
 BaseAuthentication = Extension.ImportModule("BaseAuthentication.pqm");
 

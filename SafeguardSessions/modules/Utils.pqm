@@ -219,7 +219,7 @@ let
     ) =>
         Utils.LogWrapper(TraceLevel.Error, prefix, value, delayed, isTesting),
     Utils.FetchInfo = (
-        status as text, message as text, start as nullable datetime, count as number, failed as logical, url as text
+        status as text, message as text, start as nullable datetimezone, count as number, failed as logical, url as text
     ) as table =>
         Table.FromRecords(
             {[
@@ -234,14 +234,44 @@ let
     Utils.SPSResult = (session_data as anynonnull, additional_info as table) =>
         [SessionData = session_data, FetchInfo = additional_info],
     Utils.SuccessStatus = "Success",
-    Utils.ErrorStatus = "Error"
+    Utils.ErrorStatus = "Error",
+    Utils.BuildSPSResult = (response as record, start_time as datetimezone) =>
+        let
+            url = Value.Metadata(response)[Url],
+            spsresult =
+                if response[HasError] then
+                    Utils.ErrorLog(
+                        "Error response of the http request",
+                        Utils.SPSResult(
+                            response[Error],
+                            Utils.FetchInfo(Utils.ErrorStatus, response[Error][Message], start_time, 0, true, url)
+                        )
+                    )
+                else
+                    [
+                        sessions = Table.FromRecords({response[Value]}),
+                        result = Utils.SPSResult(
+                            sessions,
+                            Utils.FetchInfo(
+                                Utils.SuccessStatus,
+                                "Data fetch succeeded",
+                                start_time,
+                                Table.RowCount(sessions),
+                                false,
+                                url
+                            )
+                        )
+                    ][result]
+        in
+            spsresult
 in
     [
         IsMocked = Utils.IsMocked,
         InfoLog = Utils.InfoLog,
         ErrorLog = Utils.ErrorLog,
         FetchInfo = Utils.FetchInfo,
-        SPSResult = Utils.SPSResult,
         SuccessStatus = Utils.SuccessStatus,
-        ErrorStatus = Utils.ErrorStatus
+        ErrorStatus = Utils.ErrorStatus,
+        SPSResult = Utils.SPSResult,
+        BuildSPSResult = Utils.BuildSPSResult
     ]
