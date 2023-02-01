@@ -263,7 +263,19 @@ let
                         )
                     ][result]
         in
-            spsresult
+            spsresult,
+    Utils.TransformResponse = (response as record) as list =>
+        let
+            GetItems = (response) =>
+                let
+                    TransformOperation = (sessions_list as list) =>
+                        List.Transform(sessions_list, each [session_id = [key]] & [body])
+                in
+                    Record.TransformFields(response, {"items", TransformOperation})[items],
+            items = GetItems(response),
+            withMeta = Value.ReplaceMetadata(items, response[#"meta"])
+        in
+            withMeta
 in
     [
         IsMocked = Utils.IsMocked,
@@ -273,5 +285,6 @@ in
         SuccessStatus = Utils.SuccessStatus,
         ErrorStatus = Utils.ErrorStatus,
         SPSResult = Utils.SPSResult,
-        BuildSPSResult = Utils.BuildSPSResult
+        BuildSPSResult = Utils.BuildSPSResult,
+        TransformResponse = Utils.TransformResponse
     ]
