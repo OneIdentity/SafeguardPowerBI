@@ -235,16 +235,23 @@ let
         [SessionData = session_data, FetchInfo = additional_info],
     Utils.SuccessStatus = "Success",
     Utils.ErrorStatus = "Error",
+    Utils.NotAvailableStatus = "N/A",
     Utils.BuildSPSResult = (response as record, start_time as datetimezone) =>
         let
-            url = Value.Metadata(response)[Url],
             spsresult =
                 if response[HasError] then
                     Utils.ErrorLog(
                         "Error response of the http request",
                         Utils.SPSResult(
                             response[Error],
-                            Utils.FetchInfo(Utils.ErrorStatus, response[Error][Message], start_time, 0, true, url)
+                            Utils.FetchInfo(
+                                Utils.ErrorStatus,
+                                response[Error][Message],
+                                start_time,
+                                0,
+                                true,
+                                response[Error][Detail][RequestUrl]? ?? Utils.NotAvailableStatus
+                            )
                         )
                     )
                 else
@@ -258,7 +265,7 @@ let
                                 start_time,
                                 Table.RowCount(sessions),
                                 false,
-                                url
+                                Value.Metadata(response[Value])[RequestUrl]
                             )
                         )
                     ][result]
@@ -272,6 +279,7 @@ in
         FetchInfo = Utils.FetchInfo,
         SuccessStatus = Utils.SuccessStatus,
         ErrorStatus = Utils.ErrorStatus,
+        NotAvailableStatus = Utils.NotAvailableStatus,
         SPSResult = Utils.SPSResult,
         BuildSPSResult = Utils.BuildSPSResult
     ]

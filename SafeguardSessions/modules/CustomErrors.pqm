@@ -1,4 +1,5 @@
 let
+    NotAvailableStatus = Extension.ImportFunction("NotAvailableStatus", "Utils.pqm"),
     CustomErrors.ErrorBase = Value.ReplaceType(CustomErrors.ErrorBaseImplementation, CustomErrors.ErrorBaseType),
     CustomErrors.ErrorBaseImplementation = (reason as text, message as text, detail as anynonnull) =>
         error [Reason = reason, Message = message, Detail = detail],
@@ -44,13 +45,17 @@ let
         429 = CustomErrors.SnapshotQuotaError,
         500 = CustomErrors.GeneralError
     ],
-    CustomErrors.RaiseErrorOrReturn = (response as any, optional details as any) =>
+    CustomErrors.RaiseErrorOrReturn = (response as record) =>
         let
-            _field = Text.From(Value.Metadata(response)[Response.Status]),
-            _details = if details <> null then details else response
+            _responseMeta = Value.Metadata(response),
+            _http_status = Text.From(_responseMeta[Response.Status]),
+            _details = [
+                Cause = response,
+                RequestUrl = _responseMeta[RequestUrl]
+            ]
         in
-            if Record.HasFields(CustomErrors.ErrorMap, _field) then
-                Record.Field(CustomErrors.ErrorMap, _field)(_details)
+            if Record.HasFields(CustomErrors.ErrorMap, _http_status) then
+                Record.Field(CustomErrors.ErrorMap, _http_status)(_details)
             else
                 response
 in

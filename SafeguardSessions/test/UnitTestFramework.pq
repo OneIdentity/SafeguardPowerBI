@@ -3,7 +3,7 @@
 // https://learn.microsoft.com/en-us/power-query/handlingunittesting
 // Version 1.0.0 was exactly the same as Microsoft's framework. Above this version number,
 // it includes our changes and additions
-[Version = "1.4.1"]
+[Version = "1.4.2"]
 section UnitTestFramework;
 
 shared Fact = (_subject as text, _expected, _actual) as record =>
@@ -250,7 +250,19 @@ ValueToText = (value, optional depth) =>
     in
         try Serialize(value) otherwise "<serialization failed>";
 
-shared FakeResponse = (body as text, optional metadata as record) as binary =>
+shared FakeResponse = (body as text, optional metadata as record) as record =>
+    let
+        response = Json.Document(body),
+        response_with_meta = Value.ReplaceMetadata(
+            response, if metadata <> null then metadata else [
+                Content.Type = "application/json",
+                Response.Status = 200
+            ]
+        )
+    in
+        response_with_meta;
+
+shared FakeRawResponse = (body as text, optional metadata as record) as binary =>
     let
         response = Text.ToBinary(body),
         response_with_meta = Value.ReplaceMetadata(
