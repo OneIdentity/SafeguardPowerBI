@@ -1,5 +1,37 @@
 section TestSafeguardSessions.Authentication;
 
+TestSafeguardSessions.URL = "dummy_url";
+
+TestSafeguardSessions.AuthenticationCredentials = [
+    Username = "dummy",
+    Password = "pwd"
+];
+
+TestAuthenticateRaisesErrorForStatusCode = (status_code as number, expectedReason as text, expectedMessage as text) =>
+    let
+        fakeAuthResponse = FakeRawResponse([#"error" = "reason"], [
+            Response.Status = status_code
+        ]),
+        facts = TestErrorIsRaised(
+            try
+                Authenticate(
+                    TestSafeguardSessions.URL,
+                    TestSafeguardSessions.AuthenticationCredentials,
+                    [
+                        AuthResponse = fakeAuthResponse
+                    ]
+                ),
+            expectedReason,
+            expectedMessage,
+            [
+                ManuallyHandled = true,
+                Cause = [#"error" = "reason"],
+                RequestUrl = "http://dummy_url/api/authentication"
+            ]
+        )
+    in
+        facts;
+
 TestAuthenticateIsSuccessful = () =>
     let
         fakeAuthResponse = FakeRawResponse(
@@ -12,10 +44,9 @@ TestAuthenticateIsSuccessful = () =>
             ]
         ),
         response = Authenticate(
-            "dummy_url", [
-                Username = "dummy",
-                Password = "pwd"
-            ], [
+            TestSafeguardSessions.URL,
+            TestSafeguardSessions.AuthenticationCredentials,
+            [
                 AuthResponse = fakeAuthResponse
             ]
         ),
@@ -28,7 +59,7 @@ TestAuthenticateIsSuccessful = () =>
                     Headers = [
                         #"Set-Cookie" = "session_id=e8e5f0a0d3367043150187f81df3484e91e365d5; expires=Sat, 03 Dec 2022 02:27:48 GMT; HttpOnly; Max-Age=43200; Path=/; Secure"
                     ],
-                    RequestUrl = "dummy_url"
+                    RequestUrl = "http://dummy_url/api/authentication"
                 ],
                 Value.Metadata(response)
             )
@@ -46,10 +77,9 @@ TestAuthenticateRaisesError = () =>
                 facts = TestErrorIsRaised(
                     try
                         Authenticate(
-                            "dummy_url", [
-                                Username = "dummy",
-                                Password = "pwd"
-                            ], [
+                            TestSafeguardSessions.URL,
+                            TestSafeguardSessions.AuthenticationCredentials,
+                            [
                                 AuthResponse = fakeAuthResponse
                             ]
                         ),
@@ -58,7 +88,7 @@ TestAuthenticateRaisesError = () =>
                     [
                         ManuallyHandled = true,
                         Cause = [#"error" = "reason"],
-                        RequestUrl = "dummy_url"
+                        RequestUrl = "http://dummy_url/api/authentication"
                     ]
                 )
             in

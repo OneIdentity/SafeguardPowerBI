@@ -21,7 +21,48 @@ TestSafeguardSessions.SuccessfulAuthenticationResponse = FakeRawResponse(
     ]
 );
 
-TestSafeguardSessions.SubTables = {"user"};
+TestSafeguardSessions.GetExpectedCountResponse = (optional expectedCount as number) =>
+    FakeRawResponse([count = expectedCount ?? 0]);
+
+TestSafeguardSessions.SuccessfulOpenSnapshotResponse = FakeRawResponse([
+    body = [snapshot = "dummy_snapshot_id"]
+]);
+
+TestSafeguardSessions.FirstHit = [
+    body = [
+        start = #datetimezone(2022, 12, 31, 23, 59, 30, 0, 0),
+        end = #datetimezone(2023, 1, 1, 7, 34, 11, 0, 0),
+        protocol = "SSH",
+        user = [name = "balabit"]
+    ],
+    key = "id1",
+    #"meta" = []
+];
+
+TestSafeguardSessions.Response.SingleHit = FakeRawResponse(
+    [
+        items = {TestSafeguardSessions.FirstHit},
+        #"meta" = [next = null]
+    ]
+);
+
+TestSafeguardSessions.SecondHit = [
+    body = [
+        start = #datetimezone(2023, 1, 14, 22, 11, 33, 0, 0),
+        end = #datetimezone(2023, 1, 16, 2, 3, 12, 0, 0),
+        protocol = "RDP",
+        user = [name = "other_username"]
+    ],
+    key = "id2",
+    #"meta" = []
+];
+
+TestSafeguardSessions.Response.DoubleHit = FakeRawResponse(
+    [
+        items = {TestSafeguardSessions.FirstHit, TestSafeguardSessions.SecondHit},
+        #"meta" = [next = null]
+    ]
+);
 
 TestSafeguardSessions.Schema = [
     Sessions = CreateSchema(
@@ -37,7 +78,7 @@ TestSafeguardSessions.Schema = [
 
 TestSafeguardSessions.Mocks = [
     AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-    SubTables = TestSafeguardSessions.SubTables,
+    OpenSnapshotResponse = TestSafeguardSessions.SuccessfulOpenSnapshotResponse,
     Schema = TestSafeguardSessions.Schema
 ];
 
@@ -101,33 +142,10 @@ TestFetchingSessions = () =>
                     null
                 },
                 [
-                    FetchResponse = FakeRawResponse(
-                        [
-                            items = {
-                                [
-                                    body = [
-                                        start = #datetimezone(2022, 12, 31, 23, 59, 30, 0, 0),
-                                        end = #datetimezone(2023, 1, 1, 7, 34, 11, 0, 0),
-                                        protocol = "SSH",
-                                        user = [name = "balabit"]
-                                    ],
-                                    key = "id1",
-                                    #"meta" = []
-                                ],
-                                [
-                                    body = [
-                                        start = #datetimezone(2023, 1, 14, 22, 11, 33, 0, 0),
-                                        end = #datetimezone(2023, 1, 16, 2, 3, 12, 0, 0),
-                                        protocol = "RDP",
-                                        user = [name = "other_username"]
-                                    ],
-                                    key = "id2",
-                                    #"meta" = []
-                                ]
-                            },
-                            #"meta" = []
-                        ]
-                    )
+                    GetSessionsCountResponse = TestSafeguardSessions.GetExpectedCountResponse(2),
+                    GetPageResponseMap = [
+                        #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&start=2023-01-01T00%3A00%3A00.0000000%2B00%3A00&end=2023-01-15T00%3A00%3A00.0000000%2B00%3A00&snapshot=dummy_snapshot_id" = TestSafeguardSessions.Response.DoubleHit
+                    ]
                 ]
                     & TestSafeguardSessions.Mocks,
                 #table(
@@ -157,30 +175,17 @@ TestFetchingSessions = () =>
                     null,
                     2,
                     false,
-                    "https://dummy_url/api/audit/sessions?fields=%2A&start=2023-01-01T00%3A00%3A00.0000000%2B00%3A00&end=2023-01-15T00%3A00%3A00.0000000%2B00%3A00"
+                    "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&start=2023-01-01T00%3A00%3A00.0000000%2B00%3A00&end=2023-01-15T00%3A00%3A00.0000000%2B00%3A00&snapshot=dummy_snapshot_id"
                 )
             },
             {
                 "Fetching sessions with field-value pairs",
                 {null, null, "protocol", "SSH", "user.name", "balabit", null, null},
                 [
-                    FetchResponse = FakeRawResponse(
-                        [
-                            items = {
-                                [
-                                    body = [
-                                        start = #datetimezone(2022, 12, 31, 23, 59, 30, 0, 0),
-                                        end = #datetimezone(2023, 1, 1, 7, 34, 11, 0, 0),
-                                        protocol = "SSH",
-                                        user = [name = "balabit"]
-                                    ],
-                                    key = "id1",
-                                    #"meta" = []
-                                ]
-                            },
-                            #"meta" = []
-                        ]
-                    )
+                    GetSessionsCountResponse = TestSafeguardSessions.GetExpectedCountResponse(1),
+                    GetPageResponseMap = [
+                        #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&q=protocol%3ASSH%20AND%20user.name%3Abalabit&snapshot=dummy_snapshot_id" = TestSafeguardSessions.Response.SingleHit
+                    ]
                 ]
                     & TestSafeguardSessions.Mocks,
                 #table(
@@ -203,30 +208,17 @@ TestFetchingSessions = () =>
                     null,
                     1,
                     false,
-                    "https://dummy_url/api/audit/sessions?fields=%2A&q=protocol%3ASSH%20AND%20user.name%3Abalabit"
+                    "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&q=protocol%3ASSH%20AND%20user.name%3Abalabit&snapshot=dummy_snapshot_id"
                 )
             },
             {
                 "Fetching sessions with only filter value",
                 {null, null, null, "SSH", null, null, null, null},
                 [
-                    FetchResponse = FakeRawResponse(
-                        [
-                            items = {
-                                [
-                                    body = [
-                                        start = #datetimezone(2022, 12, 31, 23, 59, 30, 0, 0),
-                                        end = #datetimezone(2023, 1, 1, 7, 34, 11, 0, 0),
-                                        protocol = "SSH",
-                                        user = [name = "username"]
-                                    ],
-                                    key = "id1",
-                                    #"meta" = []
-                                ]
-                            },
-                            #"meta" = []
-                        ]
-                    )
+                    GetSessionsCountResponse = TestSafeguardSessions.GetExpectedCountResponse(1),
+                    GetPageResponseMap = [
+                        #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id" = TestSafeguardSessions.Response.SingleHit
+                    ]
                 ]
                     & TestSafeguardSessions.Mocks,
                 #table(
@@ -239,29 +231,38 @@ TestFetchingSessions = () =>
                             #datetimezone(2022, 12, 31, 23, 59, 30, 0, 0),
                             #datetimezone(2023, 1, 1, 7, 34, 11, 0, 0),
                             "SSH",
-                            "username"
+                            "balabit"
                         }
                     }
                 ),
                 FetchInfo(
-                    "Success", "Data fetch succeeded", null, 1, false,
-                    "https://dummy_url/api/audit/sessions?fields=%2A"
+                    "Success",
+                    "Data fetch succeeded",
+                    null,
+                    1,
+                    false,
+                    "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id"
                 )
             },
             {
                 "Fetching sessions with invalid field-value pair",
                 {null, null, "apple", "peach", null, null, null, null},
                 [
-                    AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                    FetchResponse = FakeRawResponse([#"error" = "value"], [Response.Status = 400])
-                ],
+                    GetSessionsCountResponse = TestSafeguardSessions.GetExpectedCountResponse(),
+                    GetPageResponseMap = [
+                        #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&q=apple%3Apeach&snapshot=dummy_snapshot_id" = FakeRawResponse(
+                            [#"error" = "value"], [Response.Status = 400]
+                        )
+                    ]
+                ]
+                    & TestSafeguardSessions.Mocks,
                 [
                     Reason = "Bad Request",
                     Message = "SPS interpreted a malformed request",
                     Detail = [
                         ManuallyHandled = true,
                         Cause = [#"error" = "value"],
-                        RequestUrl = "https://dummy_url/api/audit/sessions?fields=%2A&q=apple%3Apeach"
+                        RequestUrl = "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&q=apple%3Apeach&snapshot=dummy_snapshot_id"
                     ],
                     Message.Format = null,
                     Message.Parameters = null
@@ -272,7 +273,7 @@ TestFetchingSessions = () =>
                     null,
                     0,
                     true,
-                    "https://dummy_url/api/audit/sessions?fields=%2A&q=apple%3Apeach"
+                    "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&q=apple%3Apeach&snapshot=dummy_snapshot_id"
                 )
             }
         },

@@ -155,18 +155,14 @@ let
             withType = Value.ReplaceType(enforcedTypes, SchemaToTableType(schema))
         in
             withType,
-    SchemaUtils.ApplySchema = (r as record, schema as table) =>
-        if not r[HasError] then
-            let
-                response = r[Value],
-                transformedResponse = SchemaUtils.GetSessionItemsResponse(response),
-                flattenedResponse = SchemaUtils.Flatten(transformedResponse, {"vault"}),
-                withSchema = SchemaUtils.GetResponseWithSchema(flattenedResponse, schema),
-                withMeta = Value.ReplaceMetadata(withSchema, Value.Metadata(response))
-            in
-                Record.TransformFields(r, {"Value", (value) => withMeta})
-        else
-            r
+    SchemaUtils.ApplySchema = (response as record, schema as table) =>
+        let
+            transformedResponse = SchemaUtils.GetSessionItemsResponse(response),
+            flattenedResponse = SchemaUtils.Flatten(transformedResponse, {"vault"}),
+            withSchema = SchemaUtils.GetResponseWithSchema(flattenedResponse, schema),
+            withMeta = Value.ReplaceMetadata(withSchema, Value.Metadata(response))
+        in
+            withMeta
 in
     [
         CreateSchema = SchemaUtils.CreateSchema,

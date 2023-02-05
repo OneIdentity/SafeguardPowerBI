@@ -14,10 +14,10 @@
   <ItemGroup>
     <MezContent Include="SafeguardSessions.pq" />
     <MezContent Include="$(ModulesPath)BaseAuthentication.pqm" />
-    <MezContent Include="$(ModulesPath)CustomErrors.pqm" />
     <MezContent Include="$(ModulesPath)Constants.pqm" />
     <MezContent Include="$(ModulesPath)Logger.pqm" />
     <MezContent Include="$(ModulesPath)Types.pqm" />
+    <MezContent Include="$(ModulesPath)Search.pqm" />
     <MezContent Include="$(ModulesPath)Utils.pqm" />
     <MezContent Include="$(ErrorPath)ErrorBase.pqm" />
     <MezContent Include="$(ErrorPath)QueryTransformErrors.pqm" />
@@ -25,6 +25,7 @@
     <MezContent Include="$(RequestPath)UrlBuilder.pqm" />
     <MezContent Include="$(RequestPath)QueryParameterTransformer.pqm" />
     <MezContent Include="$(RequestPath)Request.pqm" />
+    <MezContent Include="$(RequestPath)ResponseHandler.pqm" />
     <MezContent Include="$(SchemaPath)Schema.pqm" />
     <MezContent Include="$(SchemaPath)SchemaUtils.pqm" />
     <MezContent Include="$(DefinitionsPath)Sessions.pqm" />

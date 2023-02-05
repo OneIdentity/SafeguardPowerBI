@@ -1,6 +1,9 @@
 let
     ErrorBase = Extension.ImportModule("ErrorBase.pqm"),
     ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm"),
+
+    RequestErrors.NotParsableResponse = (detail as anynonnull) =>
+        ErrorBase("Not Parsable Response", "SPS returned response with missing fields", detail),
     RequestErrors.BadRequest = (detail as record) =>
         ErrorBase("Bad Request", "SPS interpreted a malformed request", detail),
     RequestErrors.AuthenticationError = (detail as record) =>
@@ -20,31 +23,10 @@ let
         404 = RequestErrors.NotFound,
         429 = RequestErrors.SnapshotQuotaError,
         500 = RequestErrors.GeneralError
-    ],
-    RequestErrors.RaiseErrorOrReturn = (response as record) =>
-        let
-            responseMeta = Value.Metadata(response),
-            httpStatus = Text.From(responseMeta[Response.Status]),
-            log = ErrorLog(
-                "SPS returned with an error response",
-                [
-                    Response = response,
-                    Response.Status = responseMeta[Response.Status],
-                    RequestUrl = responseMeta[RequestUrl]
-                ]
-            ),
-            details = [
-                ManuallyHandled = true,
-                Cause = response,
-                RequestUrl = log[RequestUrl]
-            ]
-        in
-            if Record.HasFields(RequestErrors.ErrorMap, httpStatus) then
-                Record.Field(RequestErrors.ErrorMap, httpStatus)(details)
-            else
-                response
+    ]
 in
     [
         ErrorCodes = List.Transform(Record.FieldNames(RequestErrors.ErrorMap), each Number.FromText(_)),
-        RaiseErrorOrReturn = RequestErrors.RaiseErrorOrReturn
+        ErrorMap = RequestErrors.ErrorMap,
+        NotParsableResponse = RequestErrors.NotParsableResponse
     ]

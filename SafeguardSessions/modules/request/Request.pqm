@@ -2,8 +2,9 @@ let
     IsMocked = Extension.ImportFunction("IsMocked", "Utils.pqm"),
     InfoLog = Extension.ImportFunction("InfoLog", "Logger.pqm"),
     RequestErrors = Extension.ImportModule("RequestErrors.pqm"),
-    ErrorCodes = RequestErrors[ErrorCodes],
-    RaiseErrorOrReturn = RequestErrors[RaiseErrorOrReturn],
+    ErrorCodes = Extension.ImportFunction("ErrorCodes", "RequestErrors.pqm"),
+    ValidateByStatusCode = Extension.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
+
     Request.GetAuthParameters = (encodedCredentails as text) as record =>
         let
             parameters = [
@@ -47,7 +48,7 @@ let
             extendedMeta = Value.Metadata(response) & [RequestUrl = url],
             responseWithMeta = Value.ReplaceMetadata(json, extendedMeta)
         in
-            RaiseErrorOrReturn(responseWithMeta),
+            ValidateByStatusCode(responseWithMeta),
     Request.GetHeader = (requestMetaData as record, headerName as text) as text =>
         Record.Field(requestMetaData[Headers], headerName)
 in
