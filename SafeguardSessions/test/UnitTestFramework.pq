@@ -30,7 +30,7 @@ shared Facts = (_subject as text, _predicates as list) =>
 
 shared Facts.Summarize = (_facts as list) as table =>
     [
-        shortOutput = Text.Lower(Environment.FeatureSwitch("short", false)) = "true",
+        shortOutput = Text.Lower(Environment.FeatureSwitch("short", "true")) = "true",
         simplifiedFactsList = _simplifyFactsList(_facts),
         Fact.CountSuccesses = (count, i) =>
             [
