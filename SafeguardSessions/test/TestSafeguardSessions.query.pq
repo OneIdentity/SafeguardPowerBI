@@ -13,7 +13,7 @@ TestResultsContentWithoutStartTime = (response as record, expected_data as any, 
 
 TestGetDataWithoutError = () =>
     let
-        fake_auth_response = FakeResponse(
+        fake_auth_response = FakeRawResponse(
             "{}",
             [
                 Response.Status = 200,
@@ -22,7 +22,7 @@ TestGetDataWithoutError = () =>
                 ]
             ]
         ),
-        fake_response = FakeResponse("{""dummy_field"": ""value"", ""dummy_list"": [0, 1, 2]}"),
+        fake_response = FakeRawResponse("{""dummy_field"": ""value"", ""dummy_list"": [0, 1, 2]}"),
         expected_data = #table(type table [dummy_field = any, dummy_list = any], {{"value", {0, 1, 2}}}),
         expected_info = FetchInfo(
             "Success", "Data fetch succeeded", null, 1, false, "https://dummy_url/api/audit/sessions"
@@ -43,13 +43,13 @@ TestGetDataWithoutError = () =>
 
 TestGetDataHandlesAuthenticationError = () =>
     let
-        fake_auth_response = FakeResponse("{""error"": ""value""}", [
+        fake_auth_response = FakeRawResponse("{""error"": ""value""}", [
             Response.Status = 401
         ]),
         expected_data = [
             Reason = "Authentication Error",
             Message = "Something went wrong while authenticating",
-            Detail = [#"error" = "value"],
+            Detail = [Cause = [#"error" = "value"], RequestUrl = "https://dummy_url/api/authentication"],
             Message.Format = null,
             Message.Parameters = null
         ],
@@ -68,7 +68,7 @@ TestGetDataHandlesAuthenticationError = () =>
 
 TestGetDataHandlesBadRequest = () =>
     let
-        fake_auth_response = FakeResponse(
+        fake_auth_response = FakeRawResponse(
             "{}",
             [
                 Response.Status = 200,
@@ -77,11 +77,11 @@ TestGetDataHandlesBadRequest = () =>
                 ]
             ]
         ),
-        fake_response = FakeResponse("{""error"": ""value""}", [Response.Status = 500]),
+        fake_response = FakeRawResponse("{""error"": ""value""}", [Response.Status = 500]),
         expected_data = [
             Reason = "General Error",
             Message = "SPS responded with server error",
-            Detail = [#"error" = "value"],
+            Detail = [Cause = [#"error" = "value"], RequestUrl = "https://dummy_url/api/audit/sessions"],
             Message.Format = null,
             Message.Parameters = null
         ],
@@ -102,9 +102,65 @@ TestGetDataHandlesBadRequest = () =>
     in
         TestResultsContentWithoutStartTime(response, expected_data, expected_info);
 
+TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringAuth = () =>
+    let
+        unexpected_error = [
+            HasError = true,
+            Error = [
+                Reason = "A corner case",
+                Message = "This is an error no-one expects",
+                Detail = [Cause = [#"error" = "value"]]
+            ]
+        ],
+        expected_info = FetchInfo("Error", "This is an error no-one expects", null, 0, true, "N/A"),
+        response = GetData(
+            "dummy_url",
+            [
+                Username = "dummy",
+                Password = "pwd"
+            ],
+            [Authenticate = unexpected_error]
+        )
+    in
+        TestResultsContentWithoutStartTime(response, unexpected_error[Error], expected_info);
+
+TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringDataFetch = () =>
+    let
+        fake_auth_response = FakeRawResponse(
+            "{}",
+            [
+                Response.Status = 200,
+                Headers = [
+                    #"Set-Cookie" = "session_id=e8e5f0a0d3367043150187f81df3484e91e365d5; expires=Sat, 03 Dec 2022 02:27:48 GMT; HttpOnly; Max-Age=43200; Path=/; Secure"
+                ]
+            ]
+        ),
+        unexpected_error = [
+            HasError = true,
+            Error = [
+                Reason = "A corner case",
+                Message = "This is an error no-one expects",
+                Detail = [Cause = [#"error" = "value"]]
+            ]
+        ],
+        expected_info = FetchInfo("Error", "This is an error no-one expects", null, 0, true, "N/A"),
+        response = GetData(
+            "dummy_url",
+            [
+                Username = "dummy",
+                Password = "pwd"
+            ],
+            [
+                AuthResponse = fake_auth_response,
+                FetchData = unexpected_error
+            ]
+        )
+    in
+        TestResultsContentWithoutStartTime(response, unexpected_error[Error], expected_info);
+
 TestAuthenticateIsSuccessful = () =>
     let
-        fake_auth_response = FakeResponse(
+        fake_auth_response = FakeRawResponse(
             "{}",
             [
                 Response.Status = 200,
@@ -129,7 +185,8 @@ TestAuthenticateIsSuccessful = () =>
                     Response.Status = 200,
                     Headers = [
                         #"Set-Cookie" = "session_id=e8e5f0a0d3367043150187f81df3484e91e365d5; expires=Sat, 03 Dec 2022 02:27:48 GMT; HttpOnly; Max-Age=43200; Path=/; Secure"
-                    ]
+                    ],
+                    RequestUrl = "dummy_url"
                 ],
                 Value.Metadata(response)
             )
@@ -139,7 +196,7 @@ TestAuthenticateIsSuccessful = () =>
 
 TestAuthenticateRaisesErrorForStatusCode = (status_code as number, expected_reason as text, expected_message as text) =>
     let
-        fake_auth_response = FakeResponse("{""error"": ""reason""}", [
+        fake_auth_response = FakeRawResponse("{""error"": ""reason""}", [
             Response.Status = status_code
         ]),
         facts = TestErrorIsRaised(
@@ -155,7 +212,8 @@ TestAuthenticateRaisesErrorForStatusCode = (status_code as number, expected_reas
             expected_reason,
             expected_message,
             [
-                #"error" = "reason"
+                Cause = [#"error" = "reason"],
+                RequestUrl = "dummy_url"
             ]
         )
     in
@@ -174,7 +232,7 @@ TestAuthenticateRaisesError = () =>
 
 TestFetchDataIsSuccessful = () =>
     let
-        fake_response = FakeResponse(
+        fake_response = FakeRawResponse(
             "{""dummy_field"": ""value"", ""dummy_list"": [0, 1, 2]}", [Response.Status = 200]
         ),
         response = FetchData(
@@ -184,14 +242,18 @@ TestFetchDataIsSuccessful = () =>
         ),
         facts = {
             Fact("Data fetch response is correct", [dummy_field = "value", dummy_list = {0, 1, 2}], response),
-            Fact("Test data fetch meta is correct", [Response.Status = 200], Value.Metadata(response))
+            Fact(
+                "Test data fetch meta is correct",
+                [Response.Status = 200, RequestUrl = "dummy_url"],
+                Value.Metadata(response)
+            )
         }
     in
         facts;
 
 TestFetchDataRaisesErrorForStatusCode = (status_code as number, expected_reason as text, expected_message as text) =>
     let
-        fake_response = FakeResponse("{""error"": ""reason""}", [
+        fake_response = FakeRawResponse("{""error"": ""reason""}", [
             Response.Status = status_code
         ]),
         facts = TestErrorIsRaised(
@@ -201,7 +263,8 @@ TestFetchDataRaisesErrorForStatusCode = (status_code as number, expected_reason 
             expected_reason,
             expected_message,
             [
-                #"error" = "reason"
+                Cause = [#"error" = "reason"],
+                RequestUrl = "dummy_url"
             ]
         )
     in
@@ -226,6 +289,8 @@ shared TestSafeguardSessions.UnitTest = [
         TestGetDataWithoutError(),
         TestGetDataHandlesAuthenticationError(),
         TestGetDataHandlesBadRequest(),
+        TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringAuth(),
+        TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringDataFetch(),
         TestAuthenticateIsSuccessful(),
         TestAuthenticateRaisesError(),
         TestFetchDataIsSuccessful(),

@@ -5,36 +5,26 @@ ErrorCodes = Extension.ImportFunction("ErrorCodes", "CustomErrors.pqm");
 
 TestRaiseErrorOrReturnRaisesError = () =>
     let
+        url = "dummy_url",
         fake_auth_response = FakeResponse("{""error"": ""reason""}", [
-            Response.Status = 401
+            Response.Status = 401,
+            RequestUrl = url
         ]),
         facts = TestErrorIsRaised(
             try RaiseErrorOrReturn(fake_auth_response),
             "Authentication Error",
             "Something went wrong while authenticating",
-            fake_auth_response
-        )
-    in
-        facts;
-
-TestRaiseErrorOrReturnRaisesErrorWithDetails = () =>
-    let
-        fake_auth_response = FakeResponse("{}", [
-            Response.Status = 401
-        ]),
-        details = "dummy details",
-        facts = TestErrorIsRaised(
-            try RaiseErrorOrReturn(fake_auth_response, details),
-            "Authentication Error",
-            "Something went wrong while authenticating",
-            "dummy details"
+            [
+                Cause =  fake_auth_response,
+                RequestUrl = url
+            ]
         )
     in
         facts;
 
 TestRaiseErrorOrReturnFallbackIsWorking = () =>
     let
-        fake_response = FakeResponse("{""key"": ""value""}"),
+        fake_response = FakeResponse("{""key"": ""value""}") meta [RequestUrl = "dummy_url"],
         response = RaiseErrorOrReturn(fake_response),
         facts = {
             Fact("Response data correct", fake_response, response),
@@ -42,7 +32,8 @@ TestRaiseErrorOrReturnFallbackIsWorking = () =>
                 "Response meta is correct",
                 [
                     Content.Type = "application/json",
-                    Response.Status = 200
+                    Response.Status = 200,
+                    RequestUrl = "dummy_url"
                 ],
                 Value.Metadata(response)
             )
@@ -60,7 +51,6 @@ TestErrorCodeListIsCorrect = () =>
 shared TestCustomErrors.UnitTest = [
     facts = {
         TestRaiseErrorOrReturnRaisesError(),
-        TestRaiseErrorOrReturnRaisesErrorWithDetails(),
         TestRaiseErrorOrReturnFallbackIsWorking(),
         TestErrorCodeListIsCorrect()
     },

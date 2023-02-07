@@ -10,6 +10,7 @@
   <ItemGroup>
     <MezContent Include="$(ModulesPath)BaseAuthentication.pqm" />
     <MezContent Include="$(ModulesPath)CustomErrors.pqm" />
+    <MezContent Include="$(ModulesPath)Logger.pqm" />
     <MezContent Include="$(ModulesPath)Request.pqm" />
     <MezContent Include="$(ModulesPath)Utils.pqm" />
     <MezContent Include="SafeguardSessions.pq" />

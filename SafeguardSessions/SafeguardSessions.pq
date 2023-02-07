@@ -26,21 +26,25 @@ shared GetData = (sps_ip as text, credentials as record, optional mocks as recor
         base_url = Uri.Combine(Text.Combine({"https://", sps_ip}), "api/"),
         auth_url = Uri.Combine(base_url, "authentication"),
         fetch_url = Uri.Combine(base_url, "audit/sessions"),
-        authResponse = (try Authenticate(auth_url, credentials, mocks)) meta [Url = auth_url],
+        authResponse = 
+            if IsMocked(mocks, "Authenticate") then
+                mocks[Authenticate]
+            else
+                try Authenticate(auth_url, credentials, mocks),
         response =
             if authResponse[HasError] then
                 authResponse
+            else if IsMocked(mocks, "FetchData") then
+                mocks[FetchData]
             else
-                (
-                    try
-                        FetchData(
-                            fetch_url,
-                            BaseAuthentication.MineSessionIdFromCookie(
-                                Request.GetHeader(Value.Metadata(authResponse[Value]), "Set-Cookie")
-                            ),
-                            mocks
-                        )
-                ) meta [Url = fetch_url],
+                try
+                    FetchData(
+                        fetch_url,
+                        BaseAuthentication.MineSessionIdFromCookie(
+                            Request.GetHeader(Value.Metadata(authResponse[Value]), "Set-Cookie")
+                        ),
+                        mocks
+                    ),
         result = BuildSPSResult(response, start_time)
     in
         result;
