@@ -3,8 +3,8 @@
 // https://learn.microsoft.com/en-us/power-query/handlingunittesting
 // Version 1.0.0 was exactly the same as Microsoft's framework. Above this version number,
 // it includes our changes and additions
-[Version = "1.4.2"]
-section UnitTestFramework;
+[Version = "1.5.0"]
+section UnitTestFrameork;
 
 shared Fact = (_subject as text, _expected, _actual) as record =>
     [
@@ -317,3 +317,15 @@ shared TestFetchInfoContentWithoutStartTime = (expected_info as table, actual_in
         }
     in
         facts;
+
+//
+// Load common library functions
+//
+shared UnitTestFramework.ImportModule = (name as text) =>
+    let
+        binary = Extension.Contents(name), asText = Text.FromBinary(binary)
+    in
+        Expression.Evaluate(asText, #shared);
+
+shared UnitTestFramework.ImportFunction = (function_name as text, module_name as text) =>
+    Record.Field(UnitTestFramework.ImportModule(module_name), function_name);

@@ -6,6 +6,7 @@
     <MezIntermediatePath>$(IntermediateOutputPath)MEZ\</MezIntermediatePath>
     <MezOutputPath>$(OutputPath)$(MsBuildProjectName).mez</MezOutputPath>
     <ModulesPath>$(MSBuildProjectDirectory)\modules\</ModulesPath>
+    <SchemaPath>$(ModulesPath)\schema\</SchemaPath>
   </PropertyGroup>
   <ItemGroup>
     <MezContent Include="$(ModulesPath)BaseAuthentication.pqm" />
@@ -13,6 +14,9 @@
     <MezContent Include="$(ModulesPath)Logger.pqm" />
     <MezContent Include="$(ModulesPath)Request.pqm" />
     <MezContent Include="$(ModulesPath)Utils.pqm" />
+    <MezContent Include="$(SchemaPath)Schema.pqm" />
+    <MezContent Include="$(SchemaPath)SessionsSchema.pqm" />
+    <MezContent Include="$(SchemaPath)SchemaUtils.pqm" />
     <MezContent Include="SafeguardSessions.pq" />
     <MezContent Include="SafeguardSessions16.png" />
     <MezContent Include="SafeguardSessions20.png" />

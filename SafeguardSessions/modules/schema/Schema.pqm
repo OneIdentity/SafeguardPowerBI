@@ -1,0 +1,15 @@
+let
+    // Imports
+    SessionsSchema = Extension.ImportFunction("Schema", "SessionsSchema.pqm"),
+    //
+    // Schema definition
+    Schema.GenerateSchemaMap = (schemas as list) as record => Record.Combine(schemas),
+    Schema.SchemaMap = Schema.GenerateSchemaMap({SessionsSchema}),
+    Schema.GetSchema = (schemaName as text) as nullable table =>
+        Record.FieldOrDefault(Schema.SchemaMap, schemaName)
+in
+    [
+        GenerateSchemaMap = Schema.GenerateSchemaMap,
+        SchemaMap = Schema.SchemaMap,
+        GetSchema = Schema.GetSchema
+    ]

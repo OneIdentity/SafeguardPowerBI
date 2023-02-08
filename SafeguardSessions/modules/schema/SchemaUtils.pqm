@@ -1,0 +1,6 @@
+let
+    SchemaUtils.CreateSchema = (rules as list) => #table(type table [Name = Text.Type, Type = Type.Type], rules)
+in
+    [
+        CreateSchema = SchemaUtils.CreateSchema
+    ]
