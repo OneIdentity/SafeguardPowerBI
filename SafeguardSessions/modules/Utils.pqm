@@ -1,4 +1,7 @@
 let
+    SuccessStatus = Extension.ImportFunction("SuccessStatus", "Constants.pqm"),
+    ErrorStatus = Extension.ImportFunction("ErrorStatus", "Constants.pqm"),
+    NotAvailableStatus = Extension.ImportFunction("NotAvailableStatus", "Constants.pqm"),
     ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm"),
     Utils.IsMocked = (mocks as nullable record, field as text) as logical =>
         mocks <> null and Record.HasFields(mocks, field),
@@ -42,9 +45,6 @@ let
             navigationTable = Value.ReplaceType(source, newTableType)
         in
             navigationTable,
-    Utils.SuccessStatus = "Success",
-    Utils.ErrorStatus = "Error",
-    Utils.NotAvailableStatus = "N/A",
     Utils.BuildSPSResult = (response as record, start_time as datetimezone) =>
         let
             spsresult =
@@ -54,12 +54,12 @@ let
                         Utils.SPSResult(
                             response[Error],
                             Utils.FetchInfo(
-                                Utils.ErrorStatus,
+                                ErrorStatus,
                                 response[Error][Message],
                                 start_time,
                                 0,
                                 true,
-                                response[Error][Detail][RequestUrl]? ?? Utils.NotAvailableStatus
+                                response[Error][Detail][RequestUrl]? ?? NotAvailableStatus
                             )
                         )
                     )
@@ -69,7 +69,7 @@ let
                         result = Utils.SPSResult(
                             sessions,
                             Utils.FetchInfo(
-                                Utils.SuccessStatus,
+                                SuccessStatus,
                                 "Data fetch succeeded",
                                 start_time,
                                 Table.RowCount(sessions),
@@ -85,9 +85,6 @@ in
         IsMocked = Utils.IsMocked,
         PaddedTable.FromRecords = Utils.PaddedTable.FromRecords,
         FetchInfo = Utils.FetchInfo,
-        SuccessStatus = Utils.SuccessStatus,
-        ErrorStatus = Utils.ErrorStatus,
-        NotAvailableStatus = Utils.NotAvailableStatus,
         SPSResult = Utils.SPSResult,
         BuildSPSResult = Utils.BuildSPSResult
     ]

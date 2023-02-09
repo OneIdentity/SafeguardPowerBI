@@ -1,0 +1,64 @@
+let
+    CustomErrors.ErrorBase = Value.ReplaceType(CustomErrors.ErrorBaseImplementation, CustomErrors.ErrorBaseType),
+    CustomErrors.ErrorBaseImplementation = (reason as text, message as text, detail as anynonnull) =>
+        error [Reason = reason, Message = message, Detail = detail],
+    CustomErrors.ErrorBaseType = type function (
+        reason as (
+            type text meta [
+                Documentation.FieldCaption = "Error reason",
+                Documentation.FieldDescription = "Reason for the error"
+            ]
+        ),
+        message as (
+            type text meta [
+                Documentation.FieldCaption = "Error message",
+                Documentation.FieldDescription = "Descriptive message of the error"
+            ]
+        ),
+        detail as (
+            type anynonnull meta [
+                Documentation.FieldCaption = "Error details",
+                Documentation.FieldDescription = "Details of the error"
+            ]
+        )
+    ) as table meta [
+        Documentation.Name = "ErrorBase"
+    ],
+    CustomErrors.BadRequest = (detail as anynonnull) =>
+        CustomErrors.ErrorBase("Bad Request", "SPS interpreted a malformed request", detail),
+    CustomErrors.AuthenticationError = (detail as anynonnull) =>
+        CustomErrors.ErrorBase("Authentication Error", "Something went wrong while authenticating", detail),
+    CustomErrors.AuthorizationError = (detail as anynonnull) =>
+        CustomErrors.ErrorBase("Authorization Error", "Not authorized to access the given resource", detail),
+    CustomErrors.NotFound = (detail as anynonnull) =>
+        CustomErrors.ErrorBase("Not Found", "The requested resource cannot be found", detail),
+    CustomErrors.SnapshotQuotaError = (detail as anynonnull) =>
+        CustomErrors.ErrorBase("Snapshot Quota Error", "Snapshot quota exceeded", detail),
+    CustomErrors.GeneralError = (detail as anynonnull) =>
+        CustomErrors.ErrorBase("General Error", "SPS responded with server error", detail),
+    CustomErrors.ErrorMap = [
+        400 = CustomErrors.BadRequest,
+        401 = CustomErrors.AuthenticationError,
+        403 = CustomErrors.AuthorizationError,
+        404 = CustomErrors.NotFound,
+        429 = CustomErrors.SnapshotQuotaError,
+        500 = CustomErrors.GeneralError
+    ],
+    CustomErrors.RaiseErrorOrReturn = (response as record) =>
+        let
+            _responseMeta = Value.Metadata(response),
+            _http_status = Text.From(_responseMeta[Response.Status]),
+            _details = [
+                Cause = response,
+                RequestUrl = _responseMeta[RequestUrl]
+            ]
+        in
+            if Record.HasFields(CustomErrors.ErrorMap, _http_status) then
+                Record.Field(CustomErrors.ErrorMap, _http_status)(_details)
+            else
+                response
+in
+    [
+        ErrorCodes = List.Transform(Record.FieldNames(CustomErrors.ErrorMap), each Number.FromText(_)),
+        RaiseErrorOrReturn = CustomErrors.RaiseErrorOrReturn
+    ]
