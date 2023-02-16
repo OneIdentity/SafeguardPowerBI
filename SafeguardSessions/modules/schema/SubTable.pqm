@@ -1,0 +1,143 @@
+let
+    SubTable.NameField = "Name",
+    SubTable.DataField = "Data",
+    SubTable.Type = type [Name = text, Data],
+    SubTable.ApplyType = (r as record) as record => Value.ReplaceType(r, SubTable.Type),
+    SubTable.Create = (name as text, data as any) as record =>
+        Record.FromList({name, data}, {SubTable.NameField, SubTable.DataField}),
+    SubTable.GetName = (subTable as record) as text => Record.Field(subTable, SubTable.NameField),
+    SubTable.GetData = (subTable as record) as any => Record.Field(subTable, SubTable.DataField),
+    SubTable.TransformData = (subTable as record, transformFunction as function) as record =>
+        Record.TransformFields(subTable, {SubTable.DataField, transformFunction}),
+    SubTable.SetData = (subTable as record, newData as any) as record =>
+        SubTable.TransformData(subTable, (oldData) => newData),
+    SubTable.IdField = (subTable as record) =>
+        let
+            withType = Value.ReplaceType(subTable, SubTable.Type), IdField = Text.Combine(
+                {withType[Name], "id"}, "_"
+            )
+        in
+            IdField,
+    SubTable.GetPath = (subTableName as text) as text =>
+        Text.Reverse(Text.AfterDelimiter(Text.Reverse(subTableName), ".")),
+    SubTable.FieldNamesOfType = (subTable as record, t as type) =>
+        let
+            firstRow = List.First(Record.Field(subTable, SubTable.DataField)),
+            fieldNames = Record.FieldNames(firstRow),
+            fieldNamesOfType = List.Select(
+                fieldNames, (fieldName) => Type.Is(Value.Type(Record.Field(firstRow, fieldName)), t)
+            )
+        in
+            List.Buffer(fieldNamesOfType),
+    SubTable.IsFlat = (subTable as record) as logical =>
+        List.AllTrue(
+            {
+                List.IsEmpty(SubTable.FieldNamesOfType(subTable, Record.Type)),
+                List.IsEmpty(SubTable.FieldNamesOfType(subTable, List.Type))
+            }
+        ),
+    SubTable.Flatten = (subTable as record) as record =>
+        let
+            FlattenLists = (asTable as table, fieldNames as list) as table =>
+                Table.Buffer(
+                    Table.TransformColumns(
+                        asTable,
+                        List.Transform(fieldNames, (fieldName) => {fieldName, (row) => Text.Combine(row, ",")})
+                    )
+                ),
+            FlattenRecords = (asTable as table, fieldNames as list) as any =>
+                let
+                    ExpandRecord = (asTable as table, fieldName as text) as table =>
+                        let
+                            namesToExpand = Record.FieldNames(List.First(Table.Column(asTable, fieldName))),
+                            newNames = List.Transform(
+                                namesToExpand, (nameToExpand) => Text.Combine({fieldName, nameToExpand}, ".")
+                            ),
+                            expanded = Table.ExpandRecordColumn(asTable, fieldName, namesToExpand, newNames)
+                        in
+                            Table.Buffer(expanded),
+                    flattened = List.Accumulate(
+                        fieldNames, asTable, (asTable, fieldName) => ExpandRecord(asTable, fieldName)
+                    )
+                in
+                    Table.Buffer(flattened),
+            withType = SubTable.ApplyType(subTable),
+            flattenedSubTable =
+                if SubTable.IsFlat(withType) then
+                    withType
+                else
+                    let
+                        // Determine fieldnames
+                        asTable = Table.Buffer(Table.FromRecords(Record.Field(withType, SubTable.DataField))),
+                        // Flatten lists
+                        listFieldNames = SubTable.FieldNamesOfType(withType, List.Type),
+                        withFlattenedLists = FlattenLists(asTable, listFieldNames),
+                        // Flatten records
+                        recordFieldNames = SubTable.FieldNamesOfType(withType, Record.Type),
+                        withFlattenedRecords = FlattenRecords(withFlattenedLists, recordFieldNames),
+                        flattenedSubTable = Record.TransformFields(
+                            withType, {SubTable.DataField, each List.Buffer(Table.ToRecords(withFlattenedRecords))}
+                        )
+                    in
+                        @SubTable.Flatten(flattenedSubTable)
+        in
+            flattenedSubTable,
+    SubTable.ToSubTables = (subTable as record, newSubTableNames as list, identifierColumn as text) as list =>
+        let
+            withType = SubTable.ApplyType(subTable),
+            asTable = Table.Buffer(
+                Table.FromRecords(Record.Field(withType, SubTable.DataField), null, MissingField.UseNull)
+            ),
+            mainSubTable = Record.TransformFields(
+                withType,
+                {
+                    SubTable.DataField,
+                    each List.Buffer(Table.ToRecords(Table.Buffer(Table.RemoveColumns(asTable, newSubTableNames))))
+                }
+            ),
+            newSubTables = List.Buffer(
+                List.Transform(
+                    newSubTableNames,
+                    (newSubTableName) =>
+                        Record.FromList(
+                            {
+                                Text.Combine({Record.Field(mainSubTable, SubTable.NameField), newSubTableName}, "."),
+                                List.Buffer(
+                                    Table.ToRecords(
+                                        Table.Buffer(
+                                            Table.SelectColumns(asTable, {identifierColumn, newSubTableName})
+                                        )
+                                    )
+                                )
+                            },
+                            {SubTable.NameField, SubTable.DataField}
+                        )
+                )
+            )
+        in
+            List.Buffer(List.Combine({{mainSubTable}, newSubTables})),
+    SubTable.SubTableNames = (subTables as list) as list =>
+        List.Buffer(List.Transform(subTables, (subTable) => subTable[Name])),
+    SubTable.Select = (subTables as list, subTableNames as list) as list =>
+        List.Buffer(List.Select(subTables, (subTable) => List.Contains(subTableNames, subTable[Name]))),
+    SubTable.Remove = (subTables as list, subTableNames as list) as list =>
+        List.Buffer(List.Difference(subTables, SubTable.Select(subTables, subTableNames)))
+in
+    [
+        Type = SubTable.Type,
+        ApplyType = SubTable.ApplyType,
+        Create = SubTable.Create,
+        GetName = SubTable.GetName,
+        GetData = SubTable.GetData,
+        TransformData = SubTable.TransformData,
+        SetData = SubTable.SetData,
+        IdField = SubTable.IdField,
+        GetPath = SubTable.GetPath,
+        FieldNamesOfType = SubTable.FieldNamesOfType,
+        IsFlat = SubTable.IsFlat,
+        Flatten = SubTable.Flatten,
+        ToSubTables = SubTable.ToSubTables,
+        SubTableNames = SubTable.SubTableNames,
+        Select = SubTable.Select,
+        Remove = SubTable.Remove
+    ]

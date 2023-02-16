@@ -25,6 +25,7 @@
     <MezContent Include="$(SchemaPath)Schema.pqm" />
     <MezContent Include="$(SchemaPath)SessionsSchema.pqm" />
     <MezContent Include="$(SchemaPath)SchemaUtils.pqm" />
+    <MezContent Include="$(SchemaPath)SubTable.pqm" />
     <MezContent Include="SafeguardSessions16.png" />
     <MezContent Include="SafeguardSessions20.png" />
     <MezContent Include="SafeguardSessions24.png" />
