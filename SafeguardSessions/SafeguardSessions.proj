@@ -6,15 +6,18 @@
     <MezIntermediatePath>$(IntermediateOutputPath)MEZ\</MezIntermediatePath>
     <MezOutputPath>$(OutputPath)$(MsBuildProjectName).mez</MezOutputPath>
     <ModulesPath>$(MSBuildProjectDirectory)\modules\</ModulesPath>
+    <ErrorPath>$(ModulesPath)\error\</ErrorPath>
     <SchemaPath>$(ModulesPath)\schema\</SchemaPath>
   </PropertyGroup>
   <ItemGroup>
     <MezContent Include="$(ModulesPath)BaseAuthentication.pqm" />
-    <MezContent Include="$(ModulesPath)CustomErrors.pqm" />
     <MezContent Include="$(ModulesPath)Logger.pqm" />
     <MezContent Include="$(ModulesPath)Types.pqm" />
     <MezContent Include="$(ModulesPath)Request.pqm" />
     <MezContent Include="$(ModulesPath)Utils.pqm" />
+    <MezContent Include="$(ErrorPath)ErrorBase.pqm" />
+    <MezContent Include="$(ErrorPath)QueryTransformErrors.pqm" />
+    <MezContent Include="$(ErrorPath)RequestErrors.pqm" />
     <MezContent Include="$(SchemaPath)Schema.pqm" />
     <MezContent Include="$(SchemaPath)SessionsSchema.pqm" />
     <MezContent Include="$(SchemaPath)SchemaUtils.pqm" />

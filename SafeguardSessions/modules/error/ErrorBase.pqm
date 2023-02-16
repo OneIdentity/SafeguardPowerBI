@@ -1,0 +1,7 @@
+let
+    ErrorBase.Type = Extension.ImportFunction("ErrorBaseType", "Types.pqm"),
+    ErrorBase.Implementation = (reason as text, message as text, detail as record) =>
+        error [Reason = reason, Message = message, Detail = detail],
+    ErrorBase.Error = Value.ReplaceType(ErrorBase.Implementation, ErrorBase.Type)
+in
+    ErrorBase.Error

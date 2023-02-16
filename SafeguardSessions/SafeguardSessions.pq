@@ -129,7 +129,7 @@ BaseAuthentication = Extension.ImportModule("BaseAuthentication.pqm");
 BaseAuthentication.EncodeCredentials = BaseAuthentication[EncodeCredentials];
 BaseAuthentication.MineSessionIdFromCookie = BaseAuthentication[MineSessionIdFromCookie];
 
-RaiseErrorOrReturn = Extension.ImportFunction("RaiseErrorOrReturn", "CustomErrors.pqm");
+RaiseErrorOrReturn = Extension.ImportFunction("RaiseErrorOrReturn", "RequestErrors.pqm");
 
 Request = Extension.ImportModule("Request.pqm");
 
