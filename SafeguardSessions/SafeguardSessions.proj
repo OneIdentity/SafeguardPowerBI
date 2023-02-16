@@ -22,6 +22,7 @@
     <MezContent Include="$(RequestPath)UrlBuilder.pqm" />
     <MezContent Include="$(RequestPath)QueryParameterTransformer.pqm" />
     <MezContent Include="$(RequestPath)Request.pqm" />
+    <MezContent Include="$(SchemaPath)Normalize.pqm" />
     <MezContent Include="$(SchemaPath)Schema.pqm" />
     <MezContent Include="$(SchemaPath)SessionsSchema.pqm" />
     <MezContent Include="$(SchemaPath)SchemaUtils.pqm" />

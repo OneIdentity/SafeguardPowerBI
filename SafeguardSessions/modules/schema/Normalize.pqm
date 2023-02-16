@@ -1,0 +1,85 @@
+let
+    SubTable = Extension.ImportModule("SubTable.pqm"),
+    SubTable.ApplyType = SubTable[ApplyType],
+    SubTable.Create = SubTable[Create],
+    SubTable.GetName = SubTable[GetName],
+    SubTable.GetData = SubTable[GetData],
+    SubTable.TransformData = SubTable[TransformData],
+    SubTable.SetData = SubTable[SetData],
+    SubTable.IdField = SubTable[IdField],
+    SubTable.ToSubTables = SubTable[ToSubTables],
+    SubTable.Flatten = SubTable[Flatten],
+    SubTable.Select = SubTable[Select],
+    SubTable.Remove = SubTable[Remove],
+    Normalize.GenerateRankColumn = (subTable as record, optional ignoredColumns as list) =>
+        let
+            // Generates a dense rank column and removes duplicate rows
+            withType = SubTable.ApplyType(subTable),
+            data = Table.FromRecords(SubTable.GetData(withType), null, MissingField.UseNull),
+            comparisonCriterias = List.Transform(
+                if ignoredColumns = null then
+                    Table.ColumnNames(data)
+                else
+                    List.RemoveItems(Table.ColumnNames(data), ignoredColumns),
+                (columnName) => {columnName, Order.Ascending}
+            ),
+            withId = Table.AddRankColumn(
+                data, SubTable.IdField(withType), comparisonCriterias, [
+                    RankKind = RankKind.Dense
+                ]
+            ),
+            distinct = Table.Distinct(withId)
+        in
+            SubTable.SetData(withType, distinct),
+    Normalize.Normalize = (subTable as record, newSubTableNames as list, identifierColumn as text) as list =>
+        let
+            CreateConnectionSubTable = (subTable as record, identifierColumn as text, mainSubTableName as text) as list =>
+                let
+                    mainSubTable = SubTable.TransformData(
+                        subTable,
+                        (data) => Table.Buffer(Table.Distinct(Table.RemoveColumns(data, {identifierColumn})))
+                    ),
+                    connectorSubTable = SubTable.Create(
+                        Text.Combine({SubTable.GetName(subTable), mainSubTableName}, "_to_"),
+                        Table.Buffer(
+                            Table.Distinct(
+                                Table.SelectColumns(
+                                    SubTable.GetData(subTable), {identifierColumn, SubTable.IdField(subTable)}
+                                )
+                            )
+                        )
+                    )
+                in
+                    {mainSubTable, connectorSubTable},
+            withType = SubTable.ApplyType(subTable),
+            subTables = SubTable.ToSubTables(withType, newSubTableNames, identifierColumn),
+            flattenedSubTables = List.Buffer(List.Transform(subTables, (subTable) => SubTable.Flatten(subTable))),
+            mainSubTable = List.Single(
+                List.Buffer(SubTable.Select(flattenedSubTables, {SubTable.GetName(withType)}))
+            ),
+            transformedMainSubTable = SubTable.TransformData(
+                mainSubTable,
+                (data) => Table.Buffer(Table.Distinct(Table.FromRecords(data, null, MissingField.UseNull)))
+            ),
+            newSubTables = List.Buffer(SubTable.Remove(flattenedSubTables, {SubTable.GetName(withType)})),
+            newSubTablesWithId = List.Buffer(
+                List.Transform(
+                    newSubTables, (subTable) => Normalize.GenerateRankColumn(subTable, {identifierColumn})
+                )
+            ),
+            newSubTablesWithConnectorSubTable = List.Buffer(
+                List.Combine(
+                    List.Transform(
+                        newSubTablesWithId,
+                        (subTable) =>
+                            CreateConnectionSubTable(subTable, identifierColumn, SubTable.GetName(mainSubTable))
+                    )
+                )
+            )
+        in
+            List.Buffer(List.Combine({{transformedMainSubTable}, newSubTablesWithConnectorSubTable}))
+in
+    [
+        GenerateRankColumn = Normalize.GenerateRankColumn,
+        Normalize = Normalize.Normalize
+    ]
