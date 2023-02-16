@@ -1,0 +1,57 @@
+let
+    FilterFieldWithoutValueError = Extension.ImportFunction("FilterFieldWithoutValue", "QueryTransformErrors.pqm"),
+    QueryParameterTransformer.Map = [
+        qInput = QueryParameterTransformer.GenerateQParameter,
+        from = QueryParameterTransformer.GenerateStartParameter,
+        to = QueryParameterTransformer.GenerateEndParameter
+    ],
+    QueryParameterTransformer.GenerateQParameter = (inputPairList as list) as record =>
+        let
+            combinedFieldValueList = List.Accumulate(
+                inputPairList,
+                {},
+                (state, current) =>
+                    let
+                        listWithoutNulls = List.RemoveNulls(current),
+                        parameter =
+                            if List.Count(listWithoutNulls) = 2 then
+                                List.Combine(
+                                    {
+                                        state,
+                                        {
+                                            Text.Combine(
+                                                {Text.Trim(listWithoutNulls{0}), ":", Text.Trim(listWithoutNulls{1})}
+                                            )
+                                        }
+                                    }
+                                )
+                            else if List.Count(listWithoutNulls) = 1 then
+                                if current{0} <> null then
+                                    FilterFieldWithoutValueError(
+                                        [
+                                            ManuallyHandled = false,
+                                            Cause = current{0},
+                                            RequestUrl = null
+                                        ]
+                                    )
+                                else
+                                    List.Combine({state, {}})
+                            else
+                                List.Combine({state, {}})
+                    in
+                        parameter
+            ),
+            qText = if List.Count(combinedFieldValueList) > 0 then Text.Combine(combinedFieldValueList, " AND ") else null
+        in
+            if qText <> null then
+                [q = qText]
+            else
+                [],
+    QueryParameterTransformer.GenerateStartParameter = (input as datetimezone) =>
+        [start = QueryParameterTransformer.TransformDateTimeZoneToISO8061Text(input)],
+    QueryParameterTransformer.GenerateEndParameter = (input as datetimezone) =>
+        [end = QueryParameterTransformer.TransformDateTimeZoneToISO8061Text(input)],
+    QueryParameterTransformer.TransformDateTimeZoneToISO8061Text = (input as datetimezone) =>
+        DateTimeZone.ToText(input, "O")
+in
+    [Map = QueryParameterTransformer.Map]

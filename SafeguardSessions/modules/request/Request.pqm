@@ -36,7 +36,7 @@ let
                 if IsMocked(mocks, "Response") then
                     mocks[Response]
                 else
-                    Web.Contents(url, parameters & [ManualStatusHandling = ErrorCodes]),
+                    Web.Contents(requestUrl, requestParameters & [ManualStatusHandling = ErrorCodes]),
             _meta = InfoLog("Response meta data of the http request", Value.Metadata(response)),
             _json = InfoLog("Response data of the http request", Json.Document((response))),
             _extendedMeta = _meta & [RequestUrl = url]
