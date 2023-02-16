@@ -1,0 +1,41 @@
+let
+    ErrorBase = Extension.ImportModule("ErrorBase.pqm"),
+    RequestErrors.BadRequest = (detail as record) =>
+        ErrorBase("Bad Request", "SPS interpreted a malformed request", detail),
+    RequestErrors.AuthenticationError = (detail as record) =>
+        ErrorBase("Authentication Error", "Something went wrong while authenticating", detail),
+    RequestErrors.AuthorizationError = (detail as record) =>
+        ErrorBase("Authorization Error", "Not authorized to access the given resource", detail),
+    RequestErrors.NotFound = (detail as record) =>
+        ErrorBase("Not Found", "The requested resource cannot be found", detail),
+    RequestErrors.SnapshotQuotaError = (detail as record) =>
+        ErrorBase("Snapshot Quota Error", "Snapshot quota exceeded", detail),
+    RequestErrors.GeneralError = (detail as record) =>
+        ErrorBase("General Error", "SPS responded with server error", detail),
+    RequestErrors.ErrorMap = [
+        400 = RequestErrors.BadRequest,
+        401 = RequestErrors.AuthenticationError,
+        403 = RequestErrors.AuthorizationError,
+        404 = RequestErrors.NotFound,
+        429 = RequestErrors.SnapshotQuotaError,
+        500 = RequestErrors.GeneralError
+    ],
+    RequestErrors.RaiseErrorOrReturn = (response as record) =>
+        let
+            _responseMeta = Value.Metadata(response),
+            _http_status = Text.From(_responseMeta[Response.Status]),
+            _details = [
+                ManuallyHandled = true,
+                Cause = response,
+                RequestUrl = _responseMeta[RequestUrl]
+            ]
+        in
+            if Record.HasFields(RequestErrors.ErrorMap, _http_status) then
+                Record.Field(RequestErrors.ErrorMap, _http_status)(_details)
+            else
+                response
+in
+    [
+        ErrorCodes = List.Transform(Record.FieldNames(RequestErrors.ErrorMap), each Number.FromText(_)),
+        RaiseErrorOrReturn = RequestErrors.RaiseErrorOrReturn
+    ]

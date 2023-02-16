@@ -1,7 +1,7 @@
-section TestCustomErrors;
+section TestCustomRequestErrors;
 
-RaiseErrorOrReturn = Extension.ImportFunction("RaiseErrorOrReturn", "CustomErrors.pqm");
-ErrorCodes = Extension.ImportFunction("ErrorCodes", "CustomErrors.pqm");
+RaiseErrorOrReturn = Extension.ImportFunction("RaiseErrorOrReturn", "RequestErrors.pqm");
+ErrorCodes = Extension.ImportFunction("ErrorCodes", "RequestErrors.pqm");
 
 TestRaiseErrorOrReturnRaisesError = () =>
     let
@@ -15,6 +15,7 @@ TestRaiseErrorOrReturnRaisesError = () =>
             "Authentication Error",
             "Something went wrong while authenticating",
             [
+                ManuallyHandled = true,
                 Cause =  fake_auth_response,
                 RequestUrl = url
             ]
@@ -48,7 +49,7 @@ TestErrorCodeListIsCorrect = () =>
     in
         fact;
 
-shared TestCustomErrors.UnitTest = [
+shared TestCustomRequestErrors.UnitTest = [
     facts = {
         TestRaiseErrorOrReturnRaisesError(),
         TestRaiseErrorOrReturnFallbackIsWorking(),

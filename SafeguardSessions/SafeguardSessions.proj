@@ -6,18 +6,25 @@
     <MezIntermediatePath>$(IntermediateOutputPath)MEZ\</MezIntermediatePath>
     <MezOutputPath>$(OutputPath)$(MsBuildProjectName).mez</MezOutputPath>
     <ModulesPath>$(MSBuildProjectDirectory)\modules\</ModulesPath>
+    <RequestPath>$(ModulesPath)\request\</RequestPath>
+    <ErrorPath>$(ModulesPath)\error\</ErrorPath>
     <SchemaPath>$(ModulesPath)\schema\</SchemaPath>
   </PropertyGroup>
   <ItemGroup>
+    <MezContent Include="SafeguardSessions.pq" />
     <MezContent Include="$(ModulesPath)BaseAuthentication.pqm" />
-    <MezContent Include="$(ModulesPath)CustomErrors.pqm" />
     <MezContent Include="$(ModulesPath)Logger.pqm" />
-    <MezContent Include="$(ModulesPath)Request.pqm" />
+    <MezContent Include="$(ModulesPath)Types.pqm" />
     <MezContent Include="$(ModulesPath)Utils.pqm" />
+    <MezContent Include="$(ErrorPath)ErrorBase.pqm" />
+    <MezContent Include="$(ErrorPath)QueryTransformErrors.pqm" />
+    <MezContent Include="$(ErrorPath)RequestErrors.pqm" />
+    <MezContent Include="$(RequestPath)UrlBuilder.pqm" />
+    <MezContent Include="$(RequestPath)QueryParameterTransformer.pqm" />
+    <MezContent Include="$(RequestPath)Request.pqm" />
     <MezContent Include="$(SchemaPath)Schema.pqm" />
     <MezContent Include="$(SchemaPath)SessionsSchema.pqm" />
     <MezContent Include="$(SchemaPath)SchemaUtils.pqm" />
-    <MezContent Include="SafeguardSessions.pq" />
     <MezContent Include="SafeguardSessions16.png" />
     <MezContent Include="SafeguardSessions20.png" />
     <MezContent Include="SafeguardSessions24.png" />
