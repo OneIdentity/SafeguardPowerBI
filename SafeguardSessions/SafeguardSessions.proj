@@ -11,6 +11,7 @@
     <SchemaPath>$(ModulesPath)\schema\</SchemaPath>
   </PropertyGroup>
   <ItemGroup>
+    <MezContent Include="SafeguardSessions.pq" />
     <MezContent Include="$(ModulesPath)BaseAuthentication.pqm" />
     <MezContent Include="$(ModulesPath)Logger.pqm" />
     <MezContent Include="$(ModulesPath)Types.pqm" />
@@ -24,7 +25,6 @@
     <MezContent Include="$(SchemaPath)Schema.pqm" />
     <MezContent Include="$(SchemaPath)SessionsSchema.pqm" />
     <MezContent Include="$(SchemaPath)SchemaUtils.pqm" />
-    <MezContent Include="SafeguardSessions.pq" />
     <MezContent Include="SafeguardSessions16.png" />
     <MezContent Include="SafeguardSessions20.png" />
     <MezContent Include="SafeguardSessions24.png" />

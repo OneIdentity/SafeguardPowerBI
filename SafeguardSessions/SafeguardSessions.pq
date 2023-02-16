@@ -3,49 +3,89 @@
 section SafeguardSessions;
 
 [DataSource.Kind = "SafeguardSessions", Publish = "SafeguardSessions.Publish"]
-shared SafeguardSessions.Contents = Value.ReplaceType(ContentsImpl, ContentsType);
+shared SafeguardSessions.Contents = Value.ReplaceType(SafeguardSessions.ContentsImpl, SafeguardSessions.ContentsType);
 
-ContentsType = type function (
-    url as (
-        type text meta [
-            Documentation.FieldCaption = "SPS IP",
-            Documentation.FieldDescription = "The SPS IP address identifies the appliance from which session data will be fetched.",
-            Documentation.SampleValues = {"10.12.230.21"}
-        ]
-    )
-) as table meta [
-    Documentation.Name = "Safeguard for Privileged Sessions Connector",
-    Documentation.LongDescription = "Enter required paramters to be able to fetch data from SPS."
-];
+shared SafeguardSessions.ContentsImpl = (
+    sps_ip as text,
+    from as nullable datetimezone,
+    to as nullable datetimezone,
+    filterField1 as nullable text,
+    filterValue1 as nullable text,
+    filterField2 as nullable text,
+    filterValue2 as nullable text,
+    filterField3 as nullable text,
+    filterValue3 as nullable text
+) as record =>
+    let
+        sessions = FetchSessions(
+            sps_ip,
+            Extension.CurrentCredential(),
+            from,
+            to,
+            filterField1,
+            filterValue1,
+            filterField2,
+            filterValue2,
+            filterField3,
+            filterValue3
+        )
+    in
+        sessions;
 
-ContentsImpl = (sps_ip as text) => let data = GetData(sps_ip, Extension.CurrentCredential()) in data;
+shared FetchSessions = (
+    sps_ip as text,
+    credentials as record,
+    from as nullable datetimezone,
+    to as nullable datetimezone,
+    filterField1 as nullable text,
+    filterValue1 as nullable text,
+    filterField2 as nullable text,
+    filterValue2 as nullable text,
+    filterField3 as nullable text,
+    filterValue3 as nullable text,
+    optional mocks as record
+) =>
+    let
+        qParameterInputPairList = {
+            {filterField1, filterValue1},
+            {filterField2, filterValue2},
+            {filterField3, filterValue3}
+        },
+        query = [
+            qInput = qParameterInputPairList,
+            from = from,
+            to = to
+        ],
+        data = GetData(sps_ip, credentials, query, mocks)
+    in
+        data;
 
-shared GetData = (sps_ip as text, credentials as record, optional mocks as record) =>
+shared GetData = (sps_ip as text, credentials as record, query as record, optional mocks as record) =>
     let
         start_time = DateTimeZone.LocalNow(),
-        base_url = Uri.Combine(Text.Combine({"https://", sps_ip}), "api/"),
-        auth_url = Uri.Combine(base_url, "authentication"),
-        fetch_url = Uri.Combine(base_url, "audit/sessions"),
-        authResponse = 
+        base_url = UrlBuilder.GenerateBaseUrl("https", sps_ip),
+        auth_url = UrlBuilder.GenerateUrl(base_url, "api/authentication"),
+        authResponse =
             if IsMocked(mocks, "Authenticate") then
-                mocks[Authenticate]
+                mocks[Authenticate][Value]
             else
-                try Authenticate(auth_url, credentials, mocks),
+                Authenticate(auth_url, credentials, mocks),
+        fetch_url_with_user_query = UrlBuilder.GenerateUrl(
+            base_url, "api/audit/sessions", UrlBuilder.GetDefaultQuery() & query
+        ),
         response =
-            if authResponse[HasError] then
-                authResponse
-            else if IsMocked(mocks, "FetchData") then
-                mocks[FetchData]
+            if IsMocked(mocks, "FetchData") then
+                mocks[FetchData][Value]
             else
-                try
-                    FetchData(
-                        fetch_url,
-                        BaseAuthentication.MineSessionIdFromCookie(
-                            Request.GetHeader(Value.Metadata(authResponse[Value]), "Set-Cookie")
-                        ),
-                        mocks
+                FetchData(
+                    fetch_url_with_user_query,
+                    BaseAuthentication.MineSessionIdFromCookie(
+                        Request.GetHeader(Value.Metadata(authResponse), "Set-Cookie")
                     ),
-        result = BuildSPSResult(response, start_time)
+                    mocks
+                ),
+        data = HandleIfThereIsAnError(try (response)),
+        result = BuildSPSResult(data, start_time)
     in
         result;
 
@@ -71,6 +111,21 @@ shared FetchData = (url as text, session_id as text, optional mocks as nullable 
                 Request.Generate(url, Request.GetDefaultParameters(session_id))
     in
         RaiseErrorOrReturn(response);
+
+HandleIfThereIsAnError = (input as record) =>
+    if input[HasError] = true then
+        if input[Error][Detail] is record and Record.HasFields(input[Error][Detail], "ManuallyHandled") then
+            if input[Error][Detail][ManuallyHandled] = true then
+                input
+            else
+                error input[Error]
+        else
+            let
+                logNotExpectedError = Loggger.ErrorLog("An unexpected error happend during execution",input[Error])
+            in
+                error logNotExpectedError
+    else
+        input;
 
 SafeguardSessions = [
     Authentication = [
@@ -119,6 +174,8 @@ shared Extension.ImportModule = (name as text) =>
 shared Extension.ImportFunction = (function_name as text, module_name as text) =>
     Record.Field(Extension.ImportModule(module_name), function_name);
 
+SafeguardSessions.ContentsType = Extension.ImportFunction("ContentsType", "Types.pqm");
+
 Utils = Extension.ImportModule("Utils.pqm");
 
 IsMocked = Utils[IsMocked];
@@ -137,3 +194,11 @@ Request.GetAuthParameters = Request[GetAuthParameters];
 Request.GetDefaultParameters = Request[GetDefaultParameters];
 Request.Generate = Request[Generate];
 Request.GetHeader = Request[GetHeader];
+
+UrlBuilder = Extension.ImportModule("UrlBuilder.pqm");
+
+UrlBuilder.GenerateBaseUrl = UrlBuilder[GenerateBaseUrl];
+UrlBuilder.GenerateUrl = UrlBuilder[GenerateUrl];
+UrlBuilder.GetDefaultQuery = UrlBuilder[GetDefaultQuery];
+
+Loggger.ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm");
