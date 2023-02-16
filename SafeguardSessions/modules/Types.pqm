@@ -1,0 +1,129 @@
+let
+    SafeguardSessions.ContentsType = type function (
+        url as (
+            type text meta [
+                Documentation.FieldCaption = "SPS IP",
+                Documentation.FieldDescription = "The SPS IP address identifies the appliance from which session data will be fetched.",
+                Documentation.SampleValues = {"10.12.230.21"}
+            ]
+        ),
+        from as (
+            type nullable datetimezone meta [
+                Documentation.FieldCaption = "From",
+                Documentation.FieldDescription = "This field allows users to specify the starting search date.",
+                Documentation.SampleValues = {
+                    "YYYY.MM.DD",
+                    "MM/DD/YYYY",
+                    "YYYY.MM.DD HH:MM:SS (XM)",
+                    "MM/DD/YYYY HH:MM:SS (XM)",
+                    "YYYY.MM.DD HH:MM:SS (XM) Z",
+                    "MM/DD/YYYY HH:MM:SS (XM) Z",
+                    "ISO 8061 Date",
+                    "ISO 8061 Date and time in UTC"
+                }
+            ]
+        ),
+        to as (
+            type nullable datetimezone meta [
+                Documentation.FieldCaption = "To",
+                Documentation.FieldDescription = "This field allows users to specify the closing search date.",
+                Documentation.SampleValues = {
+                    "YYYY.MM.DD",
+                    "MM/DD/YYYY",
+                    "YYYY.MM.DD HH:MM:SS (XM)",
+                    "MM/DD/YYYY HH:MM:SS (XM)",
+                    "YYYY.MM.DD HH:MM:SS (XM) Z",
+                    "MM/DD/YYYY HH:MM:SS (XM) Z",
+                    "ISO 8061 Date",
+                    "ISO 8061 Date and time in UTC"
+                }
+            ]
+        ),
+        filterField1 as (
+            type nullable text meta [
+                Documentation.FieldCaption = "Filter Field 1",
+                Documentation.FieldDescription = "This field allows the user to specify a search field for seesions. It belongs to Filter Value 1.",
+                Documentation.SampleValues = {"protocol"}
+            ]
+        ),
+        filterValue1 as (
+            type nullable text meta [
+                Documentation.FieldCaption = "Filter Value 1",
+                Documentation.FieldDescription = "This field allows the user to specify a search value for sessons. It belongs to Filter Field 1.",
+                Documentation.SampleValues = {"SSH"}
+            ]
+        ),
+        filterField2 as (
+            type nullable text meta [
+                Documentation.FieldCaption = "Filter Field 2",
+                Documentation.FieldDescription = "This field allows the user to specify a search field for sessions. It belongs to Filter Value 2.",
+                Documentation.SampleValues = {"verdict"}
+            ]
+        ),
+        filterValue2 as (
+            type nullable text meta [
+                Documentation.FieldCaption = "Filter Value 2",
+                Documentation.FieldDescription = "This field allows the user to specify a search value for sessions. It belongs to Filter Field 2.",
+                Documentation.SampleValues = {"ACCEPT"}
+            ]
+        ),
+        filterField3 as (
+            type nullable text meta [
+                Documentation.FieldCaption = "Filter Field 3",
+                Documentation.FieldDescription = "This field allows the user to specify a search field for sessions. It belongs to Filter Value 3.",
+                Documentation.SampleValues = {"active"}
+            ]
+        ),
+        filterValue3 as (
+            type nullable text meta [
+                Documentation.FieldCaption = "Filter Value 3",
+                Documentation.FieldDescription = "This field allows the user to specify a search value for sessions. It belongs to Filter Field 3.",
+                Documentation.SampleValues = {"false"}
+            ]
+        )
+    ) as record meta [
+        Documentation.Name = "Safeguard for Privileged Sessions Connector",
+        Documentation.LongDescription = "Enter required paramters to be able to fetch DATA from SPS. With the optional input fields (From, Till, Filter Field, Filter Value) the
+         user can query sessions from the specified SPS based on search criterias. The filter field-value pairs are concatenated with ""AND"" in the q query parameter. In the case
+         where only the field is specified in the matching filter field-value pair, the existing q parameter is only appended with ""field_name:"", and if only the value is specified,
+         the given field-value pair is ignored in the q query parameter. For the From and Till search fields, if only one of them is specified, the search in the other direction remains
+         open."
+    ],
+    CustomErrors.ErrorBaseType = type function (
+        reason as (
+            type text meta [
+                Documentation.FieldCaption = "Error reason",
+                Documentation.FieldDescription = "Reason for the error"
+            ]
+        ),
+        message as (
+            type text meta [
+                Documentation.FieldCaption = "Error message",
+                Documentation.FieldDescription = "Descriptive message of the error"
+            ]
+        ),
+        detail as [
+            ManuallyHandled = (
+                type logical meta [
+                    Documentation.FieldCaption = "Handled error",
+                    Documentation.FieldDescription = "Whether the error is handled manually in the code or it should propagate up to the user"
+                ]
+            ),
+            Cause = (
+                type any meta [
+                    Documentation.FieldCaption = "Cause of the error",
+                    Documentation.FieldDescription = "The data that triggered the error"
+                ]
+            ),
+            RequestUrl = (type nullable text meta [
+                Documentation.FieldCaption = "Request url"
+            ])
+        ]
+    ) as table meta [
+        Documentation.Name = "ErrorBase"
+    ]
+in
+    [
+        ContentsType = SafeguardSessions.ContentsType,
+        ErrorBaseType = CustomErrors.ErrorBaseType
+    ]
