@@ -1,6 +1,35 @@
 let
-    SchemaUtils.CreateSchema = (rules as list) => #table(type table [Name = Text.Type, Type = Type.Type], rules)
+    SchemaUtils.CreateSchema = (rules as list) => #table(type table [Name = Text.Type, Type = Type.Type], rules),
+    SchemaUtils.TransformResponse = (response as nullable record) as list =>
+        let
+            defaultValue = {},
+            transformedResponse =
+                if response <> null then
+                    let
+                        GetItems = (response as record) as list =>
+                            let
+                                TransformOperation = (sessions_list as list) =>
+                                    List.Transform(sessions_list, each [session_id = [key]] & [body])
+                            in
+                                if Record.HasFields(response, "items") then
+                                    Record.TransformFields(response, {"items", TransformOperation})[items]
+                                else
+                                    defaultValue,
+                        ApplyMeta = (items as list, response as record) as list =>
+                            if Record.HasFields(response, "meta") then
+                                Value.ReplaceMetadata(items, response[#"meta"])
+                            else
+                                items,
+                        items = GetItems(response),
+                        withMeta = ApplyMeta(items, response)
+                    in
+                        withMeta
+                else
+                    defaultValue
+        in
+            transformedResponse
 in
     [
-        CreateSchema = SchemaUtils.CreateSchema
+        CreateSchema = SchemaUtils.CreateSchema,
+        TransformResponse = SchemaUtils.TransformResponse
     ]
