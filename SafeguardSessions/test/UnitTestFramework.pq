@@ -3,7 +3,7 @@
 // https://learn.microsoft.com/en-us/power-query/handlingunittesting
 // Version 1.0.0 was exactly the same as Microsoft's framework. Above this version number,
 // it includes our changes and additions
-[Version = "1.7.0"]
+[Version = "1.8.0"]
 section UnitTestFramework;
 
 shared Fact = (_subject as text, _expected, _actual) as record =>
@@ -249,6 +249,8 @@ ValueToText = (value, optional depth) =>
                 "[#_unable_to_serialize_#]"
     in
         try Serialize(value) otherwise "<serialization failed>";
+
+shared Json.FromRecord = (r as record) => Text.FromBinary(Json.FromValue(r));
 
 shared FakeResponse = (body as text, optional metadata as record) as record =>
     let

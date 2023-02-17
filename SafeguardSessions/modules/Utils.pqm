@@ -1,5 +1,6 @@
 let
     ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm"),
+    Schema.Sessions = Extension.ImportFunction("Sessions", "Schema.pqm"),
     Utils.IsMocked = (mocks as nullable record, field as text) as logical =>
         mocks <> null and Record.HasFields(mocks, field),
     Utils.FetchInfo = (
@@ -20,7 +21,7 @@ let
     Utils.SuccessStatus = "Success",
     Utils.ErrorStatus = "Error",
     Utils.NotAvailableStatus = "N/A",
-    Utils.BuildSPSResult = (response as record, start_time as datetimezone) =>
+    Utils.BuildSPSResult = (response as record, start_time as datetimezone, mocks as nullable record) =>
         let
             spsresult =
                 if response[HasError] then
@@ -40,16 +41,17 @@ let
                     )
                 else
                     [
-                        sessions = Table.FromRecords({response[Value]}),
+                        sessions = response[Value],
+                        rowCount = Table.RowCount(sessions{[Name = Schema.Sessions]}[Data]),
                         result = Utils.SPSResult(
-                            sessions,
+                            response[Value],
                             Utils.FetchInfo(
                                 Utils.SuccessStatus,
                                 "Data fetch succeeded",
                                 start_time,
-                                Table.RowCount(sessions),
+                                rowCount,
                                 false,
-                                Value.Metadata(response[Value])[RequestUrl]
+                                Value.Metadata(sessions)[RequestUrl]
                             )
                         )
                     ][result]

@@ -60,7 +60,7 @@ shared FetchSessions = (
     in
         data;
 
-shared GetData = (sps_ip as text, credentials as record, query as record, optional mocks as record) =>
+shared GetData = (sps_ip as text, credentials as record, query as record, optional mocks as nullable record) =>
     let
         start_time = DateTimeZone.LocalNow(),
         base_url = UrlBuilder.GenerateBaseUrl("https", sps_ip),
@@ -70,22 +70,20 @@ shared GetData = (sps_ip as text, credentials as record, query as record, option
                 mocks[Authenticate][Value]
             else
                 Authenticate(auth_url, credentials, mocks),
-        fetch_url_with_user_query = UrlBuilder.GenerateUrl(
-            base_url, "api/audit/sessions", UrlBuilder.GetDefaultQuery() & query
-        ),
         response =
             if IsMocked(mocks, "FetchData") then
                 mocks[FetchData][Value]
             else
                 FetchData(
-                    fetch_url_with_user_query,
+                    UrlBuilder.GenerateUrl(base_url, "api/audit/sessions", UrlBuilder.GetDefaultQuery() & query),
                     BaseAuthentication.MineSessionIdFromCookie(
                         Request.GetHeader(Value.Metadata(authResponse), "Set-Cookie")
                     ),
                     mocks
                 ),
-        data = HandleIfThereIsAnError(try (response)),
-        result = BuildSPSResult(data, start_time)
+        normalizedResponse = NormalizeResponse(response, mocks),
+        data = HandleIfThereIsAnError(try (normalizedResponse)),
+        result = BuildSPSResult(data, start_time, mocks)
     in
         result;
 
@@ -112,6 +110,44 @@ shared FetchData = (url as text, session_id as text, optional mocks as nullable 
     in
         RaiseErrorOrReturn(response);
 
+NormalizeResponse = (response as record, optional mocks as nullable record) =>
+    let
+        normalizedResponse =
+            let
+                transformedResponse = SchemaUtils.TransformResponse(response),
+                sessions = SubTable.Create(Schema.Sessions, transformedResponse),
+                subTableNames =
+                    if IsMocked(mocks, "SubTables") then
+                        mocks[SubTables]
+                    else
+                        Schema.GetSubTables(Schema.Sessions),
+                normalizedSubTables =
+                    if IsMocked(mocks, "NormalizeResult") then
+                        mocks[NormalizeResult]
+                    else
+                        Normalize.Normalize(sessions, subTableNames, Schema.GetIdentifierColumn(Schema.Sessions)),
+                withSchema = List.Transform(
+                    normalizedSubTables,
+                    (subTable) =>
+                        SubTable.TransformData(
+                            subTable,
+                            (data) =>
+                                SchemaUtils.TransformTable(
+                                    data,
+                                    if IsMocked(mocks, "Schema") then
+                                        Record.Field(mocks[Schema], SubTable.GetName(subTable))
+                                    else
+                                        Schema.GetSchema(SubTable.GetName(subTable))
+                                )
+                        )
+                ),
+                asTable = Table.Buffer(Table.FromRecords(withSchema)),
+                withMeta = Value.ReplaceMetadata(asTable, Value.Metadata(response))
+            in
+                withMeta
+    in
+        try normalizedResponse catch (e) => NormalizeError(response, e[Message]);
+
 HandleIfThereIsAnError = (input as record) =>
     if input[HasError] = true then
         if input[Error][Detail] is record and Record.HasFields(input[Error][Detail], "ManuallyHandled") then
@@ -121,7 +157,7 @@ HandleIfThereIsAnError = (input as record) =>
                 error input[Error]
         else
             let
-                logNotExpectedError = Loggger.ErrorLog("An unexpected error happend during execution",input[Error])
+                logNotExpectedError = Logger.ErrorLog("An unexpected error happend during execution", input[Error])
             in
                 error logNotExpectedError
     else
@@ -201,4 +237,25 @@ UrlBuilder.GenerateBaseUrl = UrlBuilder[GenerateBaseUrl];
 UrlBuilder.GenerateUrl = UrlBuilder[GenerateUrl];
 UrlBuilder.GetDefaultQuery = UrlBuilder[GetDefaultQuery];
 
-Loggger.ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm");
+Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm");
+
+SchemaUtils.TransformResponse = Extension.ImportFunction("TransformResponse", "SchemaUtils.pqm");
+SchemaUtils.TransformTable = Extension.ImportFunction("TransformTable", "SchemaUtils.pqm");
+
+Schema = Extension.ImportModule("Schema.pqm");
+
+Schema.Sessions = Schema[Sessions];
+Schema.GetSchema = Schema[GetSchema];
+Schema.GetIdentifierColumn = Schema[GetIdentifierColumn];
+Schema.GetSubTables = Schema[GetSubTables];
+
+SubTable = Extension.ImportModule("SubTable.pqm");
+
+NormalizeError = Extension.ImportFunction("NormalizeError", "SchemaErrors.pqm");
+
+SubTable.Create = SubTable[Create];
+SubTable.GetName = SubTable[GetName];
+SubTable.GetData = SubTable[GetData];
+SubTable.TransformData = SubTable[TransformData];
+
+Normalize.Normalize = Extension.ImportFunction("Normalize", "Normalize.pqm");

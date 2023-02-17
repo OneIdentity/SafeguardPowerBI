@@ -17,8 +17,9 @@
     <MezContent Include="$(ModulesPath)Types.pqm" />
     <MezContent Include="$(ModulesPath)Utils.pqm" />
     <MezContent Include="$(ErrorPath)ErrorBase.pqm" />
-    <MezContent Include="$(ErrorPath)QueryTransformErrors.pqm" />
+    <MezContent Include="$(ErrorPath)SchemaErrors.pqm" />
     <MezContent Include="$(ErrorPath)RequestErrors.pqm" />
+    <MezContent Include="$(ErrorPath)QueryTransformErrors.pqm" />
     <MezContent Include="$(RequestPath)UrlBuilder.pqm" />
     <MezContent Include="$(RequestPath)QueryParameterTransformer.pqm" />
     <MezContent Include="$(RequestPath)Request.pqm" />

@@ -2,7 +2,9 @@ section TestSafeguardSessions.FetchData;
 
 TestFetchDataRaisesErrorForStatusCode = (status_code as number, expected_reason as text, expected_message as text) =>
     let
-        fake_response = FakeRawResponse("{""error"": ""reason""}", [
+        fake_response = FakeRawResponse(Json.FromRecord([
+            error = "reason"
+        ]), [
             Response.Status = status_code
         ]),
         facts = TestErrorIsRaised(
@@ -23,7 +25,10 @@ TestFetchDataRaisesErrorForStatusCode = (status_code as number, expected_reason 
 TestFetchDataIsSuccessful = () =>
     let
         fake_response = FakeRawResponse(
-            "{""dummy_field"": ""value"", ""dummy_list"": [0, 1, 2]}", [Response.Status = 200]
+            Json.FromRecord([
+                dummy_field = "value",
+                dummy_list = {0, 1, 2}
+            ]), [Response.Status = 200]
         ),
         response = FetchData(
             "dummy_url", "e8e5f0a0d3367043150187f81df3484e91e365d5", [
@@ -34,7 +39,10 @@ TestFetchDataIsSuccessful = () =>
             Fact("Data fetch response is correct", [dummy_field = "value", dummy_list = {0, 1, 2}], response),
             Fact(
                 "Test data fetch meta is correct",
-                [Response.Status = 200, RequestUrl = "dummy_url"],
+                [
+                    Response.Status = 200,
+                    RequestUrl = "dummy_url"
+                ],
                 Value.Metadata(response)
             )
         }
@@ -56,9 +64,6 @@ TestFetchDataRaisesError = () =>
         facts;
 
 shared TestSafeguardSessions.IntegrationTest = [
-    facts = {
-        TestFetchDataIsSuccessful(),
-        TestFetchDataRaisesError()
-    },
+    facts = {TestFetchDataIsSuccessful(), TestFetchDataRaisesError()},
     report = Facts.Summarize(facts)
 ][report];

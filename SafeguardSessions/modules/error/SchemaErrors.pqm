@@ -1,0 +1,21 @@
+let
+    Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm"),
+    ErrorBase = Extension.ImportModule("ErrorBase.pqm"),
+    SchemaErrors.NormalizeError = (response as record, detail as any) =>
+        Logger.ErrorLog(
+            Text.Format("An error happened during the normalization of #{0}", {response}),
+            error
+                ErrorBase(
+                    "Normalize Error",
+                    "Something went wrong during normalization",
+                    [
+                        ManuallyHandled = true,
+                        Cause = detail,
+                        RequestUrl = Value.Metadata(response)[RequestUrl]
+                    ]
+                )
+        )
+in
+    [
+        NormalizeError = SchemaErrors.NormalizeError
+    ]
