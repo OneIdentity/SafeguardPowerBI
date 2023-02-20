@@ -1,5 +1,8 @@
 let
-    SchemaUtils.CreateSchema = (rules as list) => #table(type table [Name = Text.Type, Type = Type.Type], rules),
+    SchemaUtils.NameColumn = "Name",
+    SchemaUtils.TypeColumn = "Type",
+    SchemaUtils.Header = {SchemaUtils.NameColumn, SchemaUtils.TypeColumn},
+    SchemaUtils.CreateSchema = (rules as list) => #table(SchemaUtils.Header, rules),
     SchemaUtils.TransformResponse = (response as nullable record) as list =>
         let
             defaultValue = {},
@@ -27,9 +30,59 @@ let
                 else
                     defaultValue
         in
-            transformedResponse
+            transformedResponse,
+    SchemaUtils.TransformTable = (_table as table, schema as table) as table =>
+        let
+            // Applies type transforms to a given table
+            EnforceTypes = (_table as table, schema as table) as table =>
+                let
+                    // Determine type transforms
+                    map = (t) =>
+                        if List.AnyTrue(
+                            {Type.Is(t, type list), Type.Is(t, type record), Type.Is(t, type table), t = type any}
+                        ) then
+                            null
+                        else
+                            t,
+                    // Add missing columns
+                    missingColumns = List.Difference(
+                        Table.Column(schema, SchemaUtils.NameColumn), Table.ColumnNames(_table)
+                    ),
+                    extraColumns = List.Difference(
+                        Table.ColumnNames(_table), Table.Column(schema, SchemaUtils.NameColumn)
+                    ),
+                    identicalTable = Table.Combine(
+                        {Table.RemoveColumns(_table, extraColumns), #table(missingColumns, {})}
+                    ),
+                    // The columns will be ordered according to the schema table
+                    withReordered = Table.ReorderColumns(
+                        identicalTable, Table.Column(schema, SchemaUtils.NameColumn)
+                    ),
+                    mapped = Table.TransformColumns(schema, {SchemaUtils.TypeColumn, map}),
+                    omitted = Table.SelectRows(mapped, each Table.Column(_, SchemaUtils.TypeColumn) <> null),
+                    primitiveTransforms = Table.ToRows(omitted),
+                    // Apply type transform
+                    changedPrimitives = Table.TransformColumnTypes(withReordered, primitiveTransforms)
+                in
+                    changedPrimitives,
+            // Returns the table type for a given schema
+            SchemaToTableType = (schema as table) as type =>
+                let
+                    toList = List.Transform(
+                        Table.Column(schema, SchemaUtils.TypeColumn),
+                        (t) => Record.FromList({t, false}, {SchemaUtils.TypeColumn, "Optional"})
+                    ),
+                    toRecord = Record.FromList(toList, Table.Column(schema, SchemaUtils.NameColumn)),
+                    toType = Type.ForRecord(toRecord, false)
+                in
+                    type table (toType),
+            enforcedTypes = EnforceTypes(_table, schema),
+            withType = Value.ReplaceType(enforcedTypes, SchemaToTableType(schema))
+        in
+            withType
 in
     [
         CreateSchema = SchemaUtils.CreateSchema,
-        TransformResponse = SchemaUtils.TransformResponse
+        TransformResponse = SchemaUtils.TransformResponse,
+        TransformTable = SchemaUtils.TransformTable
     ]
