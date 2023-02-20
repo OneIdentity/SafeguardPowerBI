@@ -1,325 +1,152 @@
 [
-    sessions.analytics.score.details.command = #table(
-        type table [Name = text, Type = type],
-        {{"sessions.analytics.score.details.command_id", type number}, {"score", type number}}
-    ),
-    sessions.analytics.score.details.fis = #table(
-        type table [Name = text, Type = type],
-        {{"sessions.analytics.score.details.fis_id", type number}, {"score", type number}}
-    ),
-    sessions.analytics.score.details.hostlogin = #table(
-        type table [Name = text, Type = type],
-        {{"sessions.analytics.score.details.hostlogin_id", type number}, {"score", type number}}
-    ),
-    sessions.analytics.score.details.logintime = #table(
-        type table [Name = text, Type = type],
-        {{"sessions.analytics.score.details.logintime_id", type number}, {"score", type number}}
-    ),
-    sessions.analytics.score.details.keystroke = #table(
-        type table [Name = text, Type = type],
-        {{"sessions.analytics.score.details.keystroke_id", type number}, {"score", type number}}
-    ),
-    sessions.analytics.score.details.mouse = #table(
-        type table [Name = text, Type = type],
-        {{"sessions.analytics.score.details.mouse_id", type number}, {"score", type number}}
-    ),
-    sessions.analytics.score.details.windowtitle = #table(
-        type table [Name = text, Type = type],
-        {{"sessions.analytics.score.details.windowtitle_id", type number}, {"score", type number}}
-    ),
-    sessions.analytics.score.details = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.analytics.score.details_id", type number},
-            {"sessions.analytics.score.details.command_id", type number},
-            {"sessions.analytics.score.details.fis_id", type number},
-            {"sessions.analytics.score.details.hostlogin_id", type number},
-            {"sessions.analytics.score.details.logintime_id", type number},
-            {"sessions.analytics.score.details.keystroke_id", type number},
-            {"sessions.analytics.score.details.mouse_id", type number},
-            {"sessions.analytics.score.details.windowtitle_id", type number}
-        }
-    ),
-    sessions.analytics.score = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.analytics.score_id", type number},
-            {"aggregated", type number},
-            {"sessions.analytics.score.details_id", type number}
-        }
-    ),
-    sessions.analytics = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.analytics_id", type number},
-            {"interesing_events", type text},
-            {"sessions.analytics.score_id", type number},
-            {"scripted", type logical},
-            {"similar_sessions", type text},
-            {"bucketed_duration", type text},
-            {"bucketed_duration_starting_hour", type text},
-            {"tags", type text}
-        }
-    ),
     sessions.client = #table(
-        type table [Name = text, Type = type],
-        {{"sessions.client_id", type number}, {"ip", type text}, {"name", type text}, {"port", type number}}
-    ),
-    sessions.log = #table(
-        type table [Name = text, Type = type],
+        type table [Name = any, Type = any],
         {
-            {"sessions.log_id", type number},
-            {"adapter_name", type text},
-            {"auth_method", type text},
-            {"syslog_time", type datetimezone}
+            {"sessions.client_id", type number},
+            {"client.ip", type text},
+            {"client.name", type text},
+            {"client.port", type number}
         }
     ),
-    sessions.vault.created.user = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.vault.created.user_id", type number},
-            {"user_id", type number},
-            {"user_name", type text},
-            {"domain_name", type text},
-            {"user_display_name", type text},
-            {"client_ip_address", type text}
-        }
-    ),
-    sessions.vault.created = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.vault.created_id", type number},
-            {"sessions.vault.created.user_id", type number},
-            {"comment", type text},
-            {"timestamp", type datetimezone}
-        }
-    ),
-    sessions.vault.denied.user = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.vault.denied.user_id", type number},
-            {"user_id", type number},
-            {"user_name", type text},
-            {"domain_name", type text},
-            {"user_display_name", type text},
-            {"client_ip_address", type text}
-        }
-    ),
-    sessions.vault.denied = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.vault.denied_id", type number},
-            {"sessions.vault.denied.user_id", type number},
-            {"comment", type text},
-            {"timestamp", type datetimezone}
-        }
-    ),
-    sessions.vault.revoked.user = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.vault.revoked.user_id", type number},
-            {"user_id", type number},
-            {"user_name", type text},
-            {"domain_name", type text},
-            {"user_display_name", type text},
-            {"client_ip_address", type text}
-        }
-    ),
-    sessions.vault.revoked = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.vault.revoked_id", type number},
-            {"sessions.vault.revoked.user_id", type number},
-            {"comment", type text},
-            {"timestamp", type datetimezone}
-        }
-    ),
-    sessions.vault.closed.user = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.vault.closed.user_id", type number},
-            {"user_id", type number},
-            {"user_name", type text},
-            {"domain_name", type text},
-            {"user_display_name", type text},
-            {"client_ip_address", type text}
-        }
-    ),
-    sessions.vault.closed = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.vault.closed_id", type number},
-            {"sessions.vault.closed.user_id", type number},
-            {"comment", type text},
-            {"timestamp", type datetimezone}
-        }
-    ),
-    sessions.vault.reviewed.user = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.vault.reviewed.user_id", type number},
-            {"user_id", type number},
-            {"user_name", type text},
-            {"domain_name", type text},
-            {"user_display_name", type text},
-            {"client_ip_address", type text}
-        }
-    ),
-    sessions.vault.reviewed = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.vault.reviewed_id", type number},
-            {"sessions.vault.reviewed.user_id", type number},
-            {"comment", type text},
-            {"timestamp", type datetimezone}
-        }
-    ),
-    sessions.vault.approved.user = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.vault.approved.user_id", type number},
-            {"user_id", type number},
-            {"user_name", type text},
-            {"domain_name", type text},
-            {"user_display_name", type text},
-            {"client_ip_address", type text}
-        }
-    ),
-    sessions.vault.approved = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.vault.approved_id", type number},
-            {"sessions.vault.approved.user_id", type number},
-            {"comment", type text},
-            {"timestamp", type datetimezone}
-        }
-    ),
-    sessions.vault = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.vault_id", type number},
-            {"appliance_id", type text},
-            {"appliance_name", type text},
-            {"access_request_type", type text},
-            {"asset_partition_id", type number},
-            {"asset_partition_name", type text},
-            {"broker_id", type number},
-            {"broker_name", type text},
-            {"account_id", type number},
-            {"account_name", type text},
-            {"system_id", type number},
-            {"system_name", type text},
-            {"ticket_number", type text},
-            {"reason_name", type text},
-            {"is_emergency", type logical},
-            {"offline_workflow", type logical},
-            {"auto_approved", type datetimezone},
-            {"emergency_access_granted", type datetimezone},
-            {"available", type datetimezone},
-            {"checked_in", type datetimezone},
-            {"expired", type datetimezone},
-            {"sessions.vault.created_id", type number},
-            {"sessions.vault.denied_id", type number},
-            {"sessions.vault.revoked_id", type number},
-            {"sessions.vault.closed_id", type number},
-            {"sessions.vault.reviewed_id", type number},
-            {"sessions.vault.approved_id", type number}
-        }
-    ),
-    sessions.recording.archive = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.recording.archive_id", type number},
-            {"date", type datetimezone},
-            {"path", type text},
-            {"policy", type text},
-            {"server", type text}
-        }
-    ),
-    sessions.recording.server_local = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.recording.server_local_id", type number},
-            {"ip", type text},
-            {"name", type text},
-            {"port", type number}
-        }
-    ),
-    sessions.recording.target = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.recording.target_id", type number},
-            {"ip", type text},
-            {"name", type text},
-            {"port", type number}
-        }
-    ),
-    sessions.recording = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.recording_id", type number},
-            {"sessions.recording.archive_id", type number},
-            {"archived", type logical},
-            {"auth_method", type text},
-            {"channel_policy", type text},
-            {"command_extracted", type logical},
-            {"connection_policy", type text},
-            {"connection_policy_id", type text},
-            {"content_reference_id", type number},
-            {"deny_reason", type text},
-            {"index_status", type text},
-            {"network_id", type text},
-            {"sessions.recording.server_local_id", type number},
-            {"session_id", type text},
-            {"sessions.recording.target_id", type number},
-            {"verdict", type text},
-            {"window_title_extracted", type logical}
-        }
-    ),
-    sessions.server = #table(
-        type table [Name = text, Type = type],
-        {
-            {"sessions.server_id", type number},
-            {"address", type text},
-            {"ip", type text},
-            {"id", type text},
-            {"name", type text},
-            {"port", type number}
-        }
+    sessions.client_to_sessions = #table(
+        type table [Name = any, Type = any], {{"session_id", type text}, {"sessions.client_id", type number}}
     ),
     sessions.user = #table(
-        type table [Name = text, Type = type],
+        type table [Name = any, Type = any],
         {
             {"sessions.user_id", type number},
-            {"gateway_username", type text},
-            {"gateway_username_domain", type text},
-            {"id", type text},
-            {"name", type text},
-            {"name_domain", type text},
-            {"server_username", type text},
-            {"server_username_domain", type text}
+            {"user.gateway_username", type text},
+            {"user.gateway_username_domain", type text},
+            {"user.id", type text},
+            {"user.name", type text},
+            {"user.name_domain", type text},
+            {"user.server_username", type text},
+            {"user.server_username_domain", type text}
         }
     ),
+    sessions.user_to_sessions = #table(
+        type table [Name = any, Type = any], {{"session_id", type text}, {"sessions.user_id", type number}}
+    ),
     sessions = #table(
-        type table [Name = text, Type = type],
+        type table [Name = any, Type = any],
         {
-            {"sessions_id", type number},
+            {"session_id", type text},
             {"active", type logical},
-            {"sessions.analytics_id", type number},
-            {"sessions.client_id", type number},
+            {"analytics.interesting_events", type text},
+            {"analytics.score.aggregated", type number},
+            {"analytics.score.details.command.score", type number},
+            {"analytics.score.details.fis.score", type number},
+            {"analytics.score.details.hostlogin.score", type number},
+            {"analytics.score.details.logintime.score", type number},
+            {"analytics.score.details.keystroke.score", type number},
+            {"analytics.score.details.mouse.score", type number},
+            {"analytics.score.details.windowtitle.score", type number},
+            {"analytics.scripted", type logical},
+            {"analytics.similar_sessions", type text},
+            {"analytics.bucketed_duration", type text},
+            {"analytics.bucketed_duration_starting_hour", type text},
+            {"analytics.tags", type text},
             {"creation_time", type datetimezone},
             {"duration", type number},
             {"end_time", type datetimezone},
-            {"sessions.log_id", type number},
+            {"log.adapter_name", type text},
+            {"log.auth_method", type text},
+            {"log.syslog_time", type datetimezone},
             {"node_id", type text},
             {"origin", type text},
             {"protocol", type text},
-            {"sessions.vault_id", type number},
-            {"sessions.recording_id", type number},
+            {"vault.appliance_id", type text},
+            {"vault.appliance_name", type text},
+            {"vault.access_request_type", type text},
+            {"vault.asset_partition_id", type number},
+            {"vault.asset_partition_name", type text},
+            {"vault.broker_id", type number},
+            {"vault.broker_name", type text},
+            {"vault.account_id", type number},
+            {"vault.account_name", type text},
+            {"vault.system_id", type number},
+            {"vault.system_name", type text},
+            {"vault.ticket_number", type text},
+            {"vault.reason_name", type text},
+            {"vault.is_emergency", type logical},
+            {"vault.offline_workflow", type logical},
+            {"vault.auto_approved", type datetimezone},
+            {"vault.emergency_access_granted", type datetimezone},
+            {"vault.available", type datetimezone},
+            {"vault.checked_in", type datetimezone},
+            {"vault.expired", type datetimezone},
+            {"vault.created.user.user_id", type number},
+            {"vault.created.user.user_name", type text},
+            {"vault.created.user.domain_name", type text},
+            {"vault.created.user.user_display_name", type text},
+            {"vault.created.user.client_ip_address", type text},
+            {"vault.created.comment", type text},
+            {"vault.created.timestamp", type datetimezone},
+            {"vault.denied.user.user_id", type number},
+            {"vault.denied.user.user_name", type text},
+            {"vault.denied.user.domain_name", type text},
+            {"vault.denied.user.user_display_name", type text},
+            {"vault.denied.user.client_ip_address", type text},
+            {"vault.denied.comment", type text},
+            {"vault.denied.timestamp", type datetimezone},
+            {"vault.revoked.user.user_id", type number},
+            {"vault.revoked.user.user_name", type text},
+            {"vault.revoked.user.domain_name", type text},
+            {"vault.revoked.user.user_display_name", type text},
+            {"vault.revoked.user.client_ip_address", type text},
+            {"vault.revoked.comment", type text},
+            {"vault.revoked.timestamp", type datetimezone},
+            {"vault.closed.user.user_id", type number},
+            {"vault.closed.user.user_name", type text},
+            {"vault.closed.user.domain_name", type text},
+            {"vault.closed.user.user_display_name", type text},
+            {"vault.closed.user.client_ip_address", type text},
+            {"vault.closed.comment", type text},
+            {"vault.closed.timestamp", type datetimezone},
+            {"vault.reviewed.user.user_id", type number},
+            {"vault.reviewed.user.user_name", type text},
+            {"vault.reviewed.user.domain_name", type text},
+            {"vault.reviewed.user.user_display_name", type text},
+            {"vault.reviewed.user.client_ip_address", type text},
+            {"vault.reviewed.comment", type text},
+            {"vault.reviewed.timestamp", type datetimezone},
+            {"vault.approved.user.user_id", type number},
+            {"vault.approved.user.user_name", type text},
+            {"vault.approved.user.domain_name", type text},
+            {"vault.approved.user.user_display_name", type text},
+            {"vault.approved.user.client_ip_address", type text},
+            {"vault.approved.comment", type text},
+            {"vault.approved.timestamp", type datetimezone},
+            {"recording.archive.date", type datetimezone},
+            {"recording.archive.path", type text},
+            {"recording.archive.policy", type text},
+            {"recording.archive.server", type text},
+            {"recording.archived", type logical},
+            {"recording.auth_method", type text},
+            {"recording.channel_policy", type text},
+            {"recording.command_extracted", type logical},
+            {"recording.connection_policy", type text},
+            {"recording.connection_policy_id", type text},
+            {"recording.content_reference_id", type number},
+            {"recording.deny_reason", type text},
+            {"recording.index_status", type text},
+            {"recording.network_id", type text},
+            {"recording.server_local.ip", type text},
+            {"recording.server_local.name", type text},
+            {"recording.server_local.port", type number},
+            {"recording.session_id", type text},
+            {"recording.target.ip", type text},
+            {"recording.target.name", type text},
+            {"recording.target.port", type number},
+            {"recording.verdict", type text},
+            {"recording.window_title_extracted", type logical},
             {"trail_download_link", type text},
-            {"sessions.server_id", type number},
+            {"server.address", type text},
+            {"server.ip", type text},
+            {"server.id", type text},
+            {"server.name", type text},
+            {"server.port", type number},
             {"start_time", type datetimezone},
-            {"sessions.user_id", type number},
             {"verdict", type text}
         }
     )

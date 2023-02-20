@@ -8,7 +8,6 @@ Schema = Extension.ImportModule("Schema.pqm");
 Schema.GenerateSchemaMap = Schema[GenerateSchemaMap];
 Schema.SchemaMap = Schema[SchemaMap];
 Schema.GetSchema = Schema[GetSchema];
-Schema.GetSubSchema = Schema[GetSubSchema];
 
 TestCreateSchema = () =>
     let
@@ -30,17 +29,14 @@ TestGenerateSchemaMap = () =>
 
 TestSessionsSchemaIsCorrect = () =>
     let
-        AssertSchema = (schemaName as text, assetFile as text) =>
-            let
-                expectedSchema = UnitTestFramework.ImportFunction(schemaName, assetFile)
-            in
-                Fact(Text.Format("#{0} schema matches", {schemaName}), expectedSchema, Schema.GetSchema(schemaName)),
+        AssertLiveSchema = (schemaName as text, assetFile as text) =>
+            AssertSchemaDefinition(schemaName, Schema.GetSchema(schemaName), assetFile),
         assetFile = "SessionsSchemaAsset.pqm",
         sessionsSchemaNames = List.Select(
             Record.FieldNames(Schema.SchemaMap), (schemaName) => Text.StartsWith(schemaName, "sessions")
         ),
         cases = List.Transform(sessionsSchemaNames, (schemaName) => {schemaName, assetFile}),
-        facts = ProvideDataForTest(cases, AssertSchema)
+        facts = ProvideDataForTest(cases, AssertLiveSchema)
     in
         facts;
 

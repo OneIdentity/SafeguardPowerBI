@@ -3,8 +3,8 @@
 // https://learn.microsoft.com/en-us/power-query/handlingunittesting
 // Version 1.0.0 was exactly the same as Microsoft's framework. Above this version number,
 // it includes our changes and additions
-[Version = "1.6.0"]
-section UnitTestFrameork;
+[Version = "1.7.0"]
+section UnitTestFramework;
 
 shared Fact = (_subject as text, _expected, _actual) as record =>
     [
@@ -306,6 +306,12 @@ shared TestLogging = (logValues as record, expectedLogValues as record, inputTyp
 
 shared ProvideDataForTest = (data as list, func as function) => List.Transform(data, each Function.Invoke(func, _));
 
+shared AssertSchemaDefinition = (schemaName as text, schema as table, assetFile as text) =>
+    let
+        expectedSchema = UnitTestFramework.ImportFunction(schemaName, assetFile)
+    in
+        Fact(Text.Format("#{0} schema matches", {schemaName}), expectedSchema, schema);
+
 shared TestResultsContentWithoutStartTime = (response as record, expected_data as any, expected_info as table) =>
     let
         facts = {
@@ -314,7 +320,6 @@ shared TestResultsContentWithoutStartTime = (response as record, expected_data a
         }
     in
         facts;
-
 
 shared TestFetchInfoContentWithoutStartTime = (expected_info as table, actual_info as table) =>
     let

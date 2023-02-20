@@ -1,335 +1,172 @@
 let
-    // Import
+    // Imports
     CreateSchema = Extension.ImportFunction("CreateSchema", "SchemaUtils.pqm"),
     //
+    // Constants
+    Sessions.Name = "sessions",
+    Sessions.IdentifierColumn = "session_id",
+    Sessions.SubTables = {"user", "client"},
+    //
     // Schema definiton
-    Sessions.Analytics.Score.Details.Command = CreateSchema(
-        {{"sessions.analytics.score.details.command_id", type number}, {"score", type number}}
-    ),
-    Sessions.Analytics.Score.Details.Fis = CreateSchema(
-        {{"sessions.analytics.score.details.fis_id", type number}, {"score", type number}}
-    ),
-    Sessions.Analytics.Score.Details.Hostlogin = CreateSchema(
-        {{"sessions.analytics.score.details.hostlogin_id", type number}, {"score", type number}}
-    ),
-    Sessions.Analytics.Score.Details.Logintime = CreateSchema(
-        {{"sessions.analytics.score.details.logintime_id", type number}, {"score", type number}}
-    ),
-    Sessions.Analytics.Score.Details.Keystroke = CreateSchema(
-        {{"sessions.analytics.score.details.keystroke_id", type number}, {"score", type number}}
-    ),
-    Sessions.Analytics.Score.Details.Mouse = CreateSchema(
-        {{"sessions.analytics.score.details.mouse_id", type number}, {"score", type number}}
-    ),
-    Sessions.Analytics.Score.Details.Windowtitle = CreateSchema(
-        {{"sessions.analytics.score.details.windowtitle_id", type number}, {"score", type number}}
-    ),
-    Sessions.Analytics.Score.Details = CreateSchema(
-        {
-            {"sessions.analytics.score.details_id", type number},
-            {"sessions.analytics.score.details.command_id", type number},
-            {"sessions.analytics.score.details.fis_id", type number},
-            {"sessions.analytics.score.details.hostlogin_id", type number},
-            {"sessions.analytics.score.details.logintime_id", type number},
-            {"sessions.analytics.score.details.keystroke_id", type number},
-            {"sessions.analytics.score.details.mouse_id", type number},
-            {"sessions.analytics.score.details.windowtitle_id", type number}
-        }
-    ),
-    Sessions.Analytics.Score = CreateSchema(
-        {
-            {"sessions.analytics.score_id", type number},
-            {"aggregated", type number},
-            {"sessions.analytics.score.details_id", type number}
-        }
-    ),
-    Sessions.Analytics = CreateSchema(
-        {
-            {"sessions.analytics_id", type number},
-            {"interesing_events", type text},
-            {"sessions.analytics.score_id", type number},
-            {"scripted", type logical},
-            {"similar_sessions", type text},
-            {"bucketed_duration", type text},
-            {"bucketed_duration_starting_hour", type text},
-            {"tags", type text}
-        }
-    ),
-    Sessions.Client = CreateSchema(
-        {{"sessions.client_id", type number}, {"ip", type text}, {"name", type text}, {"port", type number}}
-    ),
-    Sessions.Log = CreateSchema(
-        {
-            {"sessions.log_id", type number},
-            {"adapter_name", type text},
-            {"auth_method", type text},
-            {"syslog_time", type datetimezone}
-        }
-    ),
-    Sessions.Vault.Created.User = CreateSchema(
-        {
-            {"sessions.vault.created.user_id", type number},
-            {"user_id", type number},
-            {"user_name", type text},
-            {"domain_name", type text},
-            {"user_display_name", type text},
-            {"client_ip_address", type text}
-        }
-    ),
-    Sessions.Vault.Created = CreateSchema(
-        {
-            {"sessions.vault.created_id", type number},
-            {"sessions.vault.created.user_id", type number},
-            {"comment", type text},
-            {"timestamp", type datetimezone}
-        }
-    ),
-    Sessions.Vault.Denied.User = CreateSchema(
-        {
-            {"sessions.vault.denied.user_id", type number},
-            {"user_id", type number},
-            {"user_name", type text},
-            {"domain_name", type text},
-            {"user_display_name", type text},
-            {"client_ip_address", type text}
-        }
-    ),
-    Sessions.Vault.Denied = CreateSchema(
-        {
-            {"sessions.vault.denied_id", type number},
-            {"sessions.vault.denied.user_id", type number},
-            {"comment", type text},
-            {"timestamp", type datetimezone}
-        }
-    ),
-    Sessions.Vault.Revoked.User = CreateSchema(
-        {
-            {"sessions.vault.revoked.user_id", type number},
-            {"user_id", type number},
-            {"user_name", type text},
-            {"domain_name", type text},
-            {"user_display_name", type text},
-            {"client_ip_address", type text}
-        }
-    ),
-    Sessions.Vault.Revoked = CreateSchema(
-        {
-            {"sessions.vault.revoked_id", type number},
-            {"sessions.vault.revoked.user_id", type number},
-            {"comment", type text},
-            {"timestamp", type datetimezone}
-        }
-    ),
-    Sessions.Vault.Closed.User = CreateSchema(
-        {
-            {"sessions.vault.closed.user_id", type number},
-            {"user_id", type number},
-            {"user_name", type text},
-            {"domain_name", type text},
-            {"user_display_name", type text},
-            {"client_ip_address", type text}
-        }
-    ),
-    Sessions.Vault.Closed = CreateSchema(
-        {
-            {"sessions.vault.closed_id", type number},
-            {"sessions.vault.closed.user_id", type number},
-            {"comment", type text},
-            {"timestamp", type datetimezone}
-        }
-    ),
-    Sessions.Vault.Reviewed.User = CreateSchema(
-        {
-            {"sessions.vault.reviewed.user_id", type number},
-            {"user_id", type number},
-            {"user_name", type text},
-            {"domain_name", type text},
-            {"user_display_name", type text},
-            {"client_ip_address", type text}
-        }
-    ),
-    Sessions.Vault.Reviewed = CreateSchema(
-        {
-            {"sessions.vault.reviewed_id", type number},
-            {"sessions.vault.reviewed.user_id", type number},
-            {"comment", type text},
-            {"timestamp", type datetimezone}
-        }
-    ),
-    Sessions.Vault.Approved.User = CreateSchema(
-        {
-            {"sessions.vault.approved.user_id", type number},
-            {"user_id", type number},
-            {"user_name", type text},
-            {"domain_name", type text},
-            {"user_display_name", type text},
-            {"client_ip_address", type text}
-        }
-    ),
-    Sessions.Vault.Approved = CreateSchema(
-        {
-            {"sessions.vault.approved_id", type number},
-            {"sessions.vault.approved.user_id", type number},
-            {"comment", type text},
-            {"timestamp", type datetimezone}
-        }
-    ),
-    Sessions.Vault = CreateSchema(
-        {
-            {"sessions.vault_id", type number},
-            {"appliance_id", type text},
-            {"appliance_name", type text},
-            {"access_request_type", type text},
-            {"asset_partition_id", type number},
-            {"asset_partition_name", type text},
-            {"broker_id", type number},
-            {"broker_name", type text},
-            {"account_id", type number},
-            {"account_name", type text},
-            {"system_id", type number},
-            {"system_name", type text},
-            {"ticket_number", type text},
-            {"reason_name", type text},
-            {"is_emergency", type logical},
-            {"offline_workflow", type logical},
-            {"auto_approved", type datetimezone},
-            {"emergency_access_granted", type datetimezone},
-            {"available", type datetimezone},
-            {"checked_in", type datetimezone},
-            {"expired", type datetimezone},
-            {"sessions.vault.created_id", type number},
-            {"sessions.vault.denied_id", type number},
-            {"sessions.vault.revoked_id", type number},
-            {"sessions.vault.closed_id", type number},
-            {"sessions.vault.reviewed_id", type number},
-            {"sessions.vault.approved_id", type number}
-        }
-    ),
-    Sessions.Recording.Archive = CreateSchema(
-        {
-            {"sessions.recording.archive_id", type number},
-            {"date", type datetimezone},
-            {"path", type text},
-            {"policy", type text},
-            {"server", type text}
-        }
-    ),
-    Sessions.Recording.Server_local = CreateSchema(
-        {
-            {"sessions.recording.server_local_id", type number},
-            {"ip", type text},
-            {"name", type text},
-            {"port", type number}
-        }
-    ),
-    Sessions.Recording.Target = CreateSchema(
-        {
-            {"sessions.recording.target_id", type number},
-            {"ip", type text},
-            {"name", type text},
-            {"port", type number}
-        }
-    ),
-    Sessions.Recording = CreateSchema(
-        {
-            {"sessions.recording_id", type number},
-            {"sessions.recording.archive_id", type number},
-            {"archived", type logical},
-            {"auth_method", type text},
-            {"channel_policy", type text},
-            {"command_extracted", type logical},
-            {"connection_policy", type text},
-            {"connection_policy_id", type text},
-            {"content_reference_id", type number},
-            {"deny_reason", type text},
-            {"index_status", type text},
-            {"network_id", type text},
-            {"sessions.recording.server_local_id", type number},
-            {"session_id", type text},
-            {"sessions.recording.target_id", type number},
-            {"verdict", type text},
-            {"window_title_extracted", type logical}
-        }
-    ),
-    Sessions.Server = CreateSchema(
-        {
-            {"sessions.server_id", type number},
-            {"address", type text},
-            {"ip", type text},
-            {"id", type text},
-            {"name", type text},
-            {"port", type number}
-        }
-    ),
     Sessions.User = CreateSchema(
         {
-            {"sessions.user_id", type number},
-            {"gateway_username", type text},
-            {"gateway_username_domain", type text},
-            {"id", type text},
-            {"name", type text},
-            {"name_domain", type text},
-            {"server_username", type text},
-            {"server_username_domain", type text}
+            {"sessions.user_id", Number.Type},
+            {"user.gateway_username", Text.Type},
+            {"user.gateway_username_domain", Text.Type},
+            {"user.id", Text.Type},
+            {"user.name", Text.Type},
+            {"user.name_domain", Text.Type},
+            {"user.server_username", Text.Type},
+            {"user.server_username_domain", Text.Type}
         }
+    ),
+    Sessions.UserToSessions = CreateSchema(
+        {{Sessions.IdentifierColumn, Text.Type}, {"sessions.user_id", Number.Type}}
+    ),
+    Sessions.Client = CreateSchema(
+        {
+            {"sessions.client_id", Number.Type},
+            {"client.ip", Text.Type},
+            {"client.name", Text.Type},
+            {"client.port", Number.Type}
+        }
+    ),
+    Sessions.ClientToSessions = CreateSchema(
+        {{Sessions.IdentifierColumn, Text.Type}, {"sessions.client_id", Number.Type}}
     ),
     Sessions = CreateSchema(
         {
-            {"sessions_id", type number},
-            {"active", type logical},
-            {"sessions.analytics_id", type number},
-            {"sessions.client_id", type number},
-            {"creation_time", type datetimezone},
-            {"duration", type number},
-            {"end_time", type datetimezone},
-            {"sessions.log_id", type number},
-            {"node_id", type text},
-            {"origin", type text},
-            {"protocol", type text},
-            {"sessions.vault_id", type number},
-            {"sessions.recording_id", type number},
-            {"trail_download_link", type text},
-            {"sessions.server_id", type number},
-            {"start_time", type datetimezone},
-            {"sessions.user_id", type number},
-            {"verdict", type text}
+            {Sessions.IdentifierColumn, Text.Type},
+            {"active", Logical.Type},
+            {"analytics.interesting_events", Text.Type},
+            {"analytics.score.aggregated", Number.Type},
+            {"analytics.score.details.command.score", Number.Type},
+            {"analytics.score.details.fis.score", Number.Type},
+            {"analytics.score.details.hostlogin.score", Number.Type},
+            {"analytics.score.details.logintime.score", Number.Type},
+            {"analytics.score.details.keystroke.score", Number.Type},
+            {"analytics.score.details.mouse.score", Number.Type},
+            {"analytics.score.details.windowtitle.score", Number.Type},
+            {"analytics.scripted", Logical.Type},
+            {"analytics.similar_sessions", Text.Type},
+            {"analytics.bucketed_duration", Text.Type},
+            {"analytics.bucketed_duration_starting_hour", Text.Type},
+            {"analytics.tags", Text.Type},
+            {"creation_time", DateTimeZone.Type},
+            {"duration", Number.Type},
+            {"end_time", DateTimeZone.Type},
+            {"log.adapter_name", Text.Type},
+            {"log.auth_method", Text.Type},
+            {"log.syslog_time", DateTimeZone.Type},
+            {"node_id", Text.Type},
+            {"origin", Text.Type},
+            {"protocol", Text.Type},
+            {"vault.appliance_id", Text.Type},
+            {"vault.appliance_name", Text.Type},
+            {"vault.access_request_type", Text.Type},
+            {"vault.asset_partition_id", Number.Type},
+            {"vault.asset_partition_name", Text.Type},
+            {"vault.broker_id", Number.Type},
+            {"vault.broker_name", Text.Type},
+            {"vault.account_id", Number.Type},
+            {"vault.account_name", Text.Type},
+            {"vault.system_id", Number.Type},
+            {"vault.system_name", Text.Type},
+            {"vault.ticket_number", Text.Type},
+            {"vault.reason_name", Text.Type},
+            {"vault.is_emergency", Logical.Type},
+            {"vault.offline_workflow", Logical.Type},
+            {"vault.auto_approved", DateTimeZone.Type},
+            {"vault.emergency_access_granted", DateTimeZone.Type},
+            {"vault.available", DateTimeZone.Type},
+            {"vault.checked_in", DateTimeZone.Type},
+            {"vault.expired", DateTimeZone.Type},
+            {"vault.created.user.user_id", Number.Type},
+            {"vault.created.user.user_name", Text.Type},
+            {"vault.created.user.domain_name", Text.Type},
+            {"vault.created.user.user_display_name", Text.Type},
+            {"vault.created.user.client_ip_address", Text.Type},
+            {"vault.created.comment", Text.Type},
+            {"vault.created.timestamp", DateTimeZone.Type},
+            {"vault.denied.user.user_id", Number.Type},
+            {"vault.denied.user.user_name", Text.Type},
+            {"vault.denied.user.domain_name", Text.Type},
+            {"vault.denied.user.user_display_name", Text.Type},
+            {"vault.denied.user.client_ip_address", Text.Type},
+            {"vault.denied.comment", Text.Type},
+            {"vault.denied.timestamp", DateTimeZone.Type},
+            {"vault.revoked.user.user_id", Number.Type},
+            {"vault.revoked.user.user_name", Text.Type},
+            {"vault.revoked.user.domain_name", Text.Type},
+            {"vault.revoked.user.user_display_name", Text.Type},
+            {"vault.revoked.user.client_ip_address", Text.Type},
+            {"vault.revoked.comment", Text.Type},
+            {"vault.revoked.timestamp", DateTimeZone.Type},
+            {"vault.closed.user.user_id", Number.Type},
+            {"vault.closed.user.user_name", Text.Type},
+            {"vault.closed.user.domain_name", Text.Type},
+            {"vault.closed.user.user_display_name", Text.Type},
+            {"vault.closed.user.client_ip_address", Text.Type},
+            {"vault.closed.comment", Text.Type},
+            {"vault.closed.timestamp", DateTimeZone.Type},
+            {"vault.reviewed.user.user_id", Number.Type},
+            {"vault.reviewed.user.user_name", Text.Type},
+            {"vault.reviewed.user.domain_name", Text.Type},
+            {"vault.reviewed.user.user_display_name", Text.Type},
+            {"vault.reviewed.user.client_ip_address", Text.Type},
+            {"vault.reviewed.comment", Text.Type},
+            {"vault.reviewed.timestamp", DateTimeZone.Type},
+            {"vault.approved.user.user_id", Number.Type},
+            {"vault.approved.user.user_name", Text.Type},
+            {"vault.approved.user.domain_name", Text.Type},
+            {"vault.approved.user.user_display_name", Text.Type},
+            {"vault.approved.user.client_ip_address", Text.Type},
+            {"vault.approved.comment", Text.Type},
+            {"vault.approved.timestamp", DateTimeZone.Type},
+            {"recording.archive.date", DateTimeZone.Type},
+            {"recording.archive.path", Text.Type},
+            {"recording.archive.policy", Text.Type},
+            {"recording.archive.server", Text.Type},
+            {"recording.archived", Logical.Type},
+            {"recording.auth_method", Text.Type},
+            {"recording.channel_policy", Text.Type},
+            {"recording.command_extracted", Logical.Type},
+            {"recording.connection_policy", Text.Type},
+            {"recording.connection_policy_id", Text.Type},
+            {"recording.content_reference_id", Number.Type},
+            {"recording.deny_reason", Text.Type},
+            {"recording.index_status", Text.Type},
+            {"recording.network_id", Text.Type},
+            {"recording.server_local.ip", Text.Type},
+            {"recording.server_local.name", Text.Type},
+            {"recording.server_local.port", Number.Type},
+            {"recording.session_id", Text.Type},
+            {"recording.target.ip", Text.Type},
+            {"recording.target.name", Text.Type},
+            {"recording.target.port", Number.Type},
+            {"recording.verdict", Text.Type},
+            {"recording.window_title_extracted", Logical.Type},
+            {"trail_download_link", Text.Type},
+            {"server.address", Text.Type},
+            {"server.ip", Text.Type},
+            {"server.id", Text.Type},
+            {"server.name", Text.Type},
+            {"server.port", Number.Type},
+            {"start_time", DateTimeZone.Type},
+            {"verdict", Text.Type}
         }
     ),
     Sessions.Schema = [
-        sessions.analytics.score.details.command = Sessions.Analytics.Score.Details.Command,
-        sessions.analytics.score.details.fis = Sessions.Analytics.Score.Details.Fis,
-        sessions.analytics.score.details.hostlogin = Sessions.Analytics.Score.Details.Hostlogin,
-        sessions.analytics.score.details.logintime = Sessions.Analytics.Score.Details.Logintime,
-        sessions.analytics.score.details.keystroke = Sessions.Analytics.Score.Details.Keystroke,
-        sessions.analytics.score.details.mouse = Sessions.Analytics.Score.Details.Mouse,
-        sessions.analytics.score.details.windowtitle = Sessions.Analytics.Score.Details.Windowtitle,
-        sessions.analytics.score.details = Sessions.Analytics.Score.Details,
-        sessions.analytics.score = Sessions.Analytics.Score,
-        sessions.analytics = Sessions.Analytics,
         sessions.client = Sessions.Client,
-        sessions.log = Sessions.Log,
-        sessions.vault.created.user = Sessions.Vault.Created.User,
-        sessions.vault.created = Sessions.Vault.Created,
-        sessions.vault.denied.user = Sessions.Vault.Denied.User,
-        sessions.vault.denied = Sessions.Vault.Denied,
-        sessions.vault.revoked.user = Sessions.Vault.Revoked.User,
-        sessions.vault.revoked = Sessions.Vault.Revoked,
-        sessions.vault.closed.user = Sessions.Vault.Closed.User,
-        sessions.vault.closed = Sessions.Vault.Closed,
-        sessions.vault.reviewed.user = Sessions.Vault.Reviewed.User,
-        sessions.vault.reviewed = Sessions.Vault.Reviewed,
-        sessions.vault.approved.user = Sessions.Vault.Approved.User,
-        sessions.vault.approved = Sessions.Vault.Approved,
-        sessions.vault = Sessions.Vault,
-        sessions.recording.archive = Sessions.Recording.Archive,
-        sessions.recording.server_local = Sessions.Recording.Server_local,
-        sessions.recording.target = Sessions.Recording.Target,
-        sessions.recording = Sessions.Recording,
-        sessions.server = Sessions.Server,
+        sessions.client_to_sessions = Sessions.ClientToSessions,
         sessions.user = Sessions.User,
+        sessions.user_to_sessions = Sessions.UserToSessions,
         sessions = Sessions
     ]
 in
     [
+        Name = Sessions.Name,
+        IdentifierColumn = Sessions.IdentifierColumn,
+        SubTables = Sessions.SubTables,
         Schema = Sessions.Schema
     ]

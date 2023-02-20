@@ -1,15 +1,39 @@
 let
     // Imports
-    SessionsSchema = Extension.ImportFunction("Schema", "SessionsSchema.pqm"),
+    SessionsSchema = Extension.ImportModule("SessionsSchema.pqm"),
+    SessionsSchema.Name = SessionsSchema[Name],
+    SessionsSchema.Schema = SessionsSchema[Schema],
+    SessionsSchema.IdentifierColumn = SessionsSchema[IdentifierColumn],
+    SessionsSchema.SubTables = SessionsSchema[SubTables],
     //
     // Schema definition
+    Schema.Sessions = SessionsSchema.Name,
     Schema.GenerateSchemaMap = (schemas as list) as record => Record.Combine(schemas),
-    Schema.SchemaMap = Schema.GenerateSchemaMap({SessionsSchema}),
+    Schema.GenerateMap = (values as list) as record => Record.FromList(values, {Schema.Sessions}),
+    Schema.SchemaMap = Schema.GenerateSchemaMap({SessionsSchema.Schema}),
     Schema.GetSchema = (schemaName as text) as nullable table =>
-        Record.FieldOrDefault(Schema.SchemaMap, schemaName)
+        let
+            schema = Record.FieldOrDefault(Schema.SchemaMap, schemaName)
+        in
+            schema,
+    Schema.GetIdentifierColumn = (schemaName as text) as text =>
+        let
+            identifierColumnMap = Schema.GenerateMap({SessionsSchema.IdentifierColumn}),
+            identifiedColumnName = Record.FieldOrDefault(identifierColumnMap, schemaName, "")
+        in
+            identifiedColumnName,
+    Schema.GetSubTables = (schemaName as text) as list =>
+        let
+            subTablesMap = Schema.GenerateMap({SessionsSchema.SubTables}),
+            subTableNames = Record.FieldOrDefault(subTablesMap, schemaName, {})
+        in
+            subTableNames
 in
     [
+        Sessions = Schema.Sessions,
         GenerateSchemaMap = Schema.GenerateSchemaMap,
         SchemaMap = Schema.SchemaMap,
-        GetSchema = Schema.GetSchema
+        GetSchema = Schema.GetSchema,
+        GetIdentifierColumn = Schema.GetIdentifierColumn,
+        GetSubTables = Schema.GetSubTables
     ]
