@@ -100,7 +100,7 @@ shared Authenticate = (url as text, credentials as record, optional mocks as nul
             else
                 Request.Generate(url, Request.GetAuthParameters(encodedCredentails))
     in
-        RaiseErrorOrReturn(response);
+        response;
 
 shared FetchData = (url as text, session_id as text, optional mocks as nullable record) as record =>
     let
@@ -110,7 +110,7 @@ shared FetchData = (url as text, session_id as text, optional mocks as nullable 
             else
                 Request.Generate(url, Request.GetDefaultParameters(session_id))
     in
-        RaiseErrorOrReturn(response);
+        response;
 
 HandleIfThereIsAnError = (input as record) =>
     if input[HasError] = true then
@@ -121,7 +121,7 @@ HandleIfThereIsAnError = (input as record) =>
                 error input[Error]
         else
             let
-                logNotExpectedError = Loggger.ErrorLog("An unexpected error happend during execution",input[Error])
+                logNotExpectedError = Logger.ErrorLog("An unexpected error happend during execution", input[Error])
             in
                 error logNotExpectedError
     else
@@ -186,8 +186,6 @@ BaseAuthentication = Extension.ImportModule("BaseAuthentication.pqm");
 BaseAuthentication.EncodeCredentials = BaseAuthentication[EncodeCredentials];
 BaseAuthentication.MineSessionIdFromCookie = BaseAuthentication[MineSessionIdFromCookie];
 
-RaiseErrorOrReturn = Extension.ImportFunction("RaiseErrorOrReturn", "RequestErrors.pqm");
-
 Request = Extension.ImportModule("Request.pqm");
 
 Request.GetAuthParameters = Request[GetAuthParameters];
@@ -201,4 +199,4 @@ UrlBuilder.GenerateBaseUrl = UrlBuilder[GenerateBaseUrl];
 UrlBuilder.GenerateUrl = UrlBuilder[GenerateUrl];
 UrlBuilder.GetDefaultQuery = UrlBuilder[GetDefaultQuery];
 
-Loggger.ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm");
+Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm");

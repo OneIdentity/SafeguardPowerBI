@@ -1,7 +1,9 @@
 let
     IsMocked = Extension.ImportFunction("IsMocked", "Utils.pqm"),
     InfoLog = Extension.ImportFunction("InfoLog", "Logger.pqm"),
-    ErrorCodes = Extension.ImportFunction("ErrorCodes", "RequestErrors.pqm"),
+    RequestErrors = Extension.ImportModule("RequestErrors.pqm"),
+    ErrorCodes = RequestErrors[ErrorCodes],
+    RaiseErrorOrReturn = RequestErrors[RaiseErrorOrReturn],
     Request.GetAuthParameters = (encodedCredentails as text) as record =>
         let
             parameters = [
@@ -30,18 +32,22 @@ let
             parameters,
     Request.Generate = (url as text, parameters as record, optional mocks as record) as record =>
         let
-            requestUrl = InfoLog("Base url of the http request", url),
-            requestParameters = InfoLog("Request parameters of the http request", parameters),
+            loggedParameters =
+                if Record.HasFields(parameters, "Headers") then
+                    Record.RemoveFields(parameters, "Headers")
+                else
+                    parameters,
+            log = InfoLog("Request sent to SPS", [Url = url, Parameters = loggedParameters]),
             response =
                 if IsMocked(mocks, "Response") then
                     mocks[Response]
                 else
-                    Web.Contents(requestUrl, requestParameters & [ManualStatusHandling = ErrorCodes]),
-            _meta = InfoLog("Response meta data of the http request", Value.Metadata(response)),
-            _json = InfoLog("Response data of the http request", Json.Document((response))),
-            _extendedMeta = _meta & [RequestUrl = url]
+                    Web.Contents(log[Url], parameters & [ManualStatusHandling = ErrorCodes]),
+            json = Json.Document(response),
+            extendedMeta = Value.Metadata(response) & [RequestUrl = url],
+            responseWithMeta = Value.ReplaceMetadata(json, extendedMeta)
         in
-            Value.ReplaceMetadata(_json, _extendedMeta),
+            RaiseErrorOrReturn(responseWithMeta),
     Request.GetHeader = (requestMetaData as record, headerName as text) as text =>
         Record.Field(requestMetaData[Headers], headerName)
 in
