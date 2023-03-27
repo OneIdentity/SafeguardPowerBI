@@ -5,12 +5,9 @@
     <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">$(MSBuildProjectDirectory)\obj\</IntermediateOutputPath>
     <MezIntermediatePath>$(IntermediateOutputPath)MEZ\</MezIntermediatePath>
     <MezOutputPath>$(OutputPath)UnitTestFramework.mez</MezOutputPath>
-    <AssetsPath>$(MSBuildProjectDirectory)\assets\</AssetsPath>
-    <SchemaPath>$(AssetsPath)\schema\</SchemaPath>
   </PropertyGroup>
   <ItemGroup>
     <MezContent Include="UnitTestFramework.pq" />
-    <MezContent Include="$(SchemaPath)SessionsSchemaAsset.pqm" />
   </ItemGroup>
   <Target Name="BuildMez" AfterTargets="Build" Inputs="@(MezContent)" Outputs="$(MezOutputPath)">
     <RemoveDir Directories="$(MezIntermediatePath)" />
