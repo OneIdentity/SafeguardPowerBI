@@ -5,6 +5,7 @@ Utils = Extension.ImportModule("Utils.pqm");
 
 Logger.InfoLog = Logger[InfoLog];
 Logger.ErrorLog = Logger[ErrorLog];
+
 Utils.SPSResult = Utils[SPSResult];
 Utils.FetchInfo = Utils[FetchInfo];
 
@@ -99,14 +100,23 @@ TestErrorLogWithSPSResultInput = () =>
         ],
         expectedLogValues = [
             LogLevel = TraceLevel.Error,
-            Output = "error: [ SessionData = ""error"", FetchInfo = #table( type table [Start = any, Url = any, Status = any, Count = any, Message = any, Failed = any] , {{#datetimezone(2023, 1, 18, 9, 47, 55, 2, 0), ""query"", ""status"", 42, ""message"", true} } )  ] ",
-            Value = [
-                SessionData = "error",
-                FetchInfo = #table(
-                    type table [Start = any, Url = any, Status = any, Count = any, Message = any, Failed = any],
-                    {{#datetimezone(2023, 1, 18, 9, 47, 55, 2, 0), "query", "status", 42, "message", true}}
-                )
-            ],
+            Output = "error: #table( type table [Name = any, Data = any, ItemKind = any, ItemName = any, IsLeaf = any] , {{""Sessions"", ""error"", ""Table"", ""Table"", true} , {""Info"", #table( type table [Start = any, Url = any, Status = any, Count = any, Message = any, Failed = any] , {{#datetimezone(2023, 1, 18, 9, 47, 55, 2, 0), ""query"", ""status"", 42, ""message"", true} } ) , ""Table"", ""Table"", true} } ) ",
+            Value = #table(
+                type table [Name = any, Data = any, ItemKind = any, ItemName = any, IsLeaf = any],
+                {
+                    {"Sessions", "error", "Table", "Table", true},
+                    {
+                        "Info",
+                        #table(
+                            type table [Start = any, Url = any, Status = any, Count = any, Message = any, Failed = any],
+                            {{#datetimezone(2023, 1, 18, 9, 47, 55, 2, 0), "query", "status", 42, "message", true}}
+                        ),
+                        "Table",
+                        "Table",
+                        true
+                    }
+                }
+            ),
             Delayed = null
         ],
         logValues = Logger.ErrorLog(input[Prefix], input[Value], input[Delayed], input[IsTesting]),

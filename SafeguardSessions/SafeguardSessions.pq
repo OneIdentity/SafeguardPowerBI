@@ -15,7 +15,7 @@ shared SafeguardSessions.ContentsImpl = (
     filterValue2 as nullable text,
     filterField3 as nullable text,
     filterValue3 as nullable text
-) as record =>
+) as table =>
     let
         sessions = FetchSessions(
             sps_ip,

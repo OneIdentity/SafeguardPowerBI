@@ -301,11 +301,11 @@ shared TestLogging = (logValues as record, expectedLogValues as record, inputTyp
 
 shared ProvideDataForTest = (data as list, func as function) => List.Transform(data, each Function.Invoke(func, _));
 
-shared TestResultsContentWithoutStartTime = (response as record, expectedData as any, expectedInfo as table) =>
+shared TestResultsContentWithoutStartTime = (response as table, expectedData as any, expectedInfo as table) =>
     let
         facts = {
-            Fact("Data content of response matches", expectedData, response[SessionData]),
-            TestFetchInfoContentWithoutStartTime(expectedInfo, response[FetchInfo])
+            Fact("Data content of response matches", expectedData, response{[Name = "Sessions"]}[Data]),
+            TestFetchInfoContentWithoutStartTime(expectedInfo, response{[Name = "Info"]}[Data])
         }
     in
         facts;
