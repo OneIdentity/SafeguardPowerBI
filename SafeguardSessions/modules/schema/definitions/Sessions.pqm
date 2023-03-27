@@ -1,6 +1,6 @@
 let
-    Sessions.Schema = #table(
-        {"Name", "Type"},
+    SchemaUtils.CreateSchema = Extension.ImportFunction("CreateSchema", "SchemaUtils.pqm"),
+    Sessions.Schema = SchemaUtils.CreateSchema(
         {
             {"active", type logical},
             // Analytics

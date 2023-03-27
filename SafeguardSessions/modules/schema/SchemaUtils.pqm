@@ -1,0 +1,165 @@
+let
+    SchemaUtils.NameColumn = "Name",
+    SchemaUtils.TypeColumn = "Type",
+    SchemaUtils.Header = {SchemaUtils.NameColumn, SchemaUtils.TypeColumn},
+    SchemaUtils.CreateSchema = (fields as list) => #table(SchemaUtils.Header, fields),
+    SchemaUtils.GetSessionItemsResponse = (response as nullable record) as list =>
+        let
+            defaultValue = {},
+            transformedResponse =
+                if response <> null then
+                    let
+                        GetItems = (response as record) as list =>
+                            let
+                                TransformOperation = (sessions_list as list) =>
+                                    List.Transform(sessions_list, each [session_id = [key]] & [body])
+                            in
+                                if Record.HasFields(response, "items") then
+                                    Record.TransformFields(response, {"items", TransformOperation})[items]
+                                else
+                                    defaultValue,
+                        ApplyMeta = (items as list, response as record) as list =>
+                            if Record.HasFields(response, "meta") then
+                                Value.ReplaceMetadata(items, response[#"meta"])
+                            else
+                                items,
+                        items = GetItems(response),
+                        withMeta = ApplyMeta(items, response)
+                    in
+                        withMeta
+                else
+                    defaultValue
+        in
+            transformedResponse,
+    SchemaUtils.FieldNamesOfType = (listOfRecords as list, t as type) as list =>
+        let
+            asTable = Table.FromRecords(listOfRecords, null, MissingField.UseNull),
+            fieldNamesOfType =
+                if Table.RowCount(asTable) = 0 then
+                    {}
+                else
+                    List.Select(
+                        Table.ColumnNames(asTable),
+                        (fieldName) =>
+                            Type.Is(Value.Type(List.First(List.RemoveNulls(Table.Column(asTable, fieldName)))), t)
+                    )
+        in
+            List.Buffer(fieldNamesOfType),
+    SchemaUtils.IsFlat = (listOfRecords as list) as logical =>
+        List.AllTrue(
+            {
+                List.IsEmpty(SchemaUtils.FieldNamesOfType(listOfRecords, Record.Type)),
+                List.IsEmpty(SchemaUtils.FieldNamesOfType(listOfRecords, List.Type))
+            }
+        ),
+    SchemaUtils.Flatten = (listOfRecords as list, optional columnsToRemove as list) as table =>
+        let
+            FlattenLists = (asTable as table, fieldNames as list) as table =>
+                Table.Buffer(
+                    Table.TransformColumns(
+                        asTable,
+                        List.Transform(fieldNames, (fieldName) => {fieldName, (row) => Text.Combine(row, ",")})
+                    )
+                ),
+            FlattenRecords = (asTable as table, fieldNames as list) as table =>
+                let
+                    ExpandRecord = (asTable as table, fieldName as text) as any =>
+                        let
+                            namesToExpand = List.Distinct(
+                                Record.FieldNames(Record.Combine(Table.Column(asTable, fieldName)))
+                            ),
+                            newNames = List.Transform(
+                                namesToExpand, (nameToExpand) => Text.Combine({fieldName, nameToExpand}, ".")
+                            ),
+                            expanded = Table.ExpandRecordColumn(asTable, fieldName, namesToExpand, newNames)
+                        in
+                            Table.Buffer(expanded),
+                    flattened = List.Accumulate(
+                        fieldNames, asTable, (asTable, fieldName) => ExpandRecord(asTable, fieldName)
+                    )
+                in
+                    Table.Buffer(flattened),
+            flattenedSubTable =
+                if SchemaUtils.IsFlat(listOfRecords) then
+                    let
+                        asTable = Table.FromRecords(listOfRecords, null, MissingField.UseNull),
+                        reducedTable = Table.RemoveColumns(
+                            asTable, if columnsToRemove <> null then columnsToRemove else {}, MissingField.Ignore
+                        )
+                    in
+                        Table.Buffer(reducedTable)
+                else
+                    let
+                        // Remove columns
+                        asTable = Table.Buffer(Table.FromRecords(listOfRecords, null, MissingField.UseNull)),
+                        reducedTable = Table.RemoveColumns(
+                            asTable, if columnsToRemove <> null then columnsToRemove else {}, MissingField.Ignore
+                        ),
+                        // Flatten lists
+                        listFieldNames = SchemaUtils.FieldNamesOfType(listOfRecords, List.Type),
+                        withFlattenedLists = FlattenLists(reducedTable, listFieldNames),
+                        // Flatten records
+                        recordFieldNames = SchemaUtils.FieldNamesOfType(listOfRecords, Record.Type),
+                        withFlattenedRecords = FlattenRecords(withFlattenedLists, recordFieldNames)
+                    in
+                        @SchemaUtils.Flatten(Table.ToRecords(withFlattenedRecords))
+        in
+            flattenedSubTable,
+    SchemaUtils.GetResponseWithSchema = (_table as table, schema as table) as table =>
+        let
+            EnforceTypes = (_table as table, schema as table) as table =>
+                // Applies type transforms to a given table
+                let
+                    map = (t) =>
+                        // Determines type transforms
+                        if List.AnyTrue(
+                            {Type.Is(t, type list), Type.Is(t, type record), Type.Is(t, type table), t = type any}
+                        ) then
+                            null
+                        else
+                            t,
+                    // Add missing columns
+                    missingColumns = List.Difference(
+                        Table.Column(schema, SchemaUtils.NameColumn), Table.ColumnNames(_table)
+                    ),
+                    extraColumns = List.Difference(
+                        Table.ColumnNames(_table), Table.Column(schema, SchemaUtils.NameColumn)
+                    ),
+                    identicalTable = Table.Combine(
+                        {Table.RemoveColumns(_table, extraColumns), #table(missingColumns, {})}
+                    ),
+                    // The columns will be ordered according to the schema table
+                    withReordered = Table.ReorderColumns(
+                        identicalTable, Table.Column(schema, SchemaUtils.NameColumn)
+                    ),
+                    mapped = Table.TransformColumns(schema, {SchemaUtils.TypeColumn, map}),
+                    omitted = Table.SelectRows(mapped, each Table.Column(_, SchemaUtils.TypeColumn) <> null),
+                    primitiveTransforms = Table.ToRows(omitted),
+                    // Apply type transform
+                    changedPrimitives = Table.TransformColumnTypes(withReordered, primitiveTransforms)
+                in
+                    changedPrimitives,
+            // Returns the table type for a given schema
+            SchemaToTableType = (schema as table) as type =>
+                let
+                    toList = List.Transform(
+                        Table.Column(schema, SchemaUtils.TypeColumn),
+                        (t) => Record.FromList({t, false}, {SchemaUtils.TypeColumn, "Optional"})
+                    ),
+                    toRecord = Record.FromList(toList, Table.Column(schema, SchemaUtils.NameColumn)),
+                    toType = Type.ForRecord(toRecord, false)
+                in
+                    type table (toType),
+            enforcedTypes = EnforceTypes(_table, schema),
+            withType = Value.ReplaceType(enforcedTypes, SchemaToTableType(schema))
+        in
+            withType
+in
+    [
+        CreateSchema = SchemaUtils.CreateSchema,
+        GetSessionItemsResponse = SchemaUtils.GetSessionItemsResponse,
+        FieldNamesOfType = SchemaUtils.FieldNamesOfType,
+        IsFlat = SchemaUtils.IsFlat,
+        Flatten = SchemaUtils.Flatten,
+        GetResponseWithSchema = SchemaUtils.GetResponseWithSchema
+    ]

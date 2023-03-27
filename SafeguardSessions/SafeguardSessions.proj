@@ -24,6 +24,7 @@
     <MezContent Include="$(RequestPath)QueryParameterTransformer.pqm" />
     <MezContent Include="$(RequestPath)Request.pqm" />
     <MezContent Include="$(SchemaPath)Schema.pqm" />
+    <MezContent Include="$(SchemaPath)SchemaUtils.pqm" />
     <MezContent Include="$(DefinitionsPath)Sessions.pqm" />
     <MezContent Include="SafeguardSessions16.png" />
     <MezContent Include="SafeguardSessions20.png" />
