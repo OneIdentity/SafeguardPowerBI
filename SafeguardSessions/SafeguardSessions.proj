@@ -8,6 +8,8 @@
     <ModulesPath>$(MSBuildProjectDirectory)\modules\</ModulesPath>
     <RequestPath>$(ModulesPath)\request\</RequestPath>
     <ErrorPath>$(ModulesPath)\error\</ErrorPath>
+    <SchemaPath>$(ModulesPath)\schema\</SchemaPath>
+    <DefinitionsPath>$(Schemapath)\definitions\</DefinitionsPath>
   </PropertyGroup>
   <ItemGroup>
     <MezContent Include="SafeguardSessions.pq" />
@@ -21,6 +23,8 @@
     <MezContent Include="$(RequestPath)UrlBuilder.pqm" />
     <MezContent Include="$(RequestPath)QueryParameterTransformer.pqm" />
     <MezContent Include="$(RequestPath)Request.pqm" />
+    <MezContent Include="$(SchemaPath)Schema.pqm" />
+    <MezContent Include="$(DefinitionsPath)Sessions.pqm" />
     <MezContent Include="SafeguardSessions16.png" />
     <MezContent Include="SafeguardSessions20.png" />
     <MezContent Include="SafeguardSessions24.png" />
