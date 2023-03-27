@@ -21,8 +21,24 @@ TestSafeguardSessions.SuccessfulAuthenticationResponse = FakeRawResponse(
     ]
 );
 
+TestSafeguardSessions.SubTables = {"user"};
+
+TestSafeguardSessions.Schema = [
+    Sessions = CreateSchema(
+        {
+            {"session_id", type text},
+            {"start", type datetimezone},
+            {"end", type datetimezone},
+            {"protocol", type text},
+            {"user.name", type text}
+        }
+    )
+];
+
 TestSafeguardSessions.Mocks = [
-    AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse
+    AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+    SubTables = TestSafeguardSessions.SubTables,
+    Schema = TestSafeguardSessions.Schema
 ];
 
 TestFetchSessionsWithOnlyOneFilterFieldInput = () =>
@@ -115,32 +131,23 @@ TestFetchingSessions = () =>
                 ]
                     & TestSafeguardSessions.Mocks,
                 #table(
-                    type table [items = any, #"meta" = any],
+                    type table [
+                        session_id = text, start = datetimezone, end = datetimezone, protocol = text, user.name = text
+                    ],
                     {
                         {
-                            {
-                                [
-                                    body = [
-                                        start = "2022-12-31T23:59:30Z",
-                                        end = "2023-01-01T07:34:11Z",
-                                        protocol = "SSH",
-                                        user = [name = "balabit"]
-                                    ],
-                                    key = "id1",
-                                    #"meta" = []
-                                ],
-                                [
-                                    body = [
-                                        start = "2023-01-14T22:11:33Z",
-                                        end = "2023-01-16T02:03:12Z",
-                                        protocol = "RDP",
-                                        user = [name = "other_username"]
-                                    ],
-                                    key = "id2",
-                                    #"meta" = []
-                                ]
-                            },
-                            []
+                            "id1",
+                            #datetimezone(2022, 12, 31, 23, 59, 30, 0, 0),
+                            #datetimezone(2023, 1, 1, 7, 34, 11, 0, 0),
+                            "SSH",
+                            "balabit"
+                        },
+                        {
+                            "id2",
+                            #datetimezone(2023, 1, 14, 22, 11, 33, 0, 0),
+                            #datetimezone(2023, 1, 16, 2, 3, 12, 0, 0),
+                            "RDP",
+                            "other_username"
                         }
                     }
                 ),
@@ -148,7 +155,7 @@ TestFetchingSessions = () =>
                     "Success",
                     "Data fetch succeeded",
                     null,
-                    1,
+                    2,
                     false,
                     "https://dummy_url/api/audit/sessions?fields=%2A&start=2023-01-01T00%3A00%3A00.0000000%2B00%3A00&end=2023-01-15T00%3A00%3A00.0000000%2B00%3A00"
                 )
@@ -177,22 +184,16 @@ TestFetchingSessions = () =>
                 ]
                     & TestSafeguardSessions.Mocks,
                 #table(
-                    type table [items = any, #"meta" = any],
+                    type table [
+                        session_id = text, start = datetimezone, end = datetimezone, protocol = text, user.name = text
+                    ],
                     {
                         {
-                            {
-                                [
-                                    body = [
-                                        start = "2022-12-31T23:59:30Z",
-                                        end = "2023-01-01T07:34:11Z",
-                                        protocol = "SSH",
-                                        user = [name = "balabit"]
-                                    ],
-                                    key = "id1",
-                                    #"meta" = []
-                                ]
-                            },
-                            []
+                            "id1",
+                            #datetimezone(2022, 12, 31, 23, 59, 30, 0, 0),
+                            #datetimezone(2023, 1, 1, 7, 34, 11, 0, 0),
+                            "SSH",
+                            "balabit"
                         }
                     }
                 ),
@@ -229,22 +230,16 @@ TestFetchingSessions = () =>
                 ]
                     & TestSafeguardSessions.Mocks,
                 #table(
-                    type table [items = any, #"meta" = any],
+                    type table [
+                        session_id = text, start = datetimezone, end = datetimezone, protocol = text, user.name = text
+                    ],
                     {
                         {
-                            {
-                                [
-                                    body = [
-                                        start = "2022-12-31T23:59:30Z",
-                                        end = "2023-01-01T07:34:11Z",
-                                        protocol = "SSH",
-                                        user = [name = "username"]
-                                    ],
-                                    key = "id1",
-                                    #"meta" = []
-                                ]
-                            },
-                            []
+                            "id1",
+                            #datetimezone(2022, 12, 31, 23, 59, 30, 0, 0),
+                            #datetimezone(2023, 1, 1, 7, 34, 11, 0, 0),
+                            "SSH",
+                            "username"
                         }
                     }
                 ),

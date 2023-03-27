@@ -58,7 +58,7 @@ let
                     )
                 else
                     [
-                        sessions = Table.FromRecords({response[Value]}),
+                        sessions = response[Value],
                         result = Utils.SPSResult(
                             sessions,
                             Utils.FetchInfo(

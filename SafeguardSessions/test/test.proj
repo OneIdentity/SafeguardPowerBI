@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <MezContent Include="UnitTestFramework.pq" />
+    <MezContent Include="$(SchemaPath)GetDataAsset.pqm" />
     <MezContent Include="$(SchemaPath)SessionsSchemaAsset.pqm" />
   </ItemGroup>
   <Target Name="BuildMez" AfterTargets="Build" Inputs="@(MezContent)" Outputs="$(MezOutputPath)">
