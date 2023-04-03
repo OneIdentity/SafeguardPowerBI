@@ -1,35 +1,9 @@
 section TestSafeguardSessions.Authentication;
 
-TestAuthenticateRaisesErrorForStatusCode = (status_code as number, expected_reason as text, expected_message as text) =>
-    let
-        fake_auth_response = FakeRawResponse("{""error"": ""reason""}", [
-            Response.Status = status_code
-        ]),
-        facts = TestErrorIsRaised(
-            try
-                Authenticate(
-                    "dummy_url", [
-                        Username = "dummy",
-                        Password = "pwd"
-                    ], [
-                        AuthResponse = fake_auth_response
-                    ]
-                ),
-            expected_reason,
-            expected_message,
-            [
-                ManuallyHandled = true,
-                Cause = [#"error" = "reason"],
-                RequestUrl = "dummy_url"
-            ]
-        )
-    in
-        facts;
-
 TestAuthenticateIsSuccessful = () =>
     let
-        fake_auth_response = FakeRawResponse(
-            "{}",
+        fakeAuthResponse = FakeRawResponse(
+            [],
             [
                 Response.Status = 200,
                 Headers = [
@@ -42,7 +16,7 @@ TestAuthenticateIsSuccessful = () =>
                 Username = "dummy",
                 Password = "pwd"
             ], [
-                AuthResponse = fake_auth_response
+                AuthResponse = fakeAuthResponse
             ]
         ),
         facts = {
@@ -64,12 +38,37 @@ TestAuthenticateIsSuccessful = () =>
 
 TestAuthenticateRaisesError = () =>
     let
+        AssertErrorisRaised = (statusCode as number, expectedReason as text, expectedMessage as text) =>
+            let
+                fakeAuthResponse = FakeRawResponse([#"error" = "reason"], [
+                    Response.Status = statusCode
+                ]),
+                facts = TestErrorIsRaised(
+                    try
+                        Authenticate(
+                            "dummy_url", [
+                                Username = "dummy",
+                                Password = "pwd"
+                            ], [
+                                AuthResponse = fakeAuthResponse
+                            ]
+                        ),
+                    expectedReason,
+                    expectedMessage,
+                    [
+                        ManuallyHandled = true,
+                        Cause = [#"error" = "reason"],
+                        RequestUrl = "dummy_url"
+                    ]
+                )
+            in
+                facts,
         cases = {
             {401, "Authentication Error", "Something went wrong while authenticating"},
             {403, "Authorization Error", "Not authorized to access the given resource"},
             {500, "General Error", "SPS responded with server error"}
         },
-        facts = ProvideDataForTest(cases, TestAuthenticateRaisesErrorForStatusCode)
+        facts = ProvideDataForTest(cases, AssertErrorisRaised)
     in
         facts;
 
