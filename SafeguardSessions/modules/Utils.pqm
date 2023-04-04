@@ -2,6 +2,13 @@ let
     ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm"),
     Utils.IsMocked = (mocks as nullable record, field as text) as logical =>
         mocks <> null and Record.HasFields(mocks, field),
+    Utils.PaddedTable.FromRecords = (records as list) =>
+        let
+            fieldNames = List.Distinct(Record.FieldNames(Record.Combine(records))),
+            paddedRecords = List.Transform(records, each Record.SelectFields(_, fieldNames, MissingField.UseNull)),
+            asTable = Table.FromRecords(paddedRecords)
+        in
+            asTable,
     Utils.FetchInfo = (
         status as text, message as text, start as nullable datetimezone, count as number, failed as logical, url as text
     ) as table =>
@@ -76,6 +83,7 @@ let
 in
     [
         IsMocked = Utils.IsMocked,
+        PaddedTable.FromRecords = Utils.PaddedTable.FromRecords,
         FetchInfo = Utils.FetchInfo,
         SuccessStatus = Utils.SuccessStatus,
         ErrorStatus = Utils.ErrorStatus,

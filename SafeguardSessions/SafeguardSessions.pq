@@ -191,6 +191,7 @@ SafeguardSessions.ContentsType = Extension.ImportFunction("ContentsType", "Types
 Utils = Extension.ImportModule("Utils.pqm");
 
 IsMocked = Utils[IsMocked];
+
 BuildSPSResult = Utils[BuildSPSResult];
 
 BaseAuthentication = Extension.ImportModule("BaseAuthentication.pqm");

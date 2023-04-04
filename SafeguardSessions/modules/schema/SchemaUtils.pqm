@@ -1,4 +1,5 @@
 let
+    PaddedTable.FromRecords = Extension.ImportFunction("PaddedTable.FromRecords", "Utils.pqm"),
     SchemaUtils.NameColumn = "Name",
     SchemaUtils.TypeColumn = "Type",
     SchemaUtils.Header = {SchemaUtils.NameColumn, SchemaUtils.TypeColumn},
@@ -33,7 +34,7 @@ let
             transformedResponse,
     SchemaUtils.FieldNamesOfType = (listOfRecords as list, t as type) as list =>
         let
-            asTable = Table.FromRecords(listOfRecords, null, MissingField.UseNull),
+            asTable = PaddedTable.FromRecords(listOfRecords),
             fieldNamesOfType =
                 if Table.RowCount(asTable) = 0 then
                     {}
@@ -82,7 +83,7 @@ let
             flattenedSubTable =
                 if SchemaUtils.IsFlat(listOfRecords) then
                     let
-                        asTable = Table.FromRecords(listOfRecords, null, MissingField.UseNull),
+                        asTable = PaddedTable.FromRecords(listOfRecords),
                         reducedTable = Table.RemoveColumns(
                             asTable, if columnsToRemove <> null then columnsToRemove else {}, MissingField.Ignore
                         )
@@ -91,7 +92,7 @@ let
                 else
                     let
                         // Remove columns
-                        asTable = Table.Buffer(Table.FromRecords(listOfRecords, null, MissingField.UseNull)),
+                        asTable = Table.Buffer(PaddedTable.FromRecords(listOfRecords)),
                         reducedTable = Table.RemoveColumns(
                             asTable, if columnsToRemove <> null then columnsToRemove else {}, MissingField.Ignore
                         ),
