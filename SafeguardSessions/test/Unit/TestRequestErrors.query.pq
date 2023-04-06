@@ -6,17 +6,17 @@ ErrorCodes = Extension.ImportFunction("ErrorCodes", "RequestErrors.pqm");
 TestRaiseErrorOrReturnRaisesError = () =>
     let
         url = "dummy_url",
-        fake_auth_response = FakeResponse("{""error"": ""reason""}", [
+        fakeAuthResponse = FakeResponse([#"error" = "reason"], [
             Response.Status = 401,
             RequestUrl = url
         ]),
         facts = TestErrorIsRaised(
-            try RaiseErrorOrReturn(fake_auth_response),
+            try RaiseErrorOrReturn(fakeAuthResponse),
             "Authentication Error",
             "Something went wrong while authenticating",
             [
                 ManuallyHandled = true,
-                Cause =  fake_auth_response,
+                Cause = fakeAuthResponse,
                 RequestUrl = url
             ]
         )
@@ -25,10 +25,10 @@ TestRaiseErrorOrReturnRaisesError = () =>
 
 TestRaiseErrorOrReturnFallbackIsWorking = () =>
     let
-        fake_response = FakeResponse("{""key"": ""value""}") meta [RequestUrl = "dummy_url"],
-        response = RaiseErrorOrReturn(fake_response),
+        fakeResponse = FakeResponse([key = "value"]) meta [RequestUrl = "dummy_url"],
+        response = RaiseErrorOrReturn(fakeResponse),
         facts = {
-            Fact("Response data correct", fake_response, response),
+            Fact("Response data correct", fakeResponse, response),
             Fact(
                 "Response meta is correct",
                 [
@@ -44,8 +44,8 @@ TestRaiseErrorOrReturnFallbackIsWorking = () =>
 
 TestErrorCodeListIsCorrect = () =>
     let
-        expected_error_code_list = {400, 401, 403, 404, 429, 500},
-        fact = Fact("Error code list is correct", expected_error_code_list, ErrorCodes)
+        expectedErrorCodeList = {400, 401, 403, 404, 429, 500},
+        fact = Fact("Error code list is correct", expectedErrorCodeList, ErrorCodes)
     in
         fact;
 

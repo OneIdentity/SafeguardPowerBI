@@ -15,7 +15,7 @@ shared SafeguardSessions.ContentsImpl = (
     filterValue2 as nullable text,
     filterField3 as nullable text,
     filterValue3 as nullable text
-) as record =>
+) as table =>
     let
         sessions = FetchSessions(
             sps_ip,
@@ -60,7 +60,7 @@ shared FetchSessions = (
     in
         data;
 
-shared GetData = (sps_ip as text, credentials as record, query as record, optional mocks as record) =>
+shared GetData = (sps_ip as text, credentials as record, query as record, optional mocks as nullable record) =>
     let
         start_time = DateTimeZone.LocalNow(),
         base_url = UrlBuilder.GenerateBaseUrl("https", sps_ip),
@@ -85,7 +85,8 @@ shared GetData = (sps_ip as text, credentials as record, query as record, option
                     mocks
                 ),
         data = HandleIfThereIsAnError(try (response)),
-        result = BuildSPSResult(data, start_time)
+        withSchema = ApplySchema(data, mocks),
+        result = BuildSPSResult(withSchema, start_time)
     in
         result;
 
@@ -126,6 +127,17 @@ HandleIfThereIsAnError = (input as record) =>
                 error logNotExpectedError
     else
         input;
+
+ApplySchema = (data as record, mocks as record) =>
+    let
+        schema =
+            if IsMocked(mocks, "Schema") then
+                Record.Field(mocks[Schema], "Sessions")
+            else
+                Schema.GetSchema("Sessions"),
+        withSchema = SchemaUtils.ApplySchema(data, schema)
+    in
+        withSchema;
 
 SafeguardSessions = [
     Authentication = [
@@ -179,6 +191,7 @@ SafeguardSessions.ContentsType = Extension.ImportFunction("ContentsType", "Types
 Utils = Extension.ImportModule("Utils.pqm");
 
 IsMocked = Utils[IsMocked];
+
 BuildSPSResult = Utils[BuildSPSResult];
 
 BaseAuthentication = Extension.ImportModule("BaseAuthentication.pqm");
@@ -192,6 +205,10 @@ Request.GetAuthParameters = Request[GetAuthParameters];
 Request.GetDefaultParameters = Request[GetDefaultParameters];
 Request.Generate = Request[Generate];
 Request.GetHeader = Request[GetHeader];
+
+Schema.GetSchema = Extension.ImportFunction("GetSchema", "Schema.pqm");
+
+SchemaUtils.ApplySchema = Extension.ImportFunction("ApplySchema", "SchemaUtils.pqm");
 
 UrlBuilder = Extension.ImportModule("UrlBuilder.pqm");
 

@@ -3,7 +3,7 @@
 // https://learn.microsoft.com/en-us/power-query/handlingunittesting
 // Version 1.0.0 was exactly the same as Microsoft's framework. Above this version number,
 // it includes our changes and additions
-[Version = "1.6.0"]
+[Version = "1.6.1"]
 section UnitTestFrameork;
 
 shared Fact = (_subject as text, _expected, _actual) as record =>
@@ -250,29 +250,24 @@ ValueToText = (value, optional depth) =>
     in
         try Serialize(value) otherwise "<serialization failed>";
 
-shared FakeResponse = (body as text, optional metadata as record) as record =>
+_Response = (body as record, f as function, optional metaData as record) =>
     let
-        response = Json.Document(body),
-        response_with_meta = Value.ReplaceMetadata(
-            response, if metadata <> null then metadata else [
+        asText = Text.FromBinary(Json.FromValue(body)),
+        response = f(asText),
+        withMeta = Value.ReplaceMetadata(
+            response, if metaData <> null then metaData else [
                 Content.Type = "application/json",
                 Response.Status = 200
             ]
         )
     in
-        response_with_meta;
+        withMeta;
 
-shared FakeRawResponse = (body as text, optional metadata as record) as binary =>
-    let
-        response = Text.ToBinary(body),
-        response_with_meta = Value.ReplaceMetadata(
-            response, if metadata <> null then metadata else [
-                Content.Type = "application/json",
-                Response.Status = 200
-            ]
-        )
-    in
-        response_with_meta;
+shared FakeResponse = (body as record, optional metaData as record) as record =>
+    _Response(body, Json.Document, metaData);
+
+shared FakeRawResponse = (body as record, optional metaData as record) as binary =>
+    _Response(body, Text.ToBinary, metaData);
 
 shared TestErrorIsRaised = (err as record, reason as text, message as text, detail as anynonnull) as list =>
     let
@@ -306,24 +301,23 @@ shared TestLogging = (logValues as record, expectedLogValues as record, inputTyp
 
 shared ProvideDataForTest = (data as list, func as function) => List.Transform(data, each Function.Invoke(func, _));
 
-shared TestResultsContentWithoutStartTime = (response as record, expected_data as any, expected_info as table) =>
+shared TestResultsContentWithoutStartTime = (response as table, expectedData as any, expectedInfo as table) =>
     let
         facts = {
-            Fact("Data content of response matches", expected_data, response[SessionData]),
-            TestFetchInfoContentWithoutStartTime(expected_info, response[FetchInfo])
+            Fact("Data content of response matches", expectedData, response{[Name = "Sessions"]}[Data]),
+            TestFetchInfoContentWithoutStartTime(expectedInfo, response{[Name = "Info"]}[Data])
         }
     in
         facts;
 
-
-shared TestFetchInfoContentWithoutStartTime = (expected_info as table, actual_info as table) =>
+shared TestFetchInfoContentWithoutStartTime = (expectedInfo as table, actualInfo as table) =>
     let
         facts = {
-            Fact("Status matches", List.First(expected_info[Status]), List.First(actual_info[Status])),
-            Fact("Message matches", List.First(expected_info[Message]), List.First(actual_info[Message])),
-            Fact("Count matches", List.First(expected_info[Count]), List.First(actual_info[Count])),
-            Fact("Failed matches", List.First(expected_info[Failed]), List.First(actual_info[Failed])),
-            Fact("URL matches", List.First(expected_info[Url]), List.First(actual_info[Url]))
+            Fact("Status matches", List.First(expectedInfo[Status]), List.First(actualInfo[Status])),
+            Fact("Message matches", List.First(expectedInfo[Message]), List.First(actualInfo[Message])),
+            Fact("Count matches", List.First(expectedInfo[Count]), List.First(actualInfo[Count])),
+            Fact("Failed matches", List.First(expectedInfo[Failed]), List.First(actualInfo[Failed])),
+            Fact("URL matches", List.First(expectedInfo[Url]), List.First(actualInfo[Url]))
         }
     in
         facts;

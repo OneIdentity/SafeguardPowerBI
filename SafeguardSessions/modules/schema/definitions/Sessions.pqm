@@ -1,8 +1,9 @@
 let
-    Sessions.Schema = #table(
-        type table [Name = any, Type = any],
+    SchemaUtils.CreateSchema = Extension.ImportFunction("CreateSchema", "SchemaUtils.pqm"),
+    Sessions.Schema = SchemaUtils.CreateSchema(
         {
             {"active", type logical},
+            // Analytics
             {"analytics.interesting_events", type text},
             {"analytics.score.aggregated", type number},
             {"analytics.score.details.command.score", type number},
@@ -17,18 +18,21 @@ let
             {"analytics.bucketed_duration", type text},
             {"analytics.bucketed_starting_hour", type text},
             {"analytics.tags", type text},
+            // Client
             {"client.ip", type text},
             {"client.name", type text},
             {"client.port", type text},
             {"creation_time", type datetime},
             {"duration", type number},
             {"end_time", type datetime},
+            // Log
             {"log.adapter_name", type text},
             {"log.auth_method", type text},
             {"log.syslog_time", type text},
             {"node_id", type text},
             {"origin", type text},
             {"protocol", type text},
+            // Recording
             {"recording.archive.date", type datetime},
             {"recording.archive.path", type text},
             {"recording.archive.policy", type text},
@@ -53,12 +57,14 @@ let
             {"recording.target.port", type text},
             {"recording.verdict", type text},
             {"recording.window_title_extracted", type logical},
+            // Server
             {"server.address", type text},
             {"server.ip", type text},
             {"server.id", type text},
             {"server.name", type text},
             {"server.port", type text},
             {"start_time", type datetime},
+            // User
             {"user.gateway_username", type text},
             {"user.gateway_username_domain", type text},
             {"user.id", type text},
