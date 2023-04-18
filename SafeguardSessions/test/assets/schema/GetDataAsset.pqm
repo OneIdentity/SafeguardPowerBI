@@ -1140,16 +1140,15 @@
         },
         #"meta" = [
             fields = {"*"},
-            first = "/api/audit/sessions?limit=25&offset=0&fields=*",
+            first = null,
             href = "/api/audit/sessions",
-            last = "/api/audit/sessions?limit=25&offset=9975&fields=*",
-            limit = 25,
-            match_count = 10000,
-            next = "/api/audit/sessions?limit=25&offset=25&fields=*",
-            offset = 0,
+            last = null,
+            limit = 500,
+            next = null,
             parent = "/api/audit",
             previous = null,
-            remaining_seconds = 43200
+            remaining_seconds = 43200,
+            search_after = null
         ]
     ],
     ExpectedData = #table(

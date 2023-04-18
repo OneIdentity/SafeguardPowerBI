@@ -62,56 +62,55 @@ shared FetchSessions = (
 
 shared GetData = (sps_ip as text, credentials as record, query as record, optional mocks as nullable record) =>
     let
-        start_time = DateTimeZone.LocalNow(),
-        base_url = UrlBuilder.GenerateBaseUrl("https", sps_ip),
-        auth_url = UrlBuilder.GenerateUrl(base_url, "api/authentication"),
+        startTime = DateTimeZone.LocalNow(),
+        spsUrl = UrlBuilder.GenerateBaseUrl("https", sps_ip),
         authResponse =
             if IsMocked(mocks, "Authenticate") then
                 mocks[Authenticate][Value]
             else
-                Authenticate(auth_url, credentials, mocks),
-        fetch_url_with_user_query = UrlBuilder.GenerateUrl(
-            base_url, "api/audit/sessions", UrlBuilder.GetDefaultQuery() & query
-        ),
+                Authenticate(spsUrl, credentials, mocks),
         response =
             if IsMocked(mocks, "FetchData") then
                 mocks[FetchData][Value]
             else
                 FetchData(
-                    fetch_url_with_user_query,
+                    spsUrl,
+                    UrlBuilder.GetDefaultQuery() & query,
                     BaseAuthentication.MineSessionIdFromCookie(
                         Request.GetHeader(Value.Metadata(authResponse), "Set-Cookie")
                     ),
                     mocks
                 ),
         data = HandleIfThereIsAnError(try (response)),
-        withSchema = ApplySchema(data, mocks),
-        result = BuildSPSResult(withSchema, start_time)
+        result = BuildSPSResult(data, startTime)
     in
         result;
-
-shared Authenticate = (url as text, credentials as record, optional mocks as nullable record) as record =>
+shared Authenticate = (spsUrl as text, credentials as record, optional mocks as nullable record) as record =>
     let
+        authUrl = UrlBuilder.GenerateUrl(spsUrl, AuthEndpoint),
         encodedCredentails = BaseAuthentication.EncodeCredentials(credentials[Username], credentials[Password]),
         response =
             if IsMocked(mocks, "AuthResponse") then
                 Request.Generate(
-                    url, Request.GetAuthParameters(encodedCredentails), [Response = mocks[AuthResponse]]
+                    authUrl, Request.GetAuthParameters(encodedCredentails), [Response = mocks[AuthResponse]]
                 )
             else
-                Request.Generate(url, Request.GetAuthParameters(encodedCredentails))
+                Request.Generate(authUrl, Request.GetAuthParameters(encodedCredentails))
     in
         response;
 
-shared FetchData = (url as text, session_id as text, optional mocks as nullable record) as record =>
+shared FetchData = (spsUrl as text, queryParams as record, sessionId as text, optional mocks as nullable record) as table =>
     let
-        response =
-            if IsMocked(mocks, "FetchResponse") then
-                Request.Generate(url, Request.GetDefaultParameters(session_id), [Response = mocks[FetchResponse]])
+        snapshot = Search.OpenSnapshot(spsUrl, sessionId, mocks),
+        sessions = Search.AdvancedSearch(spsUrl, queryParams, snapshot, sessionId, mocks),
+        expectedSessionsCount = try Search.GetSessionsCount(spsUrl, queryParams, sessionId, mocks),
+        sessionsWithCountMetadata =
+            if expectedSessionsCount[HasError] = true then
+                error expectedSessionsCount[Error]
             else
-                Request.Generate(url, Request.GetDefaultParameters(session_id))
+                Value.ReplaceMetadata(sessions, Value.Metadata(sessions) & [Count = expectedSessionsCount[Value]])
     in
-        response;
+        sessionsWithCountMetadata;
 
 HandleIfThereIsAnError = (input as record) =>
     if input[HasError] = true then
@@ -127,17 +126,6 @@ HandleIfThereIsAnError = (input as record) =>
                 error logNotExpectedError
     else
         input;
-
-ApplySchema = (data as record, mocks as record) =>
-    let
-        schema =
-            if IsMocked(mocks, "Schema") then
-                Record.Field(mocks[Schema], "Sessions")
-            else
-                Schema.GetSchema("Sessions"),
-        withSchema = SchemaUtils.ApplySchema(data, schema)
-    in
-        withSchema;
 
 SafeguardSessions = [
     Authentication = [
@@ -210,6 +198,12 @@ Schema.GetSchema = Extension.ImportFunction("GetSchema", "Schema.pqm");
 
 SchemaUtils.ApplySchema = Extension.ImportFunction("ApplySchema", "SchemaUtils.pqm");
 
+Search = Extension.ImportModule("Search.pqm");
+
+Search.AdvancedSearch = Search[AdvancedSearch];
+Search.GetSessionsCount = Search[GetSessionsCount];
+Search.OpenSnapshot = Search[OpenSnapshot];
+
 UrlBuilder = Extension.ImportModule("UrlBuilder.pqm");
 
 UrlBuilder.GenerateBaseUrl = UrlBuilder[GenerateBaseUrl];
@@ -217,3 +211,5 @@ UrlBuilder.GenerateUrl = UrlBuilder[GenerateUrl];
 UrlBuilder.GetDefaultQuery = UrlBuilder[GetDefaultQuery];
 
 Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm");
+
+AuthEndpoint = Extension.ImportFunction("AuthEndpoint", "Constants.pqm");

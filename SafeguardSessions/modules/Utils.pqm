@@ -1,5 +1,9 @@
 let
+    SuccessStatus = Extension.ImportFunction("SuccessStatus", "Constants.pqm"),
+    ErrorStatus = Extension.ImportFunction("ErrorStatus", "Constants.pqm"),
+    NotAvailableStatus = Extension.ImportFunction("NotAvailableStatus", "Constants.pqm"),
     ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm"),
+    InfoLog = Extension.ImportFunction("InfoLog", "Logger.pqm"),
     Utils.IsMocked = (mocks as nullable record, field as text) as logical =>
         mocks <> null and Record.HasFields(mocks, field),
     Utils.PaddedTable.FromRecords = (records as list) =>
@@ -10,17 +14,24 @@ let
         in
             asTable,
     Utils.FetchInfo = (
-        status as text, message as text, start as nullable datetimezone, count as number, failed as logical, url as text
+        status as text,
+        message as text,
+        start as nullable datetimezone,
+        expectedCount as number,
+        failed as logical,
+        url as text
     ) as table =>
         Table.FromRecords(
-            {[
-                Start = start,
-                Url = url,
-                Status = status,
-                Count = count,
-                Message = message,
-                Failed = failed
-            ]}
+            {
+                [
+                    Start = start,
+                    Url = url,
+                    Status = status,
+                    ExpectedCount = expectedCount,
+                    Message = message,
+                    Failed = failed
+                ]
+            }
         ),
     Utils.SPSResult = (session_data as anynonnull, additional_info as table) as table =>
         let
@@ -42,9 +53,6 @@ let
             navigationTable = Value.ReplaceType(source, newTableType)
         in
             navigationTable,
-    Utils.SuccessStatus = "Success",
-    Utils.ErrorStatus = "Error",
-    Utils.NotAvailableStatus = "N/A",
     Utils.BuildSPSResult = (response as record, start_time as datetimezone) =>
         let
             spsresult =
@@ -54,27 +62,28 @@ let
                         Utils.SPSResult(
                             response[Error],
                             Utils.FetchInfo(
-                                Utils.ErrorStatus,
+                                ErrorStatus,
                                 response[Error][Message],
                                 start_time,
                                 0,
                                 true,
-                                response[Error][Detail][RequestUrl]? ?? Utils.NotAvailableStatus
+                                response[Error][Detail][RequestUrl]? ?? NotAvailableStatus
                             )
                         )
                     )
                 else
                     [
                         sessions = response[Value],
+                        sessionsMeta = Value.Metadata(sessions),
                         result = Utils.SPSResult(
                             sessions,
                             Utils.FetchInfo(
-                                Utils.SuccessStatus,
+                                SuccessStatus,
                                 "Data fetch succeeded",
                                 start_time,
-                                Table.RowCount(sessions),
+                                sessionsMeta[Count],
                                 false,
-                                Value.Metadata(response[Value])[RequestUrl]
+                                sessionsMeta[RequestUrl]
                             )
                         )
                     ][result]
@@ -85,9 +94,6 @@ in
         IsMocked = Utils.IsMocked,
         PaddedTable.FromRecords = Utils.PaddedTable.FromRecords,
         FetchInfo = Utils.FetchInfo,
-        SuccessStatus = Utils.SuccessStatus,
-        ErrorStatus = Utils.ErrorStatus,
-        NotAvailableStatus = Utils.NotAvailableStatus,
         SPSResult = Utils.SPSResult,
         BuildSPSResult = Utils.BuildSPSResult
     ]

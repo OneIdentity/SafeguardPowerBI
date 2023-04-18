@@ -4,6 +4,13 @@ FetchInfo = Extension.ImportFunction("FetchInfo", "Utils.pqm");
 
 CreateSchema = Extension.ImportFunction("CreateSchema", "SchemaUtils.pqm");
 
+TestSafeguardSessions.URL = "dummy_url";
+
+TestSafeguardSessions.AuthenticationCredentials = [
+    Username = "dummy",
+    Password = "pwd"
+];
+
 TestSafeguardSessions.SuccessfulAuthenticationResponse = FakeRawResponse(
     [],
     [
@@ -13,6 +20,64 @@ TestSafeguardSessions.SuccessfulAuthenticationResponse = FakeRawResponse(
         ]
     ]
 );
+
+TestSafeguardSession.GetExpectedCountResponse = (optional expectedCount as number) =>
+    FakeRawResponse([count = expectedCount ?? 0]);
+
+TestSafeguardSession.SuccessfulOpenSnapshotResponse = FakeRawResponse([
+    body = [snapshot = "dummy_snapshot_id"]
+]);
+
+TestSafeguardSessions.Response.First = FakeRawResponse(
+    [
+        items = {
+            [
+                body = [
+                    subtable = [field1 = 1, field2 = "value1"],
+                    flatvalue1 = 1,
+                    flatvalue2 = true
+                ],
+                key = "id1",
+                #"meta" = []
+            ]
+        },
+        #"meta" = [next = "/dummy_url_next"]
+    ]
+);
+
+TestSafeguardSessions.Response.Next = FakeRawResponse(
+    [
+        items = {
+            [
+                body = [
+                    subtable = [field1 = 2, field2 = "value2"],
+                    flatvalue1 = 2,
+                    flatvalue2 = false
+                ],
+                key = "id2",
+                #"meta" = []
+            ]
+        },
+        #"meta" = [next = "/dummy_url_final"]
+    ]
+);
+
+TestSafeguardSessions.Response.Last = FakeRawResponse([
+    items = {},
+    #"meta" = [next = null]
+]);
+
+TestSafeguardSessions.Schema = [
+    Sessions = CreateSchema(
+        {
+            {"session_id", type text},
+            {"subtable.field1", type number},
+            {"subtable.field2", type text},
+            {"flatvalue1", type number},
+            {"flatvalue2", type logical}
+        }
+    )
+];
 
 TestSafeguardSessions.ActualResponseData = UnitTestFramework.ImportFunction("FakeResponse", "GetDataAsset.pqm");
 
@@ -24,10 +89,9 @@ TestSafeguardSessions.ActualResponse = FakeRawResponse(TestSafeguardSessions.Act
 
 TestEmptyResponseIsHandled = () =>
     let
-        fetchResponse = FakeRawResponse([
-            items = {},
-            #"meta" = []
-        ]),
+        fakeResponses = [
+            #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id" = TestSafeguardSessions.Response.Last
+        ],
         expectedData = #table(
             type table [
                 session_id = text,
@@ -39,29 +103,23 @@ TestEmptyResponseIsHandled = () =>
             {}
         ),
         expectedInfo = FetchInfo(
-            "Success", "Data fetch succeeded", null, 0, false, "https://dummy_url/api/audit/sessions?fields=%2A"
+            "Success",
+            "Data fetch succeeded",
+            null,
+            0,
+            false,
+            "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id"
         ),
         response = GetData(
-            "dummy_url",
-            [
-                Username = "dummy",
-                Password = "pwd"
-            ],
+            TestSafeguardSessions.URL,
+            TestSafeguardSessions.AuthenticationCredentials,
             [],
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                FetchResponse = fetchResponse,
-                Schema = [
-                    Sessions = CreateSchema(
-                        {
-                            {"session_id", type text},
-                            {"subtable.field1", type number},
-                            {"subtable.field2", type text},
-                            {"flatvalue1", type number},
-                            {"flatvalue2", type logical}
-                        }
-                    )
-                ]
+                Schema = TestSafeguardSessions.Schema,
+                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(),
+                OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                GetPageResponseMap = fakeResponses
             ]
         )
     in
@@ -69,31 +127,11 @@ TestEmptyResponseIsHandled = () =>
 
 TestGetDataWithoutError = () =>
     let
-        fetchResponse = FakeRawResponse(
-            [
-                items = {
-                    [
-                        body = [
-                            subtable = [field1 = 1, field2 = "value1"],
-                            flatvalue1 = 1,
-                            flatvalue2 = true
-                        ],
-                        key = "id1",
-                        #"meta" = []
-                    ],
-                    [
-                        body = [
-                            subtable = [field1 = 2, field2 = "value2"],
-                            flatvalue1 = 2,
-                            flatvalue2 = false
-                        ],
-                        key = "id2",
-                        #"meta" = []
-                    ]
-                },
-                #"meta" = []
-            ]
-        ),
+        fakeResponses = [
+            #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id" = TestSafeguardSessions.Response.First,
+            #"https://dummy_url/dummy_url_next" = TestSafeguardSessions.Response.Next,
+            #"https://dummy_url/dummy_url_final" = TestSafeguardSessions.Response.Last
+        ],
         expectedData = #table(
             type table [
                 session_id = text,
@@ -105,29 +143,23 @@ TestGetDataWithoutError = () =>
             {{"id1", 1, "value1", 1, true}, {"id2", 2, "value2", 2, false}}
         ),
         expectedInfo = FetchInfo(
-            "Success", "Data fetch succeeded", null, 2, false, "https://dummy_url/api/audit/sessions?fields=%2A"
+            "Success",
+            "Data fetch succeeded",
+            null,
+            2,
+            false,
+            "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id"
         ),
         response = GetData(
-            "dummy_url",
-            [
-                Username = "dummy",
-                Password = "pwd"
-            ],
+            TestSafeguardSessions.URL,
+            TestSafeguardSessions.AuthenticationCredentials,
             [],
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                FetchResponse = fetchResponse,
-                Schema = [
-                    Sessions = CreateSchema(
-                        {
-                            {"session_id", type text},
-                            {"subtable.field1", type number},
-                            {"subtable.field2", type text},
-                            {"flatvalue1", type number},
-                            {"flatvalue2", type logical}
-                        }
-                    )
-                ]
+                Schema = TestSafeguardSessions.Schema,
+                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
+                OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                GetPageResponseMap = fakeResponses
             ]
         )
     in
@@ -135,31 +167,32 @@ TestGetDataWithoutError = () =>
 
 TestGetDataWithQueryInputs = () =>
     let
-        fetchResponse = FakeRawResponse(
-            [
-                items = {[
-                    body = [dummy = "value"],
-                    key = "id",
-                    #"meta" = []
-                ]},
-                #"meta" = []
-            ]
+        fakeResponses = [
+            #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&start=2023.1.1&end=2023.1.31&q=protocol%3ASSh%20AND%20user.name%3Abalabit&snapshot=dummy_snapshot_id" = TestSafeguardSessions.Response.First,
+            #"https://dummy_url/dummy_url_next" = TestSafeguardSessions.Response.Next,
+            #"https://dummy_url/dummy_url_final" = TestSafeguardSessions.Response.Last
+        ],
+        expectedData = #table(
+            type table [
+                session_id = text,
+                subtable.field1 = number,
+                subtable.field2 = text,
+                flatvalue1 = number,
+                flatvalue2 = logical
+            ],
+            {{"id1", 1, "value1", 1, true}, {"id2", 2, "value2", 2, false}}
         ),
-        expectedData = #table(type table [session_id = text, dummy = text], {{"id", "value"}}),
         expectedInfo = FetchInfo(
             "Success",
             "Data fetch succeeded",
             null,
-            1,
+            2,
             false,
-            "https://dummy_url/api/audit/sessions?fields=%2A&start=2023.1.1&end=2023.1.31&q=protocol%3ASSh%20AND%20user.name%3Abalabit"
+            "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&start=2023.1.1&end=2023.1.31&q=protocol%3ASSh%20AND%20user.name%3Abalabit&snapshot=dummy_snapshot_id"
         ),
         response = GetData(
-            "dummy_url",
-            [
-                Username = "dummy",
-                Password = "pwd"
-            ],
+            TestSafeguardSessions.URL,
+            TestSafeguardSessions.AuthenticationCredentials,
             [
                 start = "2023.1.1",
                 end = "2023.1.31",
@@ -167,10 +200,10 @@ TestGetDataWithQueryInputs = () =>
             ],
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                FetchResponse = fetchResponse,
-                Schema = [
-                    Sessions = CreateSchema({{"session_id", type text}, {"dummy", type text}})
-                ]
+                Schema = TestSafeguardSessions.Schema,
+                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
+                OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                GetPageResponseMap = fakeResponses
             ]
         )
     in
@@ -197,10 +230,10 @@ TestGetDataHandlesAuthenticationError = () =>
             "https://dummy_url/api/authentication"
         ),
         response = GetData(
-            "dummy_url", [
-                Username = "dummy",
-                Password = "pwd"
-            ], [], [
+            TestSafeguardSessions.URL,
+            TestSafeguardSessions.AuthenticationCredentials,
+            [],
+            [
                 AuthResponse = fakeAuthResponse
             ]
         )
@@ -209,32 +242,41 @@ TestGetDataHandlesAuthenticationError = () =>
 
 TestGetDataHandlesBadRequest = () =>
     let
-        fetchResponse = FakeRawResponse([#"error" = "value"], [Response.Status = 500]),
+        fakeResponses = [
+            #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id" = FakeRawResponse(
+                [#"error" = "reason"], [
+                    Response.Status = 500
+                ]
+            )
+        ],
         expectedData = [
             Reason = "General Error",
             Message = "SPS responded with server error",
             Detail = [
                 ManuallyHandled = true,
-                Cause = [#"error" = "value"],
-                RequestUrl = "https://dummy_url/api/audit/sessions?fields=%2A"
+                Cause = [#"error" = "reason"],
+                RequestUrl = "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id"
             ],
             Message.Format = null,
             Message.Parameters = null
         ],
         expectedInfo = FetchInfo(
-            "Error", "SPS responded with server error", null, 0, true,
-            "https://dummy_url/api/audit/sessions?fields=%2A"
+            "Error",
+            "SPS responded with server error",
+            null,
+            0,
+            true,
+            "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id"
         ),
         response = GetData(
-            "dummy_url",
-            [
-                Username = "dummy",
-                Password = "pwd"
-            ],
+            TestSafeguardSessions.URL,
+            TestSafeguardSessions.AuthenticationCredentials,
             [],
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                FetchResponse = fetchResponse
+                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(),
+                OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                GetPageResponseMap = fakeResponses
             ]
         )
     in
@@ -254,10 +296,9 @@ TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringAuth = () =>
         ],
         errorMock = [Value = error errorRecord],
         expectedInfo = FetchInfo("Error", "This is an error no-one expects", null, 0, true, "N/A"),
-        response = GetData("dummy_url", [
-            Username = "dummy",
-            Password = "pwd"
-        ], [], [Authenticate = errorMock])
+        response = GetData(
+            TestSafeguardSessions.URL, TestSafeguardSessions.AuthenticationCredentials, [], [Authenticate = errorMock]
+        )
     in
         TestResultsContentWithoutStartTime(response, errorRecord, expectedInfo);
 
@@ -276,11 +317,8 @@ TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringDataFetch = () =>
         errorMock = [Value = error errorRecord],
         expectedInfo = FetchInfo("Error", "This is an error no-one expects", null, 0, true, "N/A"),
         response = GetData(
-            "dummy_url",
-            [
-                Username = "dummy",
-                Password = "pwd"
-            ],
+            TestSafeguardSessions.URL,
+            TestSafeguardSessions.AuthenticationCredentials,
             [],
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
@@ -308,10 +346,18 @@ TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringAut
                 Message.Parameters = null
             ]
         ],
-        response = try (GetData("dummy_url", [
-            Username = "dummy",
-            Password = "pwd"
-        ], [], [Authenticate = errorMock]))
+        response =
+            try
+                (
+                    GetData(
+                        TestSafeguardSessions.URL,
+                        TestSafeguardSessions.AuthenticationCredentials,
+                        [],
+                        [
+                            Authenticate = errorMock
+                        ]
+                    )
+                )
     in
         Fact("Check error is raised", expectedResponse, response);
 
@@ -337,11 +383,8 @@ TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringDat
             try
                 (
                     GetData(
-                        "dummy_url",
-                        [
-                            Username = "dummy",
-                            Password = "pwd"
-                        ],
+                        TestSafeguardSessions.URL,
+                        TestSafeguardSessions.AuthenticationCredentials,
                         [],
                         [
                             AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
@@ -354,20 +397,27 @@ TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringDat
 
 TestGetDataWithActualData = () =>
     let
+        fakeResponses = [
+            #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id" = TestSafeguardSessions.ActualResponse
+        ],
         expectedData = TestSafeguardSessions.ExpectedDataForActualResponse,
         expectedInfo = FetchInfo(
-            "Success", "Data fetch succeeded", null, 25, false, "https://dummy_url/api/audit/sessions?fields=%2A"
+            "Success",
+            "Data fetch succeeded",
+            null,
+            25,
+            false,
+            "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id"
         ),
         response = GetData(
-            "dummy_url",
-            [
-                Username = "dummy",
-                Password = "pwd"
-            ],
+            TestSafeguardSessions.URL,
+            TestSafeguardSessions.AuthenticationCredentials,
             [],
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                FetchResponse = TestSafeguardSessions.ActualResponse
+                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(25),
+                OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                GetPageResponseMap = fakeResponses
             ]
         )
     in

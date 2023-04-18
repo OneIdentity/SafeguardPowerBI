@@ -14,7 +14,7 @@ let
         in
             UrlBuilder.GenerateBaseUrl(urlParts[Scheme], urlParts[Host]),
     UrlBuilder.GetQueryFromUrl = (url as text) as record => Uri.Parts(url)[Query],
-    UrlBuilder.GetDefaultQuery = () => [fields = "*"],
+    UrlBuilder.GetDefaultQuery = () => [fields = "*", sort = "-start_time"],
     UrlBuilder._generateNewUrl = (newUrlWithoutQuery as text, query as record) =>
         let
             transformedQueryRecordList = List.Accumulate(
