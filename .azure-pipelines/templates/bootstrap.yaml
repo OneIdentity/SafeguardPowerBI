@@ -1,0 +1,5 @@
+steps:
+  - pwsh: |
+      nuget install Microsoft.PowerQuery.SdkTools -Version 2.114.4
+      echo "##vso[task.prependpath]$(Build.SourcesDirectory)/Microsoft.PowerQuery.SdkTools.2.114.4/tools"
+    displayName: 'Install Power Query SDK tools'

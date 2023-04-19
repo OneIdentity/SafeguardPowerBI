@@ -1,0 +1,117 @@
+# See more: https://aka.ms/yaml
+
+variables:
+  project_root: 'SafeguardSessions'
+  build_path: 'bin'
+  report_template_path: 'assets/template'
+  asset_output_dir: 'assets'
+  connector: 'OneIdentitySafeguard.mez'
+  report_template: 'OneIdentitySafeguard.pbit'
+
+trigger:
+  # TODO: setup triggers (e.g. "skip-ci" if that's not default)
+  - none
+
+stages:
+  - stage: Test
+    jobs:
+      # XXX: make sure no critical job is allowed to be skipped
+      - job: run_tests
+        displayName: 'Run tests'
+        pool:
+          # XXX: 2016 will be EOL soon, other option is 2019
+          vmImage: windows-2022
+        variables:
+          test_results: results.json
+
+        steps:
+          - template: templates/bootstrap.yaml
+          - template: templates/build.yaml
+
+          - template: templates/run-tests.yaml
+          - pwsh: |
+              $results = Get-Content -Raw $(test_results) | ConvertFrom-Json |
+                ForEach-Object { $_.Output } | Where-Object -Property Result -Like "*Failure*" 
+              $exit_code = [int][bool]::Parse($null -ne $results)              
+              exit $exit_code
+            displayName: 'Evaluate test results'
+            workingDirectory: $(project_root)
+
+          # Make Artifacts
+
+          - template: templates/checksum.yaml
+
+          - task: CopyFiles@2
+            condition: always()
+            displayName: 'Collect artifacts'
+            inputs:
+              flattenFolders: true
+              Contents: |
+                $(project_root)/$(build_path)/$(connector)
+                $(project_root)/$(build_path)/$(connector).sha256
+                $(project_root)/$(report_template_path)/$(report_template)
+                $(project_root)/$(report_template_path)/$(report_template).sha256
+                $(project_root)/$(test_results)
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+          - task: PublishBuildArtifacts@1
+            condition: always()
+            inputs:
+              artifactName: $(asset_output_dir)
+
+  - stage: Release
+    jobs:
+    - job: release
+      displayName: 'Send release'
+      variables:
+        release_notes: release-notes.md
+        assets: |
+          $(Pipeline.Workspace)/$(asset_output_dir)/$(connector)
+          $(Pipeline.Workspace)/$(asset_output_dir)/$(connector).sha256
+          $(Pipeline.Workspace)/$(asset_output_dir)/$(report_template)
+          $(Pipeline.Workspace)/$(asset_output_dir)/$(report_template).sha256
+
+      steps:
+        - checkout: none
+
+        # TODO: add sanity check:
+        #  - VERSION input variable follows agreed format, if tag already exists, etc ...
+        #  - Check HEAD is on "main" branch
+
+        - download: current
+          artifact: assets
+        - bash: |
+              cat > $RELEASE_NOTES <<EOF
+              # My dummy release notes
+              
+              This is solely for testing azure pipeline capabilities
+              EOF
+          displayName: 'Create (dummy) release notes'
+
+
+        - bash: |
+              check() {
+                echo -n $1\t
+                [ -f $1 ] && echo OK || {echo FAIL; exit 1 }  
+              }
+              check $RELEASE_NOTES
+              for f in $ASSETS
+              do
+                check exit 1
+              done
+          displayName: 'Check assets'
+
+        - task: GitHubRelease@1
+          inputs:
+            # TODO: set publisher user triggering the pipeline, if possible
+            gitHubConnection: 'Publish to GitHub'
+            repositoryName: 'OneIdentity/SafeguardPowerBI'
+            action: 'create'
+            title: $(VERSION)
+            tagSource: 'userSpecifiedTag'
+            tag: $(VERSION)
+            isPreRelease: true
+            isDraft: true
+            assets: $(assets)
+            # TODO: check if this can be used w/ our agreed workflow
+            releaseNotesFilePath: $(release_notes)
+            changeLogLabels: '[{ "label" : "bug", "displayName" : "Bugs", "state" : "closed" }]'

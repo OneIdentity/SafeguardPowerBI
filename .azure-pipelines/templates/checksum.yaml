@@ -1,0 +1,5 @@
+steps:
+  - script: |
+      make checksum
+    displayName: 'Calculate sha256 checksum'
+    workingDirectory: $(project_root)

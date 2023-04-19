@@ -1,0 +1,7 @@
+# requires bootstrap
+# requires build
+steps:
+  - script: |
+      make -s unit-tests | tee $(test_results)
+    displayName: 'Run integration and unit tests'
+    workingDirectory: $(project_root)

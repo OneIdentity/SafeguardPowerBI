@@ -1,0 +1,17 @@
+steps:
+  # XXX: there's no MSBuild installed, otherwise same as:
+  # - task: PowerShell@2
+  #   displayName: 'Build Connector and Unit Test Framework'
+  #   inputs:
+  #     targetType: 'inline'
+  #     workingDirectory: $(project_root)
+  #     script: make build
+
+  - task: MSBuild@1
+    displayName: 'Build connector project'
+    inputs:
+      solution: '$(project_root)/SafeguardSessions.proj'
+  - task: MSBuild@1
+    displayName: 'Build Unit Test Framework'
+    inputs:
+      solution: '$(project_root)/test/test.proj'
