@@ -22,9 +22,9 @@ let
             {"client.ip", type text},
             {"client.name", type text},
             {"client.port", type text},
-            {"creation_time", type datetime},
+            {"creation_time", type datetimezone},
             {"duration", type number},
-            {"end_time", type datetime},
+            {"end_time", type datetimezone},
             // Log
             {"log.adapter_name", type text},
             {"log.auth_method", type text},
@@ -33,7 +33,7 @@ let
             {"origin", type text},
             {"protocol", type text},
             // Recording
-            {"recording.archive.date", type datetime},
+            {"recording.archive.date", type datetimezone},
             {"recording.archive.path", type text},
             {"recording.archive.policy", type text},
             {"recording.archive.server", type text},
@@ -63,7 +63,7 @@ let
             {"server.id", type text},
             {"server.name", type text},
             {"server.port", type text},
-            {"start_time", type datetime},
+            {"start_time", type datetimezone},
             // User
             {"user.gateway_username", type text},
             {"user.gateway_username_domain", type text},
