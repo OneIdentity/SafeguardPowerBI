@@ -5,6 +5,8 @@
     <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">$(MSBuildProjectDirectory)\obj\</IntermediateOutputPath>
     <MezIntermediatePath>$(IntermediateOutputPath)MEZ\</MezIntermediatePath>
     <MezOutputPath>$(OutputPath)$(MsBuildProjectName).mez</MezOutputPath>
+    <AssetsPath>$(MSBuildProjectDirectory)\assets\</AssetsPath>
+    <IconsPath>$(AssetsPath)\icons\</IconsPath>
     <ModulesPath>$(MSBuildProjectDirectory)\modules\</ModulesPath>
     <RequestPath>$(ModulesPath)\request\</RequestPath>
     <ErrorPath>$(ModulesPath)\error\</ErrorPath>
@@ -29,14 +31,14 @@
     <MezContent Include="$(SchemaPath)Schema.pqm" />
     <MezContent Include="$(SchemaPath)SchemaUtils.pqm" />
     <MezContent Include="$(DefinitionsPath)Sessions.pqm" />
-    <MezContent Include="SafeguardSessions16.png" />
-    <MezContent Include="SafeguardSessions20.png" />
-    <MezContent Include="SafeguardSessions24.png" />
-    <MezContent Include="SafeguardSessions32.png" />
-    <MezContent Include="SafeguardSessions40.png" />
-    <MezContent Include="SafeguardSessions48.png" />
-    <MezContent Include="SafeguardSessions64.png" />
-    <MezContent Include="SafeguardSessions80.png" />
+    <MezContent Include="$(IconsPath)OneIdentitySafeguardPowerBIConnector16.png" />
+    <MezContent Include="$(IconsPath)OneIdentitySafeguardPowerBIConnector20.png" />
+    <MezContent Include="$(IconsPath)OneIdentitySafeguardPowerBIConnector24.png" />
+    <MezContent Include="$(IconsPath)OneIdentitySafeguardPowerBIConnector32.png" />
+    <MezContent Include="$(IconsPath)OneIdentitySafeguardPowerBIConnector40.png" />
+    <MezContent Include="$(IconsPath)OneIdentitySafeguardPowerBIConnector48.png" />
+    <MezContent Include="$(IconsPath)OneIdentitySafeguardPowerBIConnector64.png" />
+    <MezContent Include="$(IconsPath)OneIdentitySafeguardPowerBIConnector80.png" />
     <MezContent Include="resources.resx" />
   </ItemGroup>
   <Target Name="BuildMez" AfterTargets="Build" Inputs="@(MezContent)" Outputs="$(MezOutputPath)">
