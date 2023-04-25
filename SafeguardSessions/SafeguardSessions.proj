@@ -4,7 +4,7 @@
     <OutputPath Condition="'$(OutputPath)' == ''">$(MSBuildProjectDirectory)\bin\</OutputPath>
     <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">$(MSBuildProjectDirectory)\obj\</IntermediateOutputPath>
     <MezIntermediatePath>$(IntermediateOutputPath)MEZ\</MezIntermediatePath>
-    <MezOutputPath>$(OutputPath)$(MsBuildProjectName).mez</MezOutputPath>
+    <MezOutputPath>$(OutputPath)OneIdentitySafeguard.mez</MezOutputPath>
     <AssetsPath>$(MSBuildProjectDirectory)\assets\</AssetsPath>
     <IconsPath>$(AssetsPath)\icons\</IconsPath>
     <ModulesPath>$(MSBuildProjectDirectory)\modules\</ModulesPath>

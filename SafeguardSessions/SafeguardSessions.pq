@@ -1,5 +1,4 @@
-﻿// This file contains your Data Connector logic
-[Version = "1.0.0"]
+﻿[Version = "1.0.0"]
 section SafeguardSessions;
 
 [DataSource.Kind = "SafeguardSessions", Publish = "SafeguardSessions.Publish"]
@@ -129,15 +128,11 @@ HandleIfThereIsAnError = (input as record) =>
 
 SafeguardSessions = [
     Authentication = [
-        // Key = [],
         UsernamePassword = []
-        // Windows = [],
-        // Anonymous = []
     ],
     Label = Extension.LoadString("DataSourceLabel")
 ];
 
-// Data Source UI publishing description
 SafeguardSessions.Publish = [
     Beta = true,
     Category = "Other",
