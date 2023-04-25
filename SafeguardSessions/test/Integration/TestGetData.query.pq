@@ -216,7 +216,7 @@ TestGetDataHandlesAuthenticationError = () =>
         ]),
         expectedData = [
             Reason = "Authentication Error",
-            Message = "Something went wrong while authenticating",
+            Message = "The username or password is invalid",
             Detail = [
                 ManuallyHandled = true,
                 Cause = [#"error" = "value"],
@@ -226,7 +226,7 @@ TestGetDataHandlesAuthenticationError = () =>
             Message.Parameters = null
         ],
         expectedInfo = FetchInfo(
-            "Error", "Something went wrong while authenticating", null, 0, true,
+            "Error", "The username or password is invalid", null, 0, true,
             "https://dummy_url/api/authentication"
         ),
         response = GetData(
