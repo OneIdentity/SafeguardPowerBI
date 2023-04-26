@@ -43,7 +43,7 @@ shared FetchSessions = (
     filterValue2 as nullable text,
     filterField3 as nullable text,
     filterValue3 as nullable text,
-    optional mocks as record
+    optional mocks as nullable record
 ) =>
     let
         qParameterInputPairList = {
