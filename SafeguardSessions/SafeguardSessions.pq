@@ -149,16 +149,16 @@ SafeguardSessions.Publish = [
 
 SafeguardSessions.Icons = [
     Icon16 = {
-        Extension.Contents("SafeguardSessions16.png"),
-        Extension.Contents("SafeguardSessions20.png"),
-        Extension.Contents("SafeguardSessions24.png"),
-        Extension.Contents("SafeguardSessions32.png")
+        Extension.Contents("OneIdentitySafeguardPowerBIConnector16.png"),
+        Extension.Contents("OneIdentitySafeguardPowerBIConnector20.png"),
+        Extension.Contents("OneIdentitySafeguardPowerBIConnector24.png"),
+        Extension.Contents("OneIdentitySafeguardPowerBIConnector32.png")
     },
     Icon32 = {
-        Extension.Contents("SafeguardSessions32.png"),
-        Extension.Contents("SafeguardSessions40.png"),
-        Extension.Contents("SafeguardSessions48.png"),
-        Extension.Contents("SafeguardSessions64.png")
+        Extension.Contents("OneIdentitySafeguardPowerBIConnector32.png"),
+        Extension.Contents("OneIdentitySafeguardPowerBIConnector40.png"),
+        Extension.Contents("OneIdentitySafeguardPowerBIConnector48.png"),
+        Extension.Contents("OneIdentitySafeguardPowerBIConnector64.png")
     }
 ];
 
