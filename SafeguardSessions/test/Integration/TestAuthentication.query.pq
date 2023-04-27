@@ -94,8 +94,8 @@ TestAuthenticateRaisesError = () =>
             in
                 facts,
         cases = {
-            {401, "Authentication Error", "Something went wrong while authenticating"},
-            {403, "Authorization Error", "Not authorized to access the given resource"},
+            {401, "Authentication Error", "The username or password is invalid"},
+            {403, "Authorization Error", "You are not authorized to access the given resource"},
             {500, "General Error", "SPS responded with server error"}
         },
         facts = ProvideDataForTest(cases, AssertErrorisRaised)

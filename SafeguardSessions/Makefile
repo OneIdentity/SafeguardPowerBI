@@ -9,7 +9,7 @@ TEST_CONNECTOR_DIR=test
 MAIN_PROJECT_CONFIG=SafeguardSessions.proj
 TEST_PROJECT_CONFIG=$(TEST_CONNECTOR_DIR)\test.proj
 
-MAIN_CONNECTOR=bin\SafeguardSessions.mez
+MAIN_CONNECTOR=bin\OneIdentitySafeguard.mez
 TEST_FRAMEWORK=$(TEST_CONNECTOR_DIR)\bin\UnitTestFramework.mez
 
 SHORT?=true

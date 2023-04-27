@@ -14,7 +14,7 @@ TestValidateByStatusCodeRaisesError = () =>
         facts = TestErrorIsRaised(
             try ValidateByStatusCode(fake_auth_response),
             "Authentication Error",
-            "Something went wrong while authenticating",
+            "The username or password is invalid",
             [
                 ManuallyHandled = true,
                 Cause = fake_auth_response,

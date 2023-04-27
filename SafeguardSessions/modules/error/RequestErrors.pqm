@@ -7,9 +7,9 @@ let
     RequestErrors.BadRequest = (detail as record) =>
         ErrorBase("Bad Request", "SPS interpreted a malformed request", detail),
     RequestErrors.AuthenticationError = (detail as record) =>
-        ErrorBase("Authentication Error", "Something went wrong while authenticating", detail),
+        ErrorBase("Authentication Error", "The username or password is invalid", detail),
     RequestErrors.AuthorizationError = (detail as record) =>
-        ErrorBase("Authorization Error", "Not authorized to access the given resource", detail),
+        ErrorBase("Authorization Error", "You are not authorized to access the given resource", detail),
     RequestErrors.NotFound = (detail as record) =>
         ErrorBase("Not Found", "The requested resource cannot be found", detail),
     RequestErrors.SnapshotQuotaError = (detail as record) =>

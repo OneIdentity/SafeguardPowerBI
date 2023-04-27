@@ -82,7 +82,7 @@ let
             ]
         )
     ) as record meta [
-        Documentation.Name = "Safeguard for Privileged Sessions Connector",
+        Documentation.Name = "One Identity Safeguard Power BI Connector",
         Documentation.LongDescription = "Enter required paramters to be able to fetch DATA from SPS. With the optional input fields (From, Till, Filter Field, Filter Value) the
          user can query sessions from the specified SPS based on search criterias. The filter field-value pairs are concatenated with ""AND"" in the q query parameter. In the case
          where only the field is specified in the matching filter field-value pair, the existing q parameter is only appended with ""field_name:"", and if only the value is specified,
