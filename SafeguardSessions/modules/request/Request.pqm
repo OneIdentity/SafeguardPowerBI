@@ -4,7 +4,6 @@ let
     RequestErrors = Extension.ImportModule("RequestErrors.pqm"),
     ErrorCodes = Extension.ImportFunction("ErrorCodes", "RequestErrors.pqm"),
     ValidateByStatusCode = Extension.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
-
     Request.GetAuthParameters = (encodedCredentails as text) as record =>
         let
             parameters = [
@@ -31,7 +30,7 @@ let
             ]
         in
             parameters,
-    Request.Generate = (url as text, parameters as record, optional mocks as record) as record =>
+    Request.Generate = (url as text, parameters as record, optional mocks as nullable record) as record =>
         let
             loggedParameters =
                 if Record.HasFields(parameters, "Headers") then
