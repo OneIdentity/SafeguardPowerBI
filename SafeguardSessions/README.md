@@ -13,7 +13,7 @@
 
 ## About the project
 
-The aim of One Identity Safeguard Power BI Connector (Connector) is to provide a solution for customers to visualize their audit data captured by [One Identity Safeguard for Priviledged Sessions] (SPS) in a highly configurable way compared to the on-box reporting system of SPS. The Connector uses basic authentication to connect to SPS and imports sessions metadata that matches the criteria given by the Connector's input parameters. After successful data retrieval, the Connector returns with two tables:
+The aim of One Identity Safeguard Power BI Connector (Connector) is to provide a solution for customers to visualize their audit data captured by [One Identity Safeguard for Priviledged Sessions] (SPS) in a highly configurable way compared to the on-box reporting system of SPS. The Connector uses basic authentication with local login method to connect to SPS and imports sessions metadata that matches the criteria given by the Connector's input parameters. After successful data retrieval, the Connector returns with two tables:
 
 - **Info**: contains information about the data fetch process for debugging purposes
 - **Sessions**: contains the actual sessions metadata
@@ -77,7 +77,7 @@ Your filter might be invalid. Make sure you input your filter parameters correct
 
 **C) The username or password you have specified is invalid.**
 
-Make sure to enter your username and password you use to access SPS for viewing audit data.
+Make sure you use a local user to access SPS with a valid username and password. One Identity recommends creating a dedicated local user for the purpose of importing data from SPS into Power BI.
 
 **D) You are not authorized to access the specified resource.**
 

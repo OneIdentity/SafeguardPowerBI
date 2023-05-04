@@ -31,7 +31,7 @@ shared TestRequest.UnitTest = [
         Fact(
             "Check authentication request parameters:",
             [
-                Query = [return = "/api/authentication"],
+                Query = [return = "/api/authentication", login_method = "local"],
                 Headers = [
                     #"Authorization" = "Basic YWxtYTpzemlsdmE=",
                     #"Accept" = "*/*",
