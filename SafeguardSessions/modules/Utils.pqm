@@ -79,7 +79,7 @@ let
                             sessions,
                             Utils.FetchInfo(
                                 SuccessStatus,
-                                "Data fetch succeeded",
+                                "Data fetch succeeded.",
                                 start_time,
                                 sessionsMeta[Count],
                                 false,
