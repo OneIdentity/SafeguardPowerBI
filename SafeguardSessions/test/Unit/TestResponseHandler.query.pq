@@ -14,7 +14,7 @@ TestValidateByStatusCodeRaisesError = () =>
         facts = TestErrorIsRaised(
             try ValidateByStatusCode(fake_auth_response),
             "Authentication Error",
-            "The username or password is invalid",
+            "The username or password you have specified is invalid.",
             [
                 ManuallyHandled = true,
                 Cause = fake_auth_response,
@@ -75,7 +75,7 @@ TestGetDataFromResponse = () =>
                     HasError = true,
                     Error = [
                         Reason = "Not Parsable Response",
-                        Message = "SPS returned response with missing fields",
+                        Message = "The source IP returned a response with missing fields.",
                         Detail = [
                             Cause = fake_response,
                             MissingField = "",
@@ -93,7 +93,7 @@ TestGetDataFromResponse = () =>
                     HasError = true,
                     Error = [
                         Reason = "Not Parsable Response",
-                        Message = "SPS returned response with missing fields",
+                        Message = "The source IP returned a response with missing fields.",
                         Detail = [
                             Cause = fake_response,
                             MissingField = "body/svc1/protocol",

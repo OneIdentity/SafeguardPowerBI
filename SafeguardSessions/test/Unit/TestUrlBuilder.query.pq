@@ -74,8 +74,8 @@ TestGenerateUrl = () =>
                 [
                     HasError = true,
                     Error = [
-                        Reason = "Bad search filter input",
-                        Message = "Filter field was given without value",
+                        Reason = "Filter Field Without Value",
+                        Message = "There is a field value missing from one or more of your filter fields.",
                         Detail = [ManuallyHandled = false, Cause = "protocol", RequestUrl = null],
                         Message.Format = null,
                         Message.Parameters = null

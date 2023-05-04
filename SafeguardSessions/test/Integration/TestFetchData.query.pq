@@ -283,11 +283,11 @@ TestFetchDataRaisesErrorWhenAdvancedSearchInitialResponseFails = () =>
             in
                 facts,
         cases = {
-            {400, "Bad Request", "SPS interpreted a malformed request"},
-            {401, "Authentication Error", "The username or password is invalid"},
-            {403, "Authorization Error", "You are not authorized to access the given resource"},
-            {404, "Not Found", "The requested resource cannot be found"},
-            {500, "General Error", "SPS responded with server error"}
+            {400, "Bad Request", "The source IP interpreted a malformed request. Your filter parameter(s) might be invalid."},
+            {401, "Authentication Error", "The username or password you have specified is invalid."},
+            {403, "Authorization Error", "You are not authorized to access the specified resource."},
+            {404, "Not Found", "The requested resource is not found."},
+            {500, "Server Error", "The source IP responded with a server error."}
         },
         facts = ProvideDataForTest(cases, AssertErrorIsRaised)
     in
@@ -328,11 +328,11 @@ TestFetchDataRaisesErrorWhenAdvancedSearchSuccessiveResponseFails = () =>
             in
                 facts,
         cases = {
-            {400, "Bad Request", "SPS interpreted a malformed request"},
-            {401, "Authentication Error", "The username or password is invalid"},
-            {403, "Authorization Error", "You are not authorized to access the given resource"},
-            {404, "Not Found", "The requested resource cannot be found"},
-            {500, "General Error", "SPS responded with server error"}
+            {400, "Bad Request", "The source IP interpreted a malformed request. Your filter parameter(s) might be invalid."},
+            {401, "Authentication Error", "The username or password you have specified is invalid."},
+            {403, "Authorization Error", "You are not authorized to access the specified resource."},
+            {404, "Not Found", "The requested resource is not found."},
+            {500, "Server Error", "The source IP responded with a server error."}
         },
         facts = ProvideDataForTest(cases, AssertErrorIsRaised)
     in
@@ -366,11 +366,11 @@ TestFetchDataRaisesErrorWhenCountRequestFails = () =>
             in
                 facts,
         cases = {
-            {400, "Bad Request", "SPS interpreted a malformed request"},
-            {401, "Authentication Error", "The username or password is invalid"},
-            {403, "Authorization Error", "You are not authorized to access the given resource"},
-            {404, "Not Found", "The requested resource cannot be found"},
-            {500, "General Error", "SPS responded with server error"}
+            {400, "Bad Request", "The source IP interpreted a malformed request. Your filter parameter(s) might be invalid."},
+            {401, "Authentication Error", "The username or password you have specified is invalid."},
+            {403, "Authorization Error", "You are not authorized to access the specified resource."},
+            {404, "Not Found", "The requested resource is not found."},
+            {500, "Server Error", "The source IP responded with a server error."}
         },
         facts = ProvideDataForTest(cases, AssertErrorIsRaised)
     in
@@ -405,12 +405,12 @@ TestFetchDataRaisesErrorWhenSnapshotRequestFails = () =>
             in
                 facts,
         cases = {
-            {400, "Bad Request", "SPS interpreted a malformed request"},
-            {401, "Authentication Error", "The username or password is invalid"},
-            {403, "Authorization Error", "You are not authorized to access the given resource"},
-            {404, "Not Found", "The requested resource cannot be found"},
-            {429, "Snapshot Quota Error", "Snapshot quota exceeded"},
-            {500, "General Error", "SPS responded with server error"}
+            {400, "Bad Request", "The source IP interpreted a malformed request. Your filter parameter(s) might be invalid."},
+            {401, "Authentication Error", "The username or password you have specified is invalid."},
+            {403, "Authorization Error", "You are not authorized to access the specified resource."},
+            {404, "Not Found", "The requested resource is not found."},
+            {429, "Snapshot Quota Error", "Snapshot quota exceeded."},
+            {500, "Server Error", "The source IP responded with a server error."}
         },
         facts = ProvideDataForTest(cases, AssertErrorIsRaised)
     in

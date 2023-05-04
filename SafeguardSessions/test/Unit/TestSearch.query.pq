@@ -102,7 +102,7 @@ TestAdvancedSearchRaisesError = () =>
             )
         ],
         expectedReason = "Not Found",
-        expectedMessage = "The requested resource cannot be found",
+        expectedMessage = "The requested resource is not found.",
         expectedDetail = [
             ManuallyHandled = true,
             Cause = [#"error" = "reason"],
@@ -138,7 +138,7 @@ TestGetSessionsCountRaisesError = () =>
             RequestUrl = requestUrl
         ]),
         expectedReason = "Not Parsable Response",
-        expectedMessage = "SPS returned response with missing fields",
+        expectedMessage = "The source IP returned a response with missing fields.",
         expectedDetail = [
             Cause = [invalid = "response"],
             MissingField = "count",
@@ -193,7 +193,7 @@ TestOpenSnapshotRaisesError = () =>
             {
                 FakeRawResponse([invalid = "response"]),
                 "Not Parsable Response",
-                "SPS returned response with missing fields",
+                "The source IP returned a response with missing fields.",
                 [
                     Cause = [invalid = "response"],
                     MissingField = "body.snapshot"
@@ -204,7 +204,7 @@ TestOpenSnapshotRaisesError = () =>
                     Response.Status = 429
                 ]),
                 "Snapshot Quota Error",
-                "Snapshot quota exceeded",
+                "Snapshot quota exceeded.",
                 [
                     ManuallyHandled = true,
                     Cause = [#"error" = "reason"]

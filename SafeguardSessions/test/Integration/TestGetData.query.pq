@@ -104,7 +104,7 @@ TestEmptyResponseIsHandled = () =>
         ),
         expectedInfo = FetchInfo(
             "Success",
-            "Data fetch succeeded",
+            "Data fetch succeeded.",
             null,
             0,
             false,
@@ -144,7 +144,7 @@ TestGetDataWithoutError = () =>
         ),
         expectedInfo = FetchInfo(
             "Success",
-            "Data fetch succeeded",
+            "Data fetch succeeded.",
             null,
             2,
             false,
@@ -184,7 +184,7 @@ TestGetDataWithQueryInputs = () =>
         ),
         expectedInfo = FetchInfo(
             "Success",
-            "Data fetch succeeded",
+            "Data fetch succeeded.",
             null,
             2,
             false,
@@ -216,7 +216,7 @@ TestGetDataHandlesAuthenticationError = () =>
         ]),
         expectedData = [
             Reason = "Authentication Error",
-            Message = "The username or password is invalid",
+            Message = "The username or password you have specified is invalid.",
             Detail = [
                 ManuallyHandled = true,
                 Cause = [#"error" = "value"],
@@ -226,7 +226,7 @@ TestGetDataHandlesAuthenticationError = () =>
             Message.Parameters = null
         ],
         expectedInfo = FetchInfo(
-            "Error", "The username or password is invalid", null, 0, true,
+            "Error", "The username or password you have specified is invalid.", null, 0, true,
             "https://dummy_url/api/authentication"
         ),
         response = GetData(
@@ -250,8 +250,8 @@ TestGetDataHandlesBadRequest = () =>
             )
         ],
         expectedData = [
-            Reason = "General Error",
-            Message = "SPS responded with server error",
+            Reason = "Server Error",
+            Message = "The source IP responded with a server error.",
             Detail = [
                 ManuallyHandled = true,
                 Cause = [#"error" = "reason"],
@@ -262,7 +262,7 @@ TestGetDataHandlesBadRequest = () =>
         ],
         expectedInfo = FetchInfo(
             "Error",
-            "SPS responded with server error",
+            "The source IP responded with a server error.",
             null,
             0,
             true,
@@ -403,7 +403,7 @@ TestGetDataWithActualData = () =>
         expectedData = TestSafeguardSessions.ExpectedDataForActualResponse,
         expectedInfo = FetchInfo(
             "Success",
-            "Data fetch succeeded",
+            "Data fetch succeeded.",
             null,
             25,
             false,

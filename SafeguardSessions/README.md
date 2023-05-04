@@ -65,33 +65,33 @@ You might have forgotten to import the CA X509 certificate of your SPS appliance
 
 I see "Error" in the Status column of the Info table and the Message column contains the following:
 
-**A) SPS returned response with missing fields**
+**A) The source IP returned a response with missing fields.**
 
 A response returned by SPS does not contain a field that Connector needs for processing data.
 Reproduce the error with trace logging enabled and create a technical case described in the [Troubleshooting](#troubleshooting) section.
 Attach the mashup trace logs to the issue.
 
-**B) SPS interpreted a malformed request**
+**B) The source IP interpreted a malformed request.**
 
 Your filter might be invalid. Make sure you input your filter parameters correctly. For more information on the available search fields, see **List of available search queries** in the **One Identity Safeguard for Privileged Sessions Administration Guide** on the [Technical documents for One Identity Safeguard for Priviledged Sessions] page.
 
-**C) The username or password is invalid**
+**C) The username or password you have specified is invalid.**
 
 Make sure to enter your username and password you use to access SPS for viewing audit data.
 
-**D) You are not authorized to access the given resource**
+**D) You are not authorized to access the specified resource.**
 
 In order to access audit data, the user you use to access SPS needs to have search access rights.
 
-**E) The requested resource cannot be found**
+**E) The requested resource is not found.**
 
 In order to fetch audit data from SPS, the Connector relies on advanced search that uses database snapshots to ensure data consistency throughout a data fetch. If for some reason the database snapshot disappears, this error can occur. Try to initiate the data fetch process again.
 
-**F) Snapshot quota exceeded**
+**F) Snapshot quota exceeded.**
 
 This happens if multiple users want to use advanced search relying on database snapshots at the same time. In this case, try initiating the data fetch at least 5 minutes later so that an existing snapshot may expire in the system and a new one can be opened.
 
-**G) SPS responded with server error**
+**G) The source IP responded with a server error.**
 
 This error indicates problems with the SPS appliance. Try the suggestions written in the [Troubleshooting](#troubleshooting) section.
 

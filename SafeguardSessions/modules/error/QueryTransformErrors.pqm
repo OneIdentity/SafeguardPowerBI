@@ -1,7 +1,7 @@
 let
     ErrorBase = Extension.ImportModule("ErrorBase.pqm"),
     QueryTransformErrors.FilterFieldWithoutValue = (detail as record) =>
-        ErrorBase("Bad search filter input", "Filter field was given without value", detail)
+        ErrorBase("Filter Field Without Value", "There is a field value missing from one or more of your filter fields.", detail)
 in
     [
         FilterFieldWithoutValue = QueryTransformErrors.FilterFieldWithoutValue

@@ -87,8 +87,8 @@ TestFetchSessionsWithOnlyOneFilterFieldInput = () =>
         expectedResult = [
             HasError = true,
             Error = [
-                Reason = "Bad search filter input",
-                Message = "Filter field was given without value",
+                Reason = "Filter Field Without Value",
+                Message = "There is a field value missing from one or more of your filter fields.",
                 Detail = [ManuallyHandled = false, Cause = "protocol", RequestUrl = null],
                 Message.Format = null,
                 Message.Parameters = null
@@ -171,7 +171,7 @@ TestFetchingSessions = () =>
                 ),
                 FetchInfo(
                     "Success",
-                    "Data fetch succeeded",
+                    "Data fetch succeeded.",
                     null,
                     2,
                     false,
@@ -204,7 +204,7 @@ TestFetchingSessions = () =>
                 ),
                 FetchInfo(
                     "Success",
-                    "Data fetch succeeded",
+                    "Data fetch succeeded.",
                     null,
                     1,
                     false,
@@ -237,7 +237,7 @@ TestFetchingSessions = () =>
                 ),
                 FetchInfo(
                     "Success",
-                    "Data fetch succeeded",
+                    "Data fetch succeeded.",
                     null,
                     1,
                     false,
@@ -258,7 +258,7 @@ TestFetchingSessions = () =>
                     & TestSafeguardSessions.Mocks,
                 [
                     Reason = "Bad Request",
-                    Message = "SPS interpreted a malformed request",
+                    Message = "The source IP interpreted a malformed request. Your filter parameter(s) might be invalid.",
                     Detail = [
                         ManuallyHandled = true,
                         Cause = [#"error" = "value"],
@@ -269,7 +269,7 @@ TestFetchingSessions = () =>
                 ],
                 FetchInfo(
                     "Error",
-                    "SPS interpreted a malformed request",
+                    "The source IP interpreted a malformed request. Your filter parameter(s) might be invalid.",
                     null,
                     0,
                     true,
