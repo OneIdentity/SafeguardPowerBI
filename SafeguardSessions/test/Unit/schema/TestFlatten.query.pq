@@ -4,7 +4,119 @@ SchemaUtils = Extension.ImportModule("SchemaUtils.pqm");
 
 SchemaUtils.FieldNamesOfType = SchemaUtils[FieldNamesOfType];
 SchemaUtils.IsFlat = SchemaUtils[IsFlat];
+SchemaUtils.FlattenLists = SchemaUtils[FlattenLists];
+SchemaUtils.FlattenRecords = SchemaUtils[FlattenRecords];
 SchemaUtils.Flatten = SchemaUtils[Flatten];
+
+TestFlatteningLists = () =>
+    let
+        AssertResult = (description as text, t as table, fieldNames as list, expectedTable as table) =>
+            Fact(description, expectedTable, SchemaUtils.FlattenLists(t, fieldNames)),
+        fieldNames = {"list_field"},
+        cases = {
+            {
+                "List field is flattened correctly",
+                #table({"list_field"}, {{{"1", "2"}}, {{"3", "4"}}}),
+                fieldNames,
+                #table(type table [list_field = any], {{"1,2"}, {"3,4"}})
+            },
+            {
+                "List field with empty list is flattened correctly",
+                #table({"list_field"}, {{{}}, {{"3", "4"}}}),
+                fieldNames,
+                #table(type table [list_field = any], {{""}, {"3,4"}})
+            },
+            {
+                "List field with null value is flattened correctly",
+                #table({"list_field"}, {{{"1", "2"}}, {null}}),
+                fieldNames,
+                #table(type table [list_field = any], {{"1,2"}, {null}})
+            },
+            {
+                "Multiple list fields are flattened correctly",
+                #table({"list_field_1", "list_field_2"}, {{{"1", "2"}, {"4", "3"}}, {{"3", "4"}, {"2", "1"}}}),
+                {"list_field_1", "list_field_2"},
+                #table(type table [list_field_1 = any, list_field_2 = any], {{"1,2", "4,3"}, {"3,4", "2,1"}})
+            }
+        },
+        facts = ProvideDataForTest(cases, AssertResult)
+    in
+        facts;
+
+TestFlattenListsHandlesListWithNonTextValue = () =>
+    let
+        t = #table({"session_id", "list_field"}, {{"id1", {"1", "2"}}, {"id2", {"3", 4}}}),
+        fieldNames = {"list_field"},
+        withFlattenedLists = SchemaUtils.FlattenLists(t, fieldNames),
+        cellValue = try withFlattenedLists{[session_id = "id2"]}[list_field],
+        withErrorsReplaced = Table.ReplaceErrorValues(withFlattenedLists, {"list_field", "error_replaced"}),
+        facts = {
+            TestErrorIsRaised(
+                cellValue,
+                "List To Text Conversion Error",
+                "The list contains other types than text.",
+                [
+                    ManuallyHandled = true,
+                    Cause = "[""3"",4]",
+                    RequestUrl = null
+                ]
+            ),
+            Fact(
+                "The rest of the response is correct",
+                #table(type table [session_id = any, list_field = any], {{"id1", "1,2"}, {"id2", "error_replaced"}}),
+                withErrorsReplaced
+            )
+        }
+    in
+        facts;
+
+TestFlatteningRecords = () =>
+    let
+        AssertResult = (description as text, t as table, fieldNames as list, expectedTable as table) =>
+            Fact(description, expectedTable, SchemaUtils.FlattenRecords(t, fieldNames)),
+        cases = {
+            {
+                "Record field is flattened correctly",
+                #table({"record_field"}, {{[a = 1]}, {[b = 2]}}),
+                {"record_field"},
+                #table(type table [record_field.a = any, record_field.b = any], {{1, null}, {null, 2}})
+            },
+            {
+                "Record field with empty record is flattened correctly",
+                #table({"record_field"}, {{[]}, {[b = 2]}}),
+                {"record_field"},
+                #table(type table [record_field.b = any], {{null}, {2}})
+            },
+            {
+                "Record field with null record is flattened correctly",
+                #table({"record_field"}, {{[a = 1]}, {null}}),
+                {"record_field"},
+                #table(type table [record_field.a = any], {{1}, {null}})
+            },
+            {
+                "Record with complex structure is flattened correctly",
+                #table({"record_field"}, {{[a = 2, b = 10]}, {[]}, {[b = 2]}, {null}}),
+                {"record_field"},
+                #table(
+                    type table [record_field.a = any, record_field.b = any],
+                    {{2, 10}, {null, null}, {null, 2}, {null, null}}
+                )
+            },
+            {
+                "Multiple record fields are flattened correctly",
+                #table({"record_field_1", "record_field_2"}, {{[a = 1], [c = 3]}, {[b = 2], [d = 4]}}),
+                {"record_field_1", "record_field_2"},
+                #table(
+                    type table [
+                        record_field_1.a = any, record_field_1.b = any, record_field_2.c = any, record_field_2.d = any
+                    ],
+                    {{1, null, 3, null}, {null, 2, null, 4}}
+                )
+            }
+        },
+        facts = ProvideDataForTest(cases, AssertResult)
+    in
+        facts;
 
 TestGettingFieldNamesOfType = () =>
     let
@@ -177,6 +289,13 @@ TestFlattening = () =>
         facts;
 
 shared TestFlatten.UnitTest = [
-    facts = {TestGettingFieldNamesOfType(), TestFlatness(), TestFlattening()},
+    facts = {
+        TestGettingFieldNamesOfType(),
+        TestFlatness(),
+        TestFlatteningLists(),
+        TestFlattenListsHandlesListWithNonTextValue(),
+        TestFlatteningRecords(),
+        TestFlattening()
+    },
     report = Facts.Summarize(facts)
 ][report];
