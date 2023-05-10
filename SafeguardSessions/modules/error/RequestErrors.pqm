@@ -1,11 +1,14 @@
 let
     ErrorBase = Extension.ImportModule("ErrorBase.pqm"),
     ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm"),
-
     RequestErrors.NotParsableResponse = (detail as anynonnull) =>
         ErrorBase("Not Parsable Response", "The source IP returned a response with missing fields.", detail),
     RequestErrors.BadRequest = (detail as record) =>
-        ErrorBase("Bad Request", "The source IP interpreted a malformed request. Your filter parameter(s) might be invalid.", detail),
+        ErrorBase(
+            "Bad Request",
+            "The source IP interpreted a malformed request. Your filter parameter(s) might be invalid.",
+            detail
+        ),
     RequestErrors.AuthenticationError = (detail as record) =>
         ErrorBase("Authentication Error", "The username or password you have specified is invalid.", detail),
     RequestErrors.AuthorizationError = (detail as record) =>

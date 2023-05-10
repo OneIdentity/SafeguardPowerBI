@@ -4,13 +4,6 @@
             [
                 body = [
                     active = false,
-                    analytics = [
-                        interesting_events = {"ls", "sudo"},
-                        score = [aggregated = 21],
-                        scripted = false,
-                        similar_sessions = {},
-                        tags = {}
-                    ],
                     client = [ip = "10.10.0.39", name = "10.10.0.39", port = 2370],
                     creation_time = "2019-11-25T23:59:28.000Z",
                     duration = 0,
@@ -1222,8 +1215,6 @@
         {
             {
                 false,
-                "ls,sudo",
-                21,
                 null,
                 null,
                 null,
@@ -1231,11 +1222,13 @@
                 null,
                 null,
                 null,
-                false,
-                "",
                 null,
                 null,
-                "",
+                null,
+                null,
+                null,
+                null,
+                null,
                 "10.10.0.39",
                 "10.10.0.39",
                 "2370",

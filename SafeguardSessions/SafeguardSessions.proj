@@ -22,6 +22,7 @@
     <MezContent Include="$(ModulesPath)Search.pqm" />
     <MezContent Include="$(ModulesPath)Utils.pqm" />
     <MezContent Include="$(ErrorPath)ErrorBase.pqm" />
+    <MezContent Include="$(ErrorPath)SchemaTransformationErrors.pqm" />
     <MezContent Include="$(ErrorPath)QueryTransformErrors.pqm" />
     <MezContent Include="$(ErrorPath)RequestErrors.pqm" />
     <MezContent Include="$(RequestPath)UrlBuilder.pqm" />

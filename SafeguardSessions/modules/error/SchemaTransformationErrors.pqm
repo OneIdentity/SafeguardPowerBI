@@ -1,0 +1,8 @@
+let
+    ErrorBase = Extension.ImportModule("ErrorBase.pqm"),
+    SchemaTransformationErrors.ListToTextConversionError = (detail as record) =>
+        ErrorBase("List To Text Conversion Error", "The list contains other types than text.", detail)
+in
+    [
+        ListToTextConversionError = SchemaTransformationErrors.ListToTextConversionError
+    ]
