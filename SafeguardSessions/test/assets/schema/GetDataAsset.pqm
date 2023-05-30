@@ -33,6 +33,32 @@
                     start_time = "2019-11-25T23:59:28.000Z",
                     trail_download_link = null,
                     user = [id = "yoda", name = "yoda", server_username = {"yoda"}],
+                    vault = [
+                        access_request_type = "REMOTEDESKTOP",
+                        account_id = 13,
+                        account_name = "example",
+                        appliance_id = "5f95b795a96e4cfc9114f1f0b0eb1c91",
+                        appliance_name = "QWERT",
+                        asset_partition_id = -1,
+                        asset_partition_name = "Macrocosm",
+                        auto_approved = "2023-05-25T09:07:26.424Z",
+                        available = "2023-05-25T09:07:26.428Z",
+                        broker_id = 0,
+                        created = [
+                            timestamp = "2023-05-25T09:07:26.424Z",
+                            user = [
+                                client_ip_address = "10.10.93.136",
+                                user_display_name = "Exampla User",
+                                user_id = 8,
+                                user_name = "example"
+                            ]
+                        ],
+                        expired = "2023-05-25T10:07:26.037Z",
+                        is_emergency = false,
+                        offline_workflow = false,
+                        system_id = 4,
+                        system_name = "POWERBI-TESTER"
+                    ],
                     verdict = "AUTH_FAIL"
                 ],
                 key = "qbDgP4YB6q61cSrUGJic",
