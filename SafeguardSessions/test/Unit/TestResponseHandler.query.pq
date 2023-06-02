@@ -77,6 +77,7 @@ TestGetDataFromResponse = () =>
                         Reason = "Not Parsable Response",
                         Message = "The source IP returned a response with missing fields.",
                         Detail = [
+                            ManuallyHandled = true,
                             Cause = fake_response,
                             MissingField = "",
                             RequestUrl = "dummy_url"
@@ -95,6 +96,7 @@ TestGetDataFromResponse = () =>
                         Reason = "Not Parsable Response",
                         Message = "The source IP returned a response with missing fields.",
                         Detail = [
+                            ManuallyHandled = true,
                             Cause = fake_response,
                             MissingField = "body/svc1/protocol",
                             RequestUrl = "dummy_url"

@@ -29,7 +29,6 @@ let
                                 if current{0} <> null then
                                     FilterFieldWithoutValueError(
                                         [
-                                            ManuallyHandled = false,
                                             Cause = current{0},
                                             RequestUrl = null
                                         ]
