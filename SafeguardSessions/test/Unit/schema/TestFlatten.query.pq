@@ -120,31 +120,32 @@ TestFlatteningRecords = () =>
 
 TestGettingFieldNamesOfType = () =>
     let
-        AssertFieldNames = (description as text, listOfRecords as list, t as type, expectedFieldNames as list) =>
-            Fact(description, expectedFieldNames, SchemaUtils.FieldNamesOfType(listOfRecords, t)),
-        listOfRecords = {
-            [
-                text_field = "text",
-                number_field = 1,
-                number_field_2 = 2,
-                logical_field = true,
-                datetimezone_field = #datetimezone(2023, 2, 23, 16, 28, 42, 1, 0),
-                list_field = {},
-                record_field = []
-            ]
-        },
-        listOfRecordsWithNull = {[text_field = null], [text_field = "text_value"]},
+        AssertFieldNames = (description as text, _table as table, t as type, expectedFieldNames as list) =>
+            Fact(description, expectedFieldNames, SchemaUtils.FieldNamesOfType(_table, t)),
+        _table = #table(
+            {
+                "text_field",
+                "number_field",
+                "number_field_2",
+                "logical_field",
+                "datetimezone_field",
+                "list_field",
+                "record_field"
+            },
+            {{"text", 1, 2, true, #datetimezone(2023, 2, 23, 16, 28, 42, 1, 0), {}, []}}
+        ),
+        _tableWithNull = #table({"text_field"}, {{null}, {"text_value"}}),
         cases = {
-            {"Empty list is handled", {}, Any.Type, {}},
-            {"Text field names are returned", listOfRecords, Text.Type, {"text_field"}},
-            {"Number field names are returned", listOfRecords, Number.Type, {"number_field", "number_field_2"}},
-            {"Logical field names are returned", listOfRecords, Logical.Type, {"logical_field"}},
-            {"DateTimeZone field names are returned", listOfRecords, DateTimeZone.Type, {"datetimezone_field"}},
-            {"List field names are returned", listOfRecords, List.Type, {"list_field"}},
-            {"Record field names are returned", listOfRecords, Record.Type, {"record_field"}},
+            {"Empty list is handled", #table({}, {}), Any.Type, {}},
+            {"Text field names are returned", _table, Text.Type, {"text_field"}},
+            {"Number field names are returned", _table, Number.Type, {"number_field", "number_field_2"}},
+            {"Logical field names are returned", _table, Logical.Type, {"logical_field"}},
+            {"DateTimeZone field names are returned", _table, DateTimeZone.Type, {"datetimezone_field"}},
+            {"List field names are returned", _table, List.Type, {"list_field"}},
+            {"Record field names are returned", _table, Record.Type, {"record_field"}},
             {
                 "All field names are returned",
-                listOfRecords,
+                _table,
                 Any.Type,
                 {
                     "text_field",
@@ -156,13 +157,8 @@ TestGettingFieldNamesOfType = () =>
                     "record_field"
                 }
             },
-            {"No field names are returned for non-existing type", listOfRecords, Function.Type, {}},
-            {
-                "Field type is correctly determined if nulls are present",
-                listOfRecordsWithNull,
-                Text.Type,
-                {"text_field"}
-            }
+            {"No field names are returned for non-existing type", _table, Function.Type, {}},
+            {"Field type is correctly determined if nulls are present", _tableWithNull, Text.Type, {"text_field"}}
         },
         facts = ProvideDataForTest(cases, AssertFieldNames)
     in
@@ -170,25 +166,13 @@ TestGettingFieldNamesOfType = () =>
 
 TestFlatness = () =>
     let
-        AssertFlatness = (description as text, listOfRecords as list, expected_result as logical) as record =>
-            Fact(description, expected_result, SchemaUtils.IsFlat(listOfRecords)),
+        AssertFlatness = (description as text, _table as table, expected_result as logical) as record =>
+            Fact(description, expected_result, SchemaUtils.IsFlat(_table)),
         cases = {
-            {"No data is flat", {}, true},
-            {"Flat", {[flat = 1], [flat = 2]}, true},
-            {"Contains record", {[
-                nonflat = [value = 1],
-                flat = 1
-            ], [
-                nonflat = [value = 2],
-                flat = 2
-            ]}, false},
-            {"Contains list", {[
-                nonflat = {"1", "2"},
-                flat = 1
-            ], [
-                nonflat = {"3", "4"},
-                flat = 2
-            ]}, false}
+            {"No data is flat", #table({}, {}), true},
+            {"Flat", #table({"flat"}, {{1}, {2}}), true},
+            {"Contains record", #table({"notflat", "flat"}, {{[value = 1], 1}, {[value = 2], 2}}), false},
+            {"Contains list", #table({"nontflat", "flat"}, {{{"1", "2"}, 1}, {{"3", "4"}, 2}}), false}
         },
         facts = ProvideDataForTest(cases, AssertFlatness)
     in
@@ -278,10 +262,84 @@ TestFlattening = () =>
                 #table(type table [nonflat.second_level.value = any, flat = any], {{1, 1}, {2, 2}})
             },
             {
-                "Columns are removed",
+                "Simple column is removed",
                 {[flat = 1, to_remove = "a"], [flat = 2, to_remove = "b"]},
                 {"to_remove"},
                 #table(type table [flat = any], {{1}, {2}})
+            },
+            {
+                "List type column is removed",
+                {[flat = 1, to_remove = {"a", "b"}], [flat = 2, to_remove = {"b", "c"}]},
+                {"to_remove"},
+                #table(type table [flat = any], {{1}, {2}})
+            },
+            {
+                "Record type column is removed",
+                {[
+                    flat = 1,
+                    to_remove = [apple = "a"]
+                ], [
+                    flat = 2,
+                    to_remove = [banana = "b"]
+                ]},
+                {"to_remove"},
+                #table(type table [flat = any], {{1}, {2}})
+            },
+            {
+                "Inner simple column is removed",
+                {
+                    [
+                        flat = 1,
+                        not_flat = [apple = "a", to_remove = "b"]
+                    ],
+                    [
+                        flat = 2,
+                        not_flat = [apple = "b", to_remove = "b"]
+                    ]
+                },
+                {"not_flat.to_remove"},
+                #table(type table [flat = any, not_flat.apple = any], {{1, "a"}, {2, "b"}})
+            },
+            {
+                "Inner record column is removed",
+                {
+                    [
+                        flat = 1,
+                        not_flat = [
+                            apple = "a",
+                            to_remove = [apple = "a", banana = "b"]
+                        ]
+                    ],
+                    [
+                        flat = 2,
+                        not_flat = [
+                            apple = "b",
+                            to_remove = [grape = "g"]
+                        ]
+                    ]
+                },
+                {"not_flat.to_remove"},
+                #table(type table [flat = any, not_flat.apple = any], {{1, "a"}, {2, "b"}})
+            },
+            {
+                "Inner list column is removed",
+                {
+                    [
+                        flat = 1,
+                        not_flat = [
+                            apple = {"a", "b", "c"},
+                            to_remove = {"a", "b", "c"}
+                        ]
+                    ],
+                    [
+                        flat = 2,
+                        not_flat = [
+                            apple = {"a", "b", "c"}
+                        ]
+                    ]
+                },
+                {"not_flat.to_remove"},
+                #table(type table [flat = any, not_flat.apple = any], {{1, "a,b,c"}, {2, "a,b,c"}})
             }
         },
         facts = ProvideDataForTest(cases, AssertFlattening)

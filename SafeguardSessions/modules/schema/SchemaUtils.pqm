@@ -64,25 +64,24 @@ let
                     defaultValue
         in
             transformedResponse,
-    SchemaUtils.FieldNamesOfType = (listOfRecords as list, t as type) as list =>
+    SchemaUtils.FieldNamesOfType = (_table as table, t as type) as list =>
         let
-            asTable = PaddedTable.FromRecords(listOfRecords),
             fieldNamesOfType =
-                if Table.RowCount(asTable) = 0 then
+                if Table.RowCount(_table) = 0 then
                     {}
                 else
                     List.Select(
-                        Table.ColumnNames(asTable),
+                        Table.ColumnNames(_table),
                         (fieldName) =>
-                            Type.Is(Value.Type(List.First(List.RemoveNulls(Table.Column(asTable, fieldName)))), t)
+                            Type.Is(Value.Type(List.First(List.RemoveNulls(Table.Column(_table, fieldName)))), t)
                     )
         in
             List.Buffer(fieldNamesOfType),
-    SchemaUtils.IsFlat = (listOfRecords as list) as logical =>
+    SchemaUtils.IsFlat = (_table as table) as logical =>
         List.AllTrue(
             {
-                List.IsEmpty(SchemaUtils.FieldNamesOfType(listOfRecords, Record.Type)),
-                List.IsEmpty(SchemaUtils.FieldNamesOfType(listOfRecords, List.Type))
+                List.IsEmpty(SchemaUtils.FieldNamesOfType(_table, Record.Type)),
+                List.IsEmpty(SchemaUtils.FieldNamesOfType(_table, List.Type))
             }
         ),
     SchemaUtils.FlattenLists = (asTable as table, fieldNames as list) as table =>
@@ -118,30 +117,23 @@ let
             Table.Buffer(flattened),
     SchemaUtils.Flatten = (listOfRecords as list, optional columnsToRemove as list) as table =>
         let
+            asTable = PaddedTable.FromRecords(listOfRecords),
+            reducedTable = Table.RemoveColumns(
+                asTable, if columnsToRemove <> null then columnsToRemove else {}, MissingField.Ignore
+            ),
             flattenedSubTable =
-                if SchemaUtils.IsFlat(listOfRecords) then
-                    let
-                        asTable = PaddedTable.FromRecords(listOfRecords),
-                        reducedTable = Table.RemoveColumns(
-                            asTable, if columnsToRemove <> null then columnsToRemove else {}, MissingField.Ignore
-                        )
-                    in
-                        Table.Buffer(reducedTable)
+                if SchemaUtils.IsFlat(reducedTable) then
+                    Table.Buffer(reducedTable)
                 else
                     let
-                        // Remove columns
-                        asTable = Table.Buffer(PaddedTable.FromRecords(listOfRecords)),
-                        reducedTable = Table.RemoveColumns(
-                            asTable, if columnsToRemove <> null then columnsToRemove else {}, MissingField.Ignore
-                        ),
                         // Flatten lists
-                        listFieldNames = SchemaUtils.FieldNamesOfType(listOfRecords, List.Type),
+                        listFieldNames = SchemaUtils.FieldNamesOfType(reducedTable, List.Type),
                         withFlattenedLists = SchemaUtils.FlattenLists(reducedTable, listFieldNames),
                         // Flatten records
-                        recordFieldNames = SchemaUtils.FieldNamesOfType(listOfRecords, Record.Type),
+                        recordFieldNames = SchemaUtils.FieldNamesOfType(reducedTable, Record.Type),
                         withFlattenedRecords = SchemaUtils.FlattenRecords(withFlattenedLists, recordFieldNames)
                     in
-                        @SchemaUtils.Flatten(Table.ToRecords(withFlattenedRecords))
+                        @SchemaUtils.Flatten(Table.ToRecords(withFlattenedRecords), columnsToRemove)
         in
             flattenedSubTable,
     SchemaUtils.GetResponseWithSchema = (_table as table, schema as table) as table =>
