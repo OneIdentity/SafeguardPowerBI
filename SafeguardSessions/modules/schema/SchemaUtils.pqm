@@ -25,7 +25,6 @@ let
                             ),
                             converted = SchemaTransformationErrors.ListToTextConversionError(
                                 [
-                                    ManuallyHandled = true,
                                     Cause = Text.FromBinary(Json.FromValue(log[Value])),
                                     RequestUrl = null
                                 ]

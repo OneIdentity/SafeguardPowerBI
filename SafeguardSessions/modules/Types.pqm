@@ -103,12 +103,6 @@ let
             ]
         ),
         detail as [
-            ManuallyHandled = (
-                type logical meta [
-                    Documentation.FieldCaption = "Handled error",
-                    Documentation.FieldDescription = "Whether the error is handled manually in the code or it should propagate up to the user"
-                ]
-            ),
             Cause = (
                 type any meta [
                     Documentation.FieldCaption = "Cause of the error",
@@ -118,7 +112,13 @@ let
             RequestUrl = (type nullable text meta [
                 Documentation.FieldCaption = "Request url"
             ])
-        ]
+        ],
+        optional manuallyHandled as (
+            type logical meta [
+                Documentation.FieldCaption = "Handled error",
+                Documentation.FieldDescription = "Whether the error is handled manually in the code or it should propagate up to the user"
+            ]
+        )
     ) as table meta [
         Documentation.Name = "ErrorBase"
     ]

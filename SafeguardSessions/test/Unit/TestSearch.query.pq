@@ -140,6 +140,7 @@ TestGetSessionsCountRaisesError = () =>
         expectedReason = "Not Parsable Response",
         expectedMessage = "The source IP returned a response with missing fields.",
         expectedDetail = [
+            ManuallyHandled = true,
             Cause = [invalid = "response"],
             MissingField = "count",
             RequestUrl = requestUrl
@@ -195,6 +196,7 @@ TestOpenSnapshotRaisesError = () =>
                 "Not Parsable Response",
                 "The source IP returned a response with missing fields.",
                 [
+                    ManuallyHandled = true,
                     Cause = [invalid = "response"],
                     MissingField = "body.snapshot"
                 ]

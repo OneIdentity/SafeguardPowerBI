@@ -1,7 +1,16 @@
 let
     ErrorBase.Type = Extension.ImportFunction("ErrorBaseType", "Types.pqm"),
-    ErrorBase.Implementation = (reason as text, message as text, detail as record) =>
-        error [Reason = reason, Message = message, Detail = detail],
+    ErrorBase.Implementation = (
+        reason as text, message as text, detail as record, optional manuallyHandled as logical
+    ) =>
+        let
+            detailRecord = detail & [ManuallyHandled = manuallyHandled ?? true]
+        in
+            error [
+                Reason = reason,
+                Message = message,
+                Detail = detailRecord
+            ],
     ErrorBase.Error = Value.ReplaceType(ErrorBase.Implementation, ErrorBase.Type)
 in
     ErrorBase.Error

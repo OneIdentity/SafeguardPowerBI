@@ -4,7 +4,8 @@ let
         ErrorBase(
             "Filter Field Without Value",
             "There is a field value missing from one or more of your filter fields.",
-            detail
+            detail,
+            false
         )
 in
     [

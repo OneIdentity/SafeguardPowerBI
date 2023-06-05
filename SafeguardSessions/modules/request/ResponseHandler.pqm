@@ -42,7 +42,6 @@ let
                 ]
             ),
             details = [
-                ManuallyHandled = true,
                 Cause = response,
                 RequestUrl = log[RequestUrl]
             ]
