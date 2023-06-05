@@ -226,7 +226,11 @@ TestGetDataHandlesAuthenticationError = () =>
             Message.Parameters = null
         ],
         expectedInfo = FetchInfo(
-            "Error", "The username or password you have specified is invalid.", null, 0, true,
+            "Error",
+            "The username or password you have specified is invalid.",
+            null,
+            0,
+            true,
             "https://dummy_url/api/authentication"
         ),
         response = GetData(
@@ -239,6 +243,36 @@ TestGetDataHandlesAuthenticationError = () =>
         )
     in
         TestResultsContentWithoutStartTime(response, expectedData, expectedInfo);
+
+TestGetDataWithActualData = () =>
+    let
+        fakeResponses = [
+            #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id" = TestSafeguardSessions.ActualResponse
+        ],
+        expectedData = TestSafeguardSessions.ExpectedDataForActualResponse,
+        expectedInfo = FetchInfo(
+            "Success",
+            "Data fetch succeeded.",
+            null,
+            25,
+            false,
+            "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id"
+        ),
+        response = GetData(
+            TestSafeguardSessions.URL,
+            TestSafeguardSessions.AuthenticationCredentials,
+            [],
+            [
+                AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(25),
+                OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                GetPageResponseMap = fakeResponses
+            ]
+        )
+    in
+        TestResultsContentWithoutStartTime(
+            response, TestSafeguardSessions.ExpectedDataForActualResponse, expectedInfo
+        );
 
 TestGetDataHandlesBadRequest = () =>
     let
@@ -395,18 +429,33 @@ TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringDat
     in
         Fact("Check error is raised", expectedResponse, response);
 
-TestGetDataWithActualData = () =>
+TestGetDataHandlesSchemaApplyError = () =>
     let
         fakeResponses = [
             #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id" = TestSafeguardSessions.ActualResponse
         ],
-        expectedData = TestSafeguardSessions.ExpectedDataForActualResponse,
+        unexpectedErrorRecord = [
+            Reason = "Wrong variable",
+            Message = "Variable type mismatch error",
+            Detail = "The variable badVariable is of the type text, but it should be of the type list"
+        ],
+        expectedData = [
+            Reason = "Schema Apply Error",
+            Message = "An error happened when applying schema.",
+            Detail = [
+                Cause = TestSafeguardSessions.ActualResponseData,
+                RequestUrl = "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id",
+                ManuallyHandled = true
+            ],
+            Message.Format = null,
+            Message.Parameters = null
+        ],
         expectedInfo = FetchInfo(
-            "Success",
-            "Data fetch succeeded.",
+            "Error",
+            "An error happened when applying schema.",
             null,
-            25,
-            false,
+            0,
+            true,
             "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id"
         ),
         response = GetData(
@@ -417,26 +466,26 @@ TestGetDataWithActualData = () =>
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
                 GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(25),
                 OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
-                GetPageResponseMap = fakeResponses
+                GetPageResponseMap = fakeResponses,
+                ApplySchema = error unexpectedErrorRecord
             ]
         )
     in
-        TestResultsContentWithoutStartTime(
-            response, TestSafeguardSessions.ExpectedDataForActualResponse, expectedInfo
-        );
+        TestResultsContentWithoutStartTime(response, expectedData, expectedInfo);
 
 shared TestSafeguardSessions.IntegrationTest = [
     facts = {
         TestEmptyResponseIsHandled(),
         TestGetDataWithoutError(),
         TestGetDataWithQueryInputs(),
+        TestGetDataWithActualData(),
         TestGetDataHandlesAuthenticationError(),
         TestGetDataHandlesBadRequest(),
         TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringAuth(),
         TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringDataFetch(),
         TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringAuthenication(),
         TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringDataFetch(),
-        TestGetDataWithActualData()
+        TestGetDataHandlesSchemaApplyError()
     },
     report = Facts.Summarize(facts)
 ][report];

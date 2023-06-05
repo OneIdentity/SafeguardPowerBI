@@ -95,7 +95,7 @@ let
                     Record.Field(mocks[Schema], "Sessions")
                 else
                     Schema.GetSchema("Sessions"),
-            page = SchemaUtils.ApplySchema(response, schema) meta [NextLink = nextLink]
+            page = SchemaUtils.ApplySchema(response, schema, mocks) meta [NextLink = nextLink]
         in
             page,
     Search.GenerateByPage = (getNextPage as function) as table =>
