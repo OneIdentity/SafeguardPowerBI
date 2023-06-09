@@ -96,6 +96,12 @@ This happens if multiple users from different computers or using different progr
 
 This error indicates issues with the SPS appliance. Try the suggestions written in the [Troubleshooting](#troubleshooting) section.
 
+**H) An error happened when applying schema.**
+
+In order to display the session records from SPS in a user-friendly way in Power BI, schema must be mapped to the session records. This error means that at least one session occurred in the SPS response that the schema application could not handle correctly and caused an unexpected error.
+Reproduce the error with trace logging enabled, and create a technical case, as described in the [Troubleshooting](#troubleshooting) section.
+Attach the mashup trace logs to the issue.
+
 ## Troubleshooting
 
 If an error occurs during the data fetching process, you can check the **Info** table to see a descriptive message about the error type. In this case, the **Sessions** table will contain the exact error record that you can inspect if you go to **Home > Transform data** and select the **Sessions** table.
