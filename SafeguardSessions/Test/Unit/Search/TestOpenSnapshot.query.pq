@@ -9,7 +9,7 @@ TestOpenSnapshotIsSuccessful = () =>
         ]),
         snapshot = OpenSnapshot(
             "dummy_url", "dummy_session_id", [
-                OpenSnapshotResponse = fakeSnapshotResponse
+                Mocks = [OpenSnapshotResponse = fakeSnapshotResponse]
             ]
         )
     in
@@ -27,7 +27,7 @@ TestOpenSnapshotRaisesError = () =>
                     "An error is raised if fields are missing in the response received",
                     OpenSnapshot,
                     {requestUrl, "dummy_session_id", [
-                        OpenSnapshotResponse = fakeSnapshotResponse
+                        Mocks = [OpenSnapshotResponse = fakeSnapshotResponse]
                     ]},
                     [
                         Reason = expectedReason,

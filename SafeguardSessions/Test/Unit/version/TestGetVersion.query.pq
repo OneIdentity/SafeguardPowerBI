@@ -10,7 +10,9 @@ TestGetVersionIsSuccesful = () =>
             body = [firmware_version = "dummy_version"]
         ]),
         version = Version.GetVersion("dummy_url", "dummy_session_id", [
-            InfoResponse = fakeInfoResponse
+            Mocks = [
+                InfoResponse = fakeInfoResponse
+            ]
         ])
     in
         Fact("Version is returned correctly", "dummy_version", version);
@@ -36,7 +38,9 @@ TestGetVersionRaisesError = () =>
             "An error is raised if fields are missing in the response received",
             Version.GetVersion,
             {requestUrl, "dummy_session_id", [
-                InfoResponse = fakeInfoResponse
+                Mocks = [
+                    InfoResponse = fakeInfoResponse
+                ]
             ]},
             [
                 Reason = expectedReason,

@@ -1,5 +1,5 @@
 let
-    IsMocked = SafeguardSessions.ImportFunction("IsMocked", "CommonUtils.pqm"),
+    GetOption = SafeguardSessions.ImportFunction("GetOption", "CommonUtils.pqm"),
     PaddedTable.FromRecords = SafeguardSessions.ImportFunction("PaddedTable.FromRecords", "CommonUtils.pqm"),
     SchemaTransformationErrors.ListToTextConversionError = SafeguardSessions.ImportFunction(
         "ListToTextConversionError", "SchemaTransformationErrors.pqm"
@@ -205,15 +205,13 @@ let
             withType = Value.ReplaceType(enforcedTypes, SchemaToTableType(schema))
         in
             withType,
-    SchemaUtils.ApplySchema = (response as record, schema as table, optional mocks as nullable record) =>
+    SchemaUtils.ApplySchema = (response as record, schema as table, optional options as nullable record) =>
         let
             transformedResponse = SchemaUtils.GetSessionItemsResponse(response),
             flattenedResponse = SchemaUtils.Flatten(transformedResponse, {"vault"}),
-            withSchema =
-                if IsMocked(mocks, "ApplySchema") then
-                    mocks[ApplySchema]
-                else
-                    SchemaUtils.GetResponseWithSchema(flattenedResponse, schema),
+            withSchema = GetOption(options, "Mocks.ApplySchema") ?? SchemaUtils.GetResponseWithSchema(
+                flattenedResponse, schema
+            ),
             processedResponse = SchemaUtils.HandleUnexpectedSchemaApplyError(try (withSchema), response),
             withMeta = Value.ReplaceMetadata(processedResponse, Value.Metadata(response))
         in

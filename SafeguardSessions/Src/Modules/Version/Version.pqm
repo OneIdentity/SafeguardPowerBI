@@ -1,23 +1,26 @@
 let
-    IsMocked = SafeguardSessions.ImportFunction("IsMocked", "CommonUtils.pqm"),
+    GetOption = SafeguardSessions.ImportFunction("GetOption", "CommonUtils.pqm"),
+    SetOption = SafeguardSessions.ImportFunction("SetOption", "CommonUtils.pqm"),
     InfoEndpoint = SafeguardSessions.ImportFunction("InfoEndpoint", "Constants.pqm"),
     Request.Generate = SafeguardSessions.ImportFunction("Generate", "Request.pqm"),
     Request.GetDefaultParameters = SafeguardSessions.ImportFunction("GetDefaultParameters", "Request.pqm"),
-    ResponseHandler.GetDataFromResponse = SafeguardSessions.ImportFunction("GetDataFromResponse", "CommonResponseHandler.pqm"),
-    ResponseHandler.ValidateByStatusCode = SafeguardSessions.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
+    ResponseHandler.GetDataFromResponse = SafeguardSessions.ImportFunction(
+        "GetDataFromResponse", "CommonResponseHandler.pqm"
+    ),
+    ResponseHandler.ValidateByStatusCode = SafeguardSessions.ImportFunction(
+        "ValidateByStatusCode", "ResponseHandler.pqm"
+    ),
     UrlBuilder.GenerateUrl = SafeguardSessions.ImportFunction("GenerateUrl", "UrlBuilder.pqm"),
     Version.Separator = ".",
-    Version.GetVersion = (spsUrl as text, sessionId as text, optional mocks as nullable record) as text =>
+    Version.GetVersion = (spsUrl as text, sessionId as text, optional options as nullable record) as text =>
         let
             infoUrl = UrlBuilder.GenerateUrl(spsUrl, InfoEndpoint),
+            mockedInfoResponse = GetOption(options, "Mocks.InfoResponse"),
             infoResponse = ResponseHandler.ValidateByStatusCode(
                 Request.Generate(
                     infoUrl,
                     Request.GetDefaultParameters(sessionId),
-                    if IsMocked(mocks, "InfoResponse") then
-                        [Response = mocks[InfoResponse]]
-                    else
-                        []
+                    SetOption([], "Mocks.Response", GetOption(options, "Mocks.InfoResponse"))
                 )
             ),
             version = ResponseHandler.GetDataFromResponse(infoResponse, "body.firmware_version")

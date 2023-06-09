@@ -22,7 +22,9 @@ TestAuthenticateIsSuccessful = () =>
             TestSafeguardSessions.URL,
             TestSafeguardSessions.AuthenticationCredentials,
             [
-                AuthResponse = fakeAuthResponse
+                Mocks = [
+                    AuthResponse = fakeAuthResponse
+                ]
             ]
         ),
         facts = {
@@ -59,7 +61,9 @@ TestAuthenticateRaisesError = () =>
                         TestSafeguardSessions.URL,
                         TestSafeguardSessions.AuthenticationCredentials,
                         [
-                            AuthResponse = fakeAuthResponse
+                            Mocks = [
+                                AuthResponse = fakeAuthResponse
+                            ]
                         ]
                     },
                     [
@@ -93,9 +97,6 @@ TestAuthenticateRaisesError = () =>
         facts;
 
 shared TestSafeguardSessions.IntegrationTest = [
-    facts = {
-        TestAuthenticateIsSuccessful(),
-        TestAuthenticateRaisesError()
-    },
+    facts = {TestAuthenticateIsSuccessful(), TestAuthenticateRaisesError()},
     report = Summarize(facts)
 ][report];

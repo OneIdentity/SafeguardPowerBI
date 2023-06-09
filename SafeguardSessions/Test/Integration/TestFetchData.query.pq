@@ -74,10 +74,12 @@ TestFetchDataIsSuccessful = () =>
                     [],
                     TestSafeguardSessions.SessionId,
                     [
-                        GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
-                        OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
-                        GetPageResponseMap = fakeResponses,
-                        Schema = TestSafeguardSessions.Schema
+                        Mocks = [
+                            GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
+                            OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                            GetPageResponseMap = fakeResponses,
+                            Schema = TestSafeguardSessions.Schema
+                        ]
                     ]
                 ),
                 facts = {
@@ -221,10 +223,12 @@ TestFetchDataWithInvalidTypeForField = () =>
             [],
             TestSafeguardSessions.SessionId,
             [
-                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
-                OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
-                GetPageResponseMap = fakeResponses,
-                Schema = TestSafeguardSessions.Schema
+                Mocks = [
+                    GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
+                    OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                    GetPageResponseMap = fakeResponses,
+                    Schema = TestSafeguardSessions.Schema
+                ]
             ]
         ),
         cellValue = try response{[session_id = "id2"]}[flatvalue2],
@@ -260,9 +264,11 @@ TestFetchDataRaisesErrorWhenAdvancedSearchInitialResponseFails = () =>
                     [],
                     TestSafeguardSessions.SessionId,
                     [
-                        GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(0),
-                        OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
-                        GetPageResponseMap = fakeResponses
+                        Mocks = [
+                            GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(0),
+                            OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                            GetPageResponseMap = fakeResponses
+                        ]
                     ]
                 },
                 fakeResponses = [
@@ -331,10 +337,12 @@ TestErrorIsContainedWhenAdvancedSearchSuccessiveResponseFails = () =>
                     [],
                     TestSafeguardSessions.SessionId,
                     [
-                        GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
-                        OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
-                        GetPageResponseMap = fakeResponses,
-                        Schema = TestSafeguardSessions.Schema
+                        Mocks = [
+                            GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
+                            OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                            GetPageResponseMap = fakeResponses,
+                            Schema = TestSafeguardSessions.Schema
+                        ]
                     ]
                 ),
                 dataFacts = {
@@ -419,7 +427,9 @@ TestFetchDataRaisesErrorWhenCountRequestFails = () =>
                     [],
                     TestSafeguardSessions.SessionId,
                     [
-                        GetSessionsCountResponse = fakeCountResponse
+                        Mocks = [
+                            GetSessionsCountResponse = fakeCountResponse
+                        ]
                     ]
                 },
                 caseName = Text.Format("Error is raised for status code [#StatusCode]", [StatusCode = statusCode])
@@ -476,8 +486,10 @@ TestFetchDataRaisesErrorWhenSnapshotRequestFails = () =>
                     [],
                     TestSafeguardSessions.SessionId,
                     [
-                        GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
-                        OpenSnapshotResponse = fakeSnapshotResponse
+                        Mocks = [
+                            GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
+                            OpenSnapshotResponse = fakeSnapshotResponse
+                        ]
                     ]
                 },
                 caseName = Text.Format("Error is raised for status code [#StatusCode]", [StatusCode = statusCode])

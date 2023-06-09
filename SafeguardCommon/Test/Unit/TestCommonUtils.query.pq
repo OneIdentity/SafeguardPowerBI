@@ -1,8 +1,17 @@
 section TestCommonUtils;
 
-PaddedTable.FromRecords = SafeguardCommon.ImportFunction("PaddedTable.FromRecords", "CommonUtils.pqm");
+CommonUtils = SafeguardCommon.ImportModule("CommonUtils.pqm");
 
+PaddedTable.FromRecords = CommonUtils[PaddedTable.FromRecords];
 PaddedTable.FromRecords.Name = "PaddedTable.FromRecords";
+
+GetOption = CommonUtils[GetOption];
+
+GetOption.Name = "GetOption";
+
+SetOption = CommonUtils[SetOption];
+
+SetOption.Name = "SetOption";
 
 TestPaddedTableFromRecords = () =>
     let
@@ -59,7 +68,116 @@ TestPaddedTableFromRecordsRaisesError = () =>
     in
         facts;
 
+TestGetOption = () =>
+    let
+        AssertOptionIsReturnedCorrectly = (
+            description as text, options as record, selectedOption as text, expectedOutput as any
+        ) =>
+            Fact(
+                Text.Format("#{0}: #{1}", {GetOption.Name, description}),
+                expectedOutput,
+                GetOption(options, selectedOption)
+            ),
+        options = [
+            a = 1,
+            b = [
+                c = 2
+            ]
+        ],
+        cases = {
+            {"Returns first level simple option", options, "a", 1},
+            {"Returns first level complex option", options, "b", [c = 2]},
+            {"Returns second level option", options, "b.c", 2},
+            {"Returns null if option does not exists", options, "not_existing_option", null}
+        },
+        facts = ProvideDataForTest(cases, AssertOptionIsReturnedCorrectly)
+    in
+        facts;
+
+TestSetOption = () =>
+    let
+        AssertOptionIsSetCorrectly = (
+            description as text, options as record, selectedOption as text, value as any, expectedOutput as record
+        ) =>
+            Fact(
+                Text.Format("#{0}: #{1}", {SetOption.Name, description}),
+                expectedOutput,
+                SetOption(options, selectedOption, value)
+            ),
+        cases = {
+            {
+                "Sets first level option, keeps the others intact",
+                [
+                    do_not_touch = true
+                ],
+                "set",
+                1,
+                [
+                    do_not_touch = true,
+                    set = 1
+                ]
+            },
+            {
+                "Updates first level option, keeps the others intact",
+                [
+                    do_not_touch = true,
+                    to_update = 0
+                ],
+                "to_update",
+                1,
+                [
+                    do_not_touch = true,
+                    to_update = 1
+                ]
+            },
+            {
+                "Sets second level option, keeps the others intact",
+                [
+                    do_not_touch = true,
+                    update = [not_this = true]
+                ],
+                "update.set",
+                1,
+                [
+                    do_not_touch = true,
+                    update = [set = 1, not_this = true]
+                ]
+            },
+            {
+                "Updates second level option, keeps the others intact",
+                [
+                    do_not_touch = true,
+                    update = [this = 0, not_this = true]
+                ],
+                "update.this",
+                1,
+                [
+                    do_not_touch = true,
+                    update = [this = 1, not_this = true]
+                ]
+            },
+            {"Sets second level option without first level", [], "set.this", 1, [
+                set = [this = 1]
+            ]},
+            {
+                "Does not set null option, keeps the others intact",
+                [
+                    do_not_touch = true,
+                    wont_update = true
+                ],
+                "wont_update",
+                null,
+                [
+                    do_not_touch = true,
+                    wont_update = true
+                ]
+            }
+        },
+        facts = ProvideDataForTest(cases, AssertOptionIsSetCorrectly)
+    in
+        facts;
+
 shared TestCommonUtils.UnitTest = [
-    facts = {TestPaddedTableFromRecords(), TestPaddedTableFromRecordsRaisesError()},
+    facts = {TestPaddedTableFromRecords(), TestPaddedTableFromRecordsRaisesError(), TestGetOption(), TestSetOption()},
     report = Summarize(facts)
 ][report];

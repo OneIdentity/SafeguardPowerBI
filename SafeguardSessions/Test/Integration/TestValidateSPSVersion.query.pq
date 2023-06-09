@@ -21,18 +21,16 @@ TestValidateSPSVersionReturnsSessionId = () =>
                     TestValidateSPSVersion.SessionId,
                     skipVersionCheck,
                     [
-                        InfoResponse = fakeInfoResponse
+                        Mocks = [
+                            InfoResponse = fakeInfoResponse
+                        ]
                     ]
                 )
             ),
         cases = {
-            {
-                "Version check is performed by default",
-                FakeRawResponse([
-                    body = [firmware_version = "7.4.0"]
-                ]),
-                null
-            },
+            {"Version check is performed by default", FakeRawResponse([
+                body = [firmware_version = "7.4.0"]
+            ]), null},
             {
                 "Version is supported and version check is performed",
                 FakeRawResponse([
@@ -76,7 +74,9 @@ TestValidateSPSVersionRaisesError = () =>
                     TestValidateSPSVersion.SessionId,
                     No,
                     [
-                        InfoResponse = fakeInfoResponse
+                        Mocks = [
+                            InfoResponse = fakeInfoResponse
+                        ]
                     ]
                 },
                 [

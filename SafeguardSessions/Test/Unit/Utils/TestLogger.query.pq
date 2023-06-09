@@ -10,14 +10,13 @@ Utils.FetchInfo = Utils[FetchInfo];
 
 TestErrorLogWithSPSResultInput = () =>
     let
-        isTesting = true,
         input = [
             Prefix = "error",
             Value = Utils.SPSResult(
                 "error",
                 Utils.FetchInfo("status", "message", #datetimezone(2023, 1, 18, 9, 47, 55, 2, 0), 42, true, "query")
             ),
-            Delayed = null
+            Options = [Test = true]
         ],
         expectedLogValues = [
             LogLevel = TraceLevel.Error,
@@ -58,7 +57,7 @@ TestErrorLogWithSPSResultInput = () =>
             ),
             Delayed = null
         ],
-        logValues = Logger.ErrorLog(input[Prefix], input[Value], input[Delayed], isTesting),
+        logValues = Logger.ErrorLog(input[Prefix], input[Value], input[Options]),
         facts = AssertLogContent("Input value is SPSResult", logValues, expectedLogValues)
     in
         facts;

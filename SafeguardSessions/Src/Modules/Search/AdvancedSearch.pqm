@@ -1,29 +1,32 @@
 let
-    IsMocked = SafeguardSessions.ImportFunction("IsMocked", "CommonUtils.pqm"),
+    GetOption = SafeguardSessions.ImportFunction("GetOption", "CommonUtils.pqm"),
+    SetOption = SafeguardSessions.ImportFunction("SetOption", "CommonUtils.pqm"),
     SessionsEndpoint = SafeguardSessions.ImportFunction("SessionsEndpoint", "Constants.pqm"),
     Request.Generate = SafeguardSessions.ImportFunction("Generate", "Request.pqm"),
     Request.GetDefaultParameters = SafeguardSessions.ImportFunction("GetDefaultParameters", "Request.pqm"),
-    ResponseHandler.ValidateByStatusCode = SafeguardSessions.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
+    ResponseHandler.ValidateByStatusCode = SafeguardSessions.ImportFunction(
+        "ValidateByStatusCode", "ResponseHandler.pqm"
+    ),
     UrlBuilder.GenerateUrl = SafeguardSessions.ImportFunction("GenerateUrl", "UrlBuilder.pqm"),
     Schema.GetSchema = SafeguardSessions.ImportFunction("GetSchema", "Schema.pqm"),
     SchemaUtils.ApplySchema = SafeguardSessions.ImportFunction("ApplySchema", "SchemaUtils.pqm"),
     AdvancedSearch.AdvancedSearch = (
-        spsUrl as text, queryParams as record, snapshot as text, sessionId as text, optional mocks as nullable record
+        spsUrl as text, queryParams as record, snapshot as text, sessionId as text, optional options as nullable record
     ) as table =>
         let
             fetchUrl = UrlBuilder.GenerateUrl(spsUrl, SessionsEndpoint, queryParams & [snapshot = snapshot]),
-            result = AdvancedSearch.GetAllPagesByNextLink(spsUrl, fetchUrl, sessionId, mocks),
+            result = AdvancedSearch.GetAllPagesByNextLink(spsUrl, fetchUrl, sessionId, options),
             resultWithMetadata = Value.ReplaceMetadata(result, [RequestUrl = fetchUrl])
         in
             resultWithMetadata,
     AdvancedSearch.GetAllPagesByNextLink = (
-        spsUrl as text, start_url as text, sessionId as text, optional mocks as nullable record
+        spsUrl as text, start_url as text, sessionId as text, optional options as nullable record
     ) as table =>
         AdvancedSearch.GenerateByPage(
             (previous) =>
                 let
                     nextUrl = if (previous = null) then start_url else AdvancedSearch.GetNextUrl(spsUrl, previous),
-                    page = if (nextUrl <> null) then AdvancedSearch.GetPage(nextUrl, sessionId, mocks) else null
+                    page = if (nextUrl <> null) then AdvancedSearch.GetPage(nextUrl, sessionId, options) else null
                 in
                     page
         ),
@@ -33,27 +36,25 @@ let
             nextUrl = if nextLink <> null then UrlBuilder.GenerateUrl(spsUrl, nextLink) else null
         in
             nextUrl,
-    AdvancedSearch.GetPage = (url as text, sessionId as text, optional mocks as nullable record) as table =>
+    AdvancedSearch.GetPage = (url as text, sessionId as text, optional options as nullable record) as table =>
         let
+            mockedGetPageResponseMap = GetOption(options, "Mocks.GetPageResponseMap"),
             response = ResponseHandler.ValidateByStatusCode(
-                if IsMocked(mocks, "GetPageResponseMap") then
-                    Request.Generate(
-                        url,
-                        Request.GetDefaultParameters(sessionId),
-                        [
-                            Response = Record.Field(mocks[GetPageResponseMap], url)
-                        ]
+                Request.Generate(
+                    url,
+                    Request.GetDefaultParameters(sessionId),
+                    SetOption(
+                        [],
+                        "Mocks.Response",
+                        Record.FieldOrDefault(GetOption(options, "Mocks.GetPageResponseMap") ?? [], url)
                     )
-                else
-                    Request.Generate(url, Request.GetDefaultParameters(sessionId))
+                )
             ),
             nextLink = response[meta][next]?,
-            schema =
-                if IsMocked(mocks, "Schema") then
-                    Record.Field(mocks[Schema], "Sessions")
-                else
-                    Schema.GetSchema("Sessions"),
-            page = SchemaUtils.ApplySchema(response, schema, mocks) meta [NextLink = nextLink]
+            mockedSessionsSchema = GetOption(options, "Mocks.Schema.Sessions"),
+            page = SchemaUtils.ApplySchema(
+                response, GetOption(options, "Mocks.Schema.Sessions") ?? Schema.GetSchema("Sessions"), options
+            ) meta [NextLink = nextLink]
         in
             page,
     AdvancedSearch.GenerateByPage = (getNextPage as function) as table =>

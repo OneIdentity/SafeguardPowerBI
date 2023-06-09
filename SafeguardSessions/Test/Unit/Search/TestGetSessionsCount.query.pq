@@ -11,7 +11,7 @@ TestGetSessionsCountIsSuccessful = () =>
         fakeCountResponse = FakeRawResponse([count = 2]),
         count = GetSessionsCount.GetSessionsCount(
             "dummy_url", [], "dummy_session_id", [
-                GetSessionsCountResponse = fakeCountResponse
+                Mocks = [GetSessionsCountResponse = fakeCountResponse]
             ]
         )
     in
@@ -38,7 +38,7 @@ TestGetSessionsCountRaisesError = () =>
             "An error is raised if fields are missing in the response received",
             GetSessionsCount.GetSessionsCount,
             {requestUrl, [], "dummy_session_id", [
-                GetSessionsCountResponse = fakeCountResponse
+                Mocks = [GetSessionsCountResponse = fakeCountResponse]
             ]},
             [
                 Reason = expectedReason,

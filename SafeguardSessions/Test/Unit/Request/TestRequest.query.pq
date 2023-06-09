@@ -41,10 +41,12 @@ TestRequestParams = () =>
 
 TestRequestGeneration = () =>
     let
-        fakeresponse = FakeRawResponse([dummy_field = "value", dummy_list = {0, 1, 2}]),
+        fakeResponse = FakeRawResponse([dummy_field = "value", dummy_list = {0, 1, 2}]),
         expectedBody = [dummy_field = "value", dummy_list = {0, 1, 2}],
         expectedMeta = [Content.Type = "application/json", Response.Status = 200, RequestUrl = "dummy_url"],
-        response = Request.Generate("dummy_url", [], [Response = fakeresponse]),
+        response = Request.Generate("dummy_url", [], [
+            Mocks = [Response = fakeResponse]
+        ]),
         facts = {
             Fact("Response body as json is correct", expectedBody, response),
             Fact("Response meta is correct", expectedMeta, Value.Metadata(response))

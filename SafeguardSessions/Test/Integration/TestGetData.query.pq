@@ -129,12 +129,14 @@ TestEmptyResponseIsHandled = () =>
             [],
             No,
             [
-                AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                InfoResponse = TestSafeguardSessions.InfoResponse,
-                Schema = TestSafeguardSessions.Schema,
-                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(),
-                OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
-                GetPageResponseMap = fakeResponses
+                Mocks = [
+                    AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                    InfoResponse = TestSafeguardSessions.InfoResponse,
+                    Schema = TestSafeguardSessions.Schema,
+                    GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(),
+                    OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                    GetPageResponseMap = fakeResponses
+                ]
             ]
         )
     in
@@ -171,12 +173,14 @@ TestGetDataWithoutError = () =>
             [],
             No,
             [
-                AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                InfoResponse = TestSafeguardSessions.InfoResponse,
-                Schema = TestSafeguardSessions.Schema,
-                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
-                OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
-                GetPageResponseMap = fakeResponses
+                Mocks = [
+                    AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                    InfoResponse = TestSafeguardSessions.InfoResponse,
+                    Schema = TestSafeguardSessions.Schema,
+                    GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
+                    OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                    GetPageResponseMap = fakeResponses
+                ]
             ]
         )
     in
@@ -214,12 +218,14 @@ TestFirmwareCheckCanBeBypassed = () =>
             [],
             Yes,
             [
-                AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                InfoResponse = infoResponse,
-                Schema = TestSafeguardSessions.Schema,
-                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(0),
-                OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
-                GetPageResponseMap = fakeResponses
+                Mocks = [
+                    AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                    InfoResponse = infoResponse,
+                    Schema = TestSafeguardSessions.Schema,
+                    GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(0),
+                    OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                    GetPageResponseMap = fakeResponses
+                ]
             ]
         )
     in
@@ -260,12 +266,14 @@ TestGetDataWithQueryInputs = () =>
             ],
             No,
             [
-                AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                InfoResponse = TestSafeguardSessions.InfoResponse,
-                Schema = TestSafeguardSessions.Schema,
-                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
-                OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
-                GetPageResponseMap = fakeResponses
+                Mocks = [
+                    AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                    InfoResponse = TestSafeguardSessions.InfoResponse,
+                    Schema = TestSafeguardSessions.Schema,
+                    GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
+                    OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                    GetPageResponseMap = fakeResponses
+                ]
             ]
         )
     in
@@ -302,7 +310,9 @@ TestGetDataHandlesAuthenticationError = () =>
             [],
             No,
             [
-                AuthResponse = fakeAuthResponse
+                Mocks = [
+                    AuthResponse = fakeAuthResponse
+                ]
             ]
         )
     in
@@ -329,11 +339,13 @@ TestGetDataWithActualData = () =>
             [],
             No,
             [
-                AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                InfoResponse = TestSafeguardSessions.InfoResponse,
-                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(25),
-                OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
-                GetPageResponseMap = fakeResponses
+                Mocks = [
+                    AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                    InfoResponse = TestSafeguardSessions.InfoResponse,
+                    GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(25),
+                    OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                    GetPageResponseMap = fakeResponses
+                ]
             ]
         )
     in
@@ -376,11 +388,13 @@ TestGetDataHandlesBadRequest = () =>
             [],
             No,
             [
-                AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                InfoResponse = TestSafeguardSessions.InfoResponse,
-                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(),
-                OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
-                GetPageResponseMap = fakeResponses
+                Mocks = [
+                    AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                    InfoResponse = TestSafeguardSessions.InfoResponse,
+                    GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(),
+                    OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                    GetPageResponseMap = fakeResponses
+                ]
             ]
         )
     in
@@ -406,7 +420,9 @@ TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringAuth = () =>
             [],
             No,
             [
-                Authenticate = errorMock
+                Mocks = [
+                    Authenticate = errorMock
+                ]
             ]
         )
     in
@@ -432,9 +448,11 @@ TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringDataFetch = () =>
             [],
             No,
             [
-                AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                InfoResponse = TestSafeguardSessions.InfoResponse,
-                FetchData = errorMock
+                Mocks = [
+                    AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                    InfoResponse = TestSafeguardSessions.InfoResponse,
+                    FetchData = errorMock
+                ]
             ]
         )
     in
@@ -468,8 +486,10 @@ TestGetDataReturnsWithErrorInCaseOfUnsupportedSPSVersion = () =>
                     [],
                     No,
                     [
-                        AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                        InfoResponse = infoResponse
+                        Mocks = [
+                            AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                            InfoResponse = infoResponse
+                        ]
                     ]
                 )
     in
@@ -506,7 +526,9 @@ TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringAut
                         [],
                         No,
                         [
-                            Authenticate = errorMock
+                            Mocks = [
+                                Authenticate = errorMock
+                            ]
                         ]
                     )
                 )
@@ -544,9 +566,11 @@ TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringDat
                         [],
                         No,
                         [
-                            AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                            InfoResponse = TestSafeguardSessions.InfoResponse,
-                            FetchData = errorMock
+                            Mocks = [
+                                AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                                InfoResponse = TestSafeguardSessions.InfoResponse,
+                                FetchData = errorMock
+                            ]
                         ]
                     )
                 )
@@ -589,12 +613,14 @@ TestGetDataHandlesSchemaApplyError = () =>
             [],
             No,
             [
-                AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                InfoResponse = TestSafeguardSessions.InfoResponse,
-                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(25),
-                OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
-                GetPageResponseMap = fakeResponses,
-                ApplySchema = error unexpectedErrorRecord
+                Mocks = [
+                    AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                    InfoResponse = TestSafeguardSessions.InfoResponse,
+                    GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(25),
+                    OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                    GetPageResponseMap = fakeResponses,
+                    ApplySchema = error unexpectedErrorRecord
+                ]
             ]
         )
     in
