@@ -220,6 +220,25 @@ SafeguardSessions.Icons = [
 //
 // Load common library functions
 //
+shared GetOption = (options as nullable record, valuePath as text) as any =>
+    let
+        delimiterChar = ".",
+        delimiterCount = 0,
+        /*
+                Record.FieldOrDefault uses null by default as default value
+                but we use null explicitely to show that it need to retun null
+                if a field is not present
+            */
+        defaultValue = null,
+        optionName = Text.BeforeDelimiter(valuePath, delimiterChar, delimiterCount),
+        newPath = Text.AfterDelimiter(valuePath, delimiterChar, delimiterCount),
+        optionValue = Record.FieldOrDefault(options, optionName, defaultValue)
+    in
+        if Text.Contains(valuePath, delimiterChar) then
+            @GetOption(optionValue, newPath)
+        else
+            optionValue;
+
 shared SafeguardSessions.ImportModule = (name as text) =>
     let
         binary = Extension.Contents(name), asText = Text.FromBinary(binary)
