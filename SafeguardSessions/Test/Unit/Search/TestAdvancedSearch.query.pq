@@ -80,8 +80,10 @@ TestAdvancedSearchIsSuccessful = () =>
             "dummy_snapshot",
             "dummy_session_id",
             [
-                GetPageResponseMap = fakeResponses,
-                Schema = TestSafeguardSessions.Schema
+                Mocks = [
+                    GetPageResponseMap = fakeResponses,
+                    Schema = TestSafeguardSessions.Schema
+                ]
             ]
         )
     in
@@ -109,8 +111,10 @@ TestAdvancedSearchWithZeroItem = () =>
             "dummy_snapshot",
             "dummy_session_id",
             [
-                GetPageResponseMap = fakeResponses,
-                Schema = TestSafeguardSessions.Schema
+                Mocks = [
+                    GetPageResponseMap = fakeResponses,
+                    Schema = TestSafeguardSessions.Schema
+                ]
             ]
         )
     in
@@ -134,8 +138,10 @@ TestErrorIsContainedInAdvancedSearchResponse = () =>
             "dummy_snapshot",
             "dummy_session_id",
             [
-                GetPageResponseMap = fakeResponses,
-                Schema = TestSafeguardSessions.Schema
+                Mocks = [
+                    GetPageResponseMap = fakeResponses,
+                    Schema = TestSafeguardSessions.Schema
+                ]
             ]
         ),
         expectedReason = "Not Found",

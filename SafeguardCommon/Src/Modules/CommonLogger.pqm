@@ -1,12 +1,9 @@
 let
-    Logger.LogWrapper = (
-        logLevel as number,
-        prefix as text,
-        value as any,
-        optional delayed as nullable logical,
-        optional isTesting as nullable logical
-    ) =>
+    GetOption = SafeguardCommon.ImportFunction("GetOption", "CommonUtils.pqm"),
+    Logger.LogWrapper = (logLevel as number, prefix as text, value as any, optional options as nullable record) =>
         let
+            delayed = GetOption(options, "Delayed"),
+            isTesting = GetOption(options, "Test") ?? false,
             //From Microsoft TripPin 8-Diagnostics tutorial
             //Source: https://github.com/microsoft/DataConnectors/blob/master/samples/TripPin/8-Diagnostics/Diagnostics.pqm
             _valueToText = (value) =>
@@ -196,7 +193,7 @@ let
                 in
                     try Serialize(value) otherwise "<serialization failed>"
         in
-            if isTesting = null or isTesting = false then
+            if isTesting = false then
                 Diagnostics.Trace(
                     logLevel, prefix & ": " & (try _valueToText(value) otherwise "<error getting value>"), value,
                     delayed
@@ -208,14 +205,10 @@ let
                     Value = value,
                     Delayed = delayed
                 ],
-    Logger.InfoLog = (
-        prefix as text, value as any, optional delayed as nullable logical, optional isTesting as nullable logical
-    ) =>
-        Logger.LogWrapper(TraceLevel.Information, prefix, value, delayed, isTesting),
-    Logger.ErrorLog = (
-        prefix as text, value as any, optional delayed as nullable logical, optional isTesting as nullable logical
-    ) =>
-        Logger.LogWrapper(TraceLevel.Error, prefix, value, delayed, isTesting)
+    Logger.InfoLog = (prefix as text, value as any, optional options as nullable record) =>
+        Logger.LogWrapper(TraceLevel.Information, prefix, value, options),
+    Logger.ErrorLog = (prefix as text, value as any, optional options as nullable record) =>
+        Logger.LogWrapper(TraceLevel.Error, prefix, value, options)
 in
     [
         InfoLog = Logger.InfoLog,

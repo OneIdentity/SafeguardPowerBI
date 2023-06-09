@@ -1,5 +1,12 @@
 let
+    Utils.DelimiterChar = ".",
+    Utils.DelimiterCount = 0,
     Utils.IsMocked = (mocks as nullable record, field as text) as logical =>
+        /*
+            Utils.GetOption is the successor of Utils.IsMocked but the latter
+            is still kept in the code base as it is still in use in the
+            SafeguardPassword project.
+        */
         mocks <> null and Record.HasFields(mocks, field),
     Utils.PaddedTable.FromRecords = (records as list) =>
         let
@@ -7,9 +14,52 @@ let
             paddedRecords = List.Transform(records, each Record.SelectFields(_, fieldNames, MissingField.UseNull)),
             asTable = Table.FromRecords(paddedRecords)
         in
-            asTable
+            asTable,
+    Utils.Record.Update = (r as record, field as text, value as any) =>
+        Record.AddField(Record.RemoveFields(r, field, MissingField.Ignore), field, value),
+    Utils.GetOption = (options as nullable record, valuePath as text) as any =>
+        let
+            /*
+                Record.FieldOrDefault uses null by default as default value
+                but we use null explicitely to show that it needs to return
+                null if a field is not present
+            */
+            defaultValue = null,
+            optionName = Text.BeforeDelimiter(valuePath, Utils.DelimiterChar, Utils.DelimiterCount),
+            newPath = Text.AfterDelimiter(valuePath, Utils.DelimiterChar, Utils.DelimiterCount),
+            optionValue = Record.FieldOrDefault(options, optionName, defaultValue)
+        in
+            if Text.Contains(valuePath, Utils.DelimiterChar) then
+                @Utils.GetOption(optionValue, newPath)
+            else
+                optionValue,
+    Utils.SetOption = (options as nullable record, valuePath as text, value as any) as record =>
+        let
+            /*
+                If key is not present, add it to the record and keep the others intact
+                If key is present, update value and keep the others intact
+            */
+            newOptions =
+                if value is null then
+                    options
+                else
+                    let
+                        optionName = Text.BeforeDelimiter(valuePath, Utils.DelimiterChar, Utils.DelimiterCount),
+                        newPath = Text.AfterDelimiter(valuePath, Utils.DelimiterChar, Utils.DelimiterCount),
+                        optionValue = Record.FieldOrDefault(options, optionName, []),
+                        newValue =
+                            if Text.Contains(valuePath, Utils.DelimiterChar) then
+                                @Utils.SetOption(optionValue, newPath, value)
+                            else
+                                value
+                    in
+                        Utils.Record.Update(options, optionName, newValue)
+        in
+            newOptions
 in
     [
         IsMocked = Utils.IsMocked,
-        PaddedTable.FromRecords = Utils.PaddedTable.FromRecords
+        PaddedTable.FromRecords = Utils.PaddedTable.FromRecords,
+        GetOption = Utils.GetOption,
+        SetOption = Utils.SetOption
     ]

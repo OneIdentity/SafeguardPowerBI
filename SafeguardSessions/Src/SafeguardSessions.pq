@@ -45,9 +45,10 @@ shared FetchSessions = (
     filterField3 as nullable text,
     filterValue3 as nullable text,
     skipVersionCheck as nullable text,
-    optional mocks as nullable record
+    optional options as nullable record
 ) =>
     let
+        returnParams = GetOption(options, "ReturnParams") ?? false,
         qParameterInputPairList = {
             {filterField1, filterValue1},
             {filterField2, filterValue2},
@@ -59,16 +60,16 @@ shared FetchSessions = (
             to = to
         ],
         data =
-            if IsMocked(mocks, "ReturnParams") then
+            if returnParams then
                 [
                     SpsIp = spsIp,
                     Credentials = credentials,
                     Query = query,
                     SkipVersionCheck = skipVersionCheck,
-                    Mocks = mocks
+                    Options = options
                 ]
             else
-                GetData(spsIp, credentials, query, skipVersionCheck, mocks)
+                GetData(spsIp, credentials, query, skipVersionCheck, options)
     in
         data;
 
@@ -77,34 +78,28 @@ shared GetData = (
     credentials as record,
     query as record,
     skipVersionCheck as nullable text,
-    optional mocks as nullable record
+    optional options as nullable record
 ) =>
     let
         startTime = DateTimeZone.LocalNow(),
         spsUrl = UrlBuilder.GenerateBaseUrl("https", spsIp),
-        authResponse =
-            if IsMocked(mocks, "Authenticate") then
-                mocks[Authenticate][Value]
-            else
-                Authenticate(spsUrl, credentials, mocks),
+        authResponse = GetOption(options, "Mocks.Authenticate")[Value]? ?? Authenticate(spsUrl, credentials, options),
         sessionId = ValidateSPSVersion(
             spsUrl,
             BaseAuthentication.MineSessionIdFromCookie(Request.GetHeader(Value.Metadata(authResponse), "Set-Cookie")),
             skipVersionCheck,
-            mocks
+            options
         ),
-        response =
-            if IsMocked(mocks, "FetchData") then
-                mocks[FetchData][Value]
-            else
-                FetchData(spsUrl, UrlBuilder.DefaultQuery & query, sessionId, mocks),
+        response = GetOption(options, "Mocks.FetchData")[Value]? ?? FetchData(
+            spsUrl, UrlBuilder.DefaultQuery & query, sessionId, options
+        ),
         data = HandleIfThereIsAnError(try (response)),
         result = BuildSPSResult(data, startTime)
     in
         result;
 
 shared ValidateSPSVersion = (
-    spsUrl as text, sessionId as text, skipVersionCheck as nullable text, optional mocks as nullable record
+    spsUrl as text, sessionId as text, skipVersionCheck as nullable text, optional options as nullable record
 ) =>
     let
         sessionIdOrError =
@@ -112,7 +107,7 @@ shared ValidateSPSVersion = (
                 sessionId
             else
                 let
-                    version = Version.GetVersion(spsUrl, sessionId, mocks),
+                    version = Version.GetVersion(spsUrl, sessionId, options),
                     checkedVersion = try Version.CheckVersion(version, SupportedVersions.Versions),
                     validatedVersion =
                         if checkedVersion[HasError] then
@@ -134,25 +129,23 @@ shared ValidateSPSVersion = (
     in
         sessionIdOrError;
 
-shared Authenticate = (spsUrl as text, credentials as record, optional mocks as nullable record) as record =>
+shared Authenticate = (spsUrl as text, credentials as record, optional options as nullable record) as record =>
     let
         authUrl = UrlBuilder.GenerateUrl(spsUrl, AuthEndpoint),
         encodedCredentails = BaseAuthentication.EncodeCredentials(credentials[Username], credentials[Password]),
-        response =
-            if IsMocked(mocks, "AuthResponse") then
-                Request.Generate(
-                    authUrl, Request.GetAuthParameters(encodedCredentails), [Response = mocks[AuthResponse]]
-                )
-            else
-                Request.Generate(authUrl, Request.GetAuthParameters(encodedCredentails))
+        response = Request.Generate(
+            authUrl,
+            Request.GetAuthParameters(encodedCredentails),
+            SetOption([], "Mocks.Response", GetOption(options, "Mocks.AuthResponse"))
+        )
     in
         response;
 
-shared FetchData = (spsUrl as text, queryParams as record, sessionId as text, optional mocks as nullable record) as table =>
+shared FetchData = (spsUrl as text, queryParams as record, sessionId as text, optional options as nullable record) as table =>
     let
-        snapshot = OpenSnapshot.OpenSnapshot(spsUrl, sessionId, mocks),
-        sessions = AdvancedSearch.AdvancedSearch(spsUrl, queryParams, snapshot, sessionId, mocks),
-        expectedSessionsCount = try GetSessionsCount.GetSessionsCount(spsUrl, queryParams, sessionId, mocks),
+        snapshot = OpenSnapshot.OpenSnapshot(spsUrl, sessionId, options),
+        sessions = AdvancedSearch.AdvancedSearch(spsUrl, queryParams, snapshot, sessionId, options),
+        expectedSessionsCount = try GetSessionsCount.GetSessionsCount(spsUrl, queryParams, sessionId, options),
         sessionsWithCountMetadata =
             if expectedSessionsCount[HasError] = true then
                 error expectedSessionsCount[Error]
@@ -231,7 +224,8 @@ shared SafeguardSessions.ImportFunction = (function_name as text, module_name as
 
 SafeguardSessions.ContentsType = SafeguardSessions.ImportFunction("ContentsType", "Types.pqm");
 
-IsMocked = SafeguardSessions.ImportFunction("IsMocked", "CommonUtils.pqm");
+GetOption = SafeguardSessions.ImportFunction("GetOption", "CommonUtils.pqm");
+SetOption = SafeguardSessions.ImportFunction("SetOption", "CommonUtils.pqm");
 
 BuildSPSResult = SafeguardSessions.ImportFunction("BuildSPSResult", "Utils.pqm");
 
