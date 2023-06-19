@@ -80,6 +80,13 @@ let
                 Documentation.FieldDescription = "This field allows you to specify a search value for sessions. Specifies the value of Filter field 3.",
                 Documentation.SampleValues = {"false"}
             ]
+        ),
+        skipVersionCheck as (
+            type nullable logical meta [
+                Documentation.FieldCaption = "Skip Version Check",
+                Documentation.FieldDescription = "This field allows you to skip the SPS version check.",
+                Documentation.AllowedValues = {false, true}
+            ]
         )
     ) as record meta [
         Documentation.Name = "One Identity Safeguard Power BI Connector",

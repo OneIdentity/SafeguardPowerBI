@@ -100,7 +100,7 @@ TestErrorLogWithSPSResultInput = () =>
         ],
         expectedLogValues = [
             LogLevel = TraceLevel.Error,
-            Output = "error: #table( type table [Name = any, Data = any, ItemKind = any, ItemName = any, IsLeaf = any] , {{""Sessions"", ""error"", ""Table"", ""Table"", true} , {""Info"", #table( type table [Start = any, Url = any, Status = any, ExpectedCount = any, Message = any, Failed = any] , {{#datetimezone(2023, 1, 18, 9, 47, 55, 2, 0), ""query"", ""status"", 42, ""message"", true} } ) , ""Table"", ""Table"", true} } ) ",
+            Output = "error: #table( type table [Name = any, Data = any, ItemKind = any, ItemName = any, IsLeaf = any] , {{""Sessions"", ""error"", ""Table"", ""Table"", true} , {""Info"", #table( type table [Start = any, Url = any, ConnectorVersion = any, Status = any, ExpectedCount = any, Message = any, Failed = any] , {{#datetimezone(2023, 1, 18, 9, 47, 55, 2, 0), ""query"", ""v1.0.0+sps7.3.0"", ""status"", 42, ""message"", true} } ) , ""Table"", ""Table"", true} } ) ",
             Value = #table(
                 type table [Name = any, Data = any, ItemKind = any, ItemName = any, IsLeaf = any],
                 {
@@ -109,9 +109,25 @@ TestErrorLogWithSPSResultInput = () =>
                         "Info",
                         #table(
                             type table [
-                                Start = any, Url = any, Status = any, ExpectedCount = any, Message = any, Failed = any
+                                Start = any,
+                                Url = any,
+                                ConnectorVersion = any,
+                                Status = any,
+                                ExpectedCount = any,
+                                Message = any,
+                                Failed = any
                             ],
-                            {{#datetimezone(2023, 1, 18, 9, 47, 55, 2, 0), "query", "status", 42, "message", true}}
+                            {
+                                {
+                                    #datetimezone(2023, 1, 18, 9, 47, 55, 2, 0),
+                                    "query",
+                                    "v1.0.0+sps7.3.0",
+                                    "status",
+                                    42,
+                                    "message",
+                                    true
+                                }
+                            }
                         ),
                         "Table",
                         "Table",

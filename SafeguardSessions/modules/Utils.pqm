@@ -26,6 +26,7 @@ let
                 [
                     Start = start,
                     Url = url,
+                    ConnectorVersion = Extension.LoadString("ReleaseVersion"),
                     Status = status,
                     ExpectedCount = expectedCount,
                     Message = message,

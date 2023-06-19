@@ -4,6 +4,8 @@ FetchInfo = Extension.ImportFunction("FetchInfo", "Utils.pqm");
 
 CreateSchema = Extension.ImportFunction("CreateSchema", "SchemaUtils.pqm");
 
+SupportedVersions.LatestVersion = Extension.ImportFunction("LatestVersion", "SupportedVersions.pqm");
+
 TestSafeguardSessions.URL = "dummy_url";
 
 TestSafeguardSessions.AuthenticationCredentials = [
@@ -20,6 +22,10 @@ TestSafeguardSessions.SuccessfulAuthenticationResponse = FakeRawResponse(
         ]
     ]
 );
+
+TestSafeguardSessions.InfoResponse = FakeRawResponse([
+    body = [firmware_version = SupportedVersions.LatestVersion]
+]);
 
 TestSafeguardSession.GetExpectedCountResponse = (optional expectedCount as number) =>
     FakeRawResponse([count = expectedCount ?? 0]);
@@ -114,8 +120,10 @@ TestEmptyResponseIsHandled = () =>
             TestSafeguardSessions.URL,
             TestSafeguardSessions.AuthenticationCredentials,
             [],
+            false,
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                InfoResponse = TestSafeguardSessions.InfoResponse,
                 Schema = TestSafeguardSessions.Schema,
                 GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(),
                 OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
@@ -154,10 +162,55 @@ TestGetDataWithoutError = () =>
             TestSafeguardSessions.URL,
             TestSafeguardSessions.AuthenticationCredentials,
             [],
+            false,
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                InfoResponse = TestSafeguardSessions.InfoResponse,
                 Schema = TestSafeguardSessions.Schema,
                 GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
+                OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                GetPageResponseMap = fakeResponses
+            ]
+        )
+    in
+        TestResultsContentWithoutStartTime(response, expectedData, expectedInfo);
+
+TestFirmwareCheckCanBeBypassed = () =>
+    let
+        infoResponse = FakeRawResponse([
+            body = [firmware_version = "unsupported_version"]
+        ]),
+        fakeResponses = [
+            #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id" = TestSafeguardSessions.Response.Last
+        ],
+        expectedData = #table(
+            type table [
+                session_id = text,
+                subtable.field1 = number,
+                subtable.field2 = text,
+                flatvalue1 = number,
+                flatvalue2 = logical
+            ],
+            {}
+        ),
+        expectedInfo = FetchInfo(
+            "Success",
+            "Data fetch succeeded.",
+            null,
+            0,
+            false,
+            "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id"
+        ),
+        response = GetData(
+            TestSafeguardSessions.URL,
+            TestSafeguardSessions.AuthenticationCredentials,
+            [],
+            true,
+            [
+                AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                InfoResponse = infoResponse,
+                Schema = TestSafeguardSessions.Schema,
+                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(0),
                 OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
                 GetPageResponseMap = fakeResponses
             ]
@@ -198,8 +251,10 @@ TestGetDataWithQueryInputs = () =>
                 end = "2023.1.31",
                 q = "protocol:SSh AND user.name:balabit"
             ],
+            false,
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                InfoResponse = TestSafeguardSessions.InfoResponse,
                 Schema = TestSafeguardSessions.Schema,
                 GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
                 OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
@@ -237,6 +292,7 @@ TestGetDataHandlesAuthenticationError = () =>
             TestSafeguardSessions.URL,
             TestSafeguardSessions.AuthenticationCredentials,
             [],
+            false,
             [
                 AuthResponse = fakeAuthResponse
             ]
@@ -262,8 +318,10 @@ TestGetDataWithActualData = () =>
             TestSafeguardSessions.URL,
             TestSafeguardSessions.AuthenticationCredentials,
             [],
+            false,
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                InfoResponse = TestSafeguardSessions.InfoResponse,
                 GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(25),
                 OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
                 GetPageResponseMap = fakeResponses
@@ -306,8 +364,10 @@ TestGetDataHandlesBadRequest = () =>
             TestSafeguardSessions.URL,
             TestSafeguardSessions.AuthenticationCredentials,
             [],
+            false,
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                InfoResponse = TestSafeguardSessions.InfoResponse,
                 GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(),
                 OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
                 GetPageResponseMap = fakeResponses
@@ -331,7 +391,13 @@ TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringAuth = () =>
         errorMock = [Value = error errorRecord],
         expectedInfo = FetchInfo("Error", "This is an error no-one expects", null, 0, true, "N/A"),
         response = GetData(
-            TestSafeguardSessions.URL, TestSafeguardSessions.AuthenticationCredentials, [], [Authenticate = errorMock]
+            TestSafeguardSessions.URL,
+            TestSafeguardSessions.AuthenticationCredentials,
+            [],
+            false,
+            [
+                Authenticate = errorMock
+            ]
         )
     in
         TestResultsContentWithoutStartTime(response, errorRecord, expectedInfo);
@@ -354,13 +420,45 @@ TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringDataFetch = () =>
             TestSafeguardSessions.URL,
             TestSafeguardSessions.AuthenticationCredentials,
             [],
+            false,
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                InfoResponse = TestSafeguardSessions.InfoResponse,
                 FetchData = errorMock
             ]
         )
     in
         TestResultsContentWithoutStartTime(response, errorRecord, expectedInfo);
+
+TestGetDataReturnsWithErrorInCaseOfUnsupportedSPSVersion = () =>
+    let
+        infoResponse = FakeRawResponse([
+            body = [firmware_version = "unsupported_version"]
+        ]),
+        expectedResponse = [
+            HasError = true,
+            Error = [
+                Reason = "Not Supported Version",
+                Message = "Your version of the connector (v1.0.0+sps7.3.0) is not compatible with your SPS version (unsupported_version). For a connector version that is compatible with your SPS version, visit the official release page of the connector: https://github.com/OneIdentity/SafeguardPowerBI/releases",
+                Detail = [Version = "unsupported_version", SupportedVersions = "7.3", ManuallyHandled = false],
+                Message.Format = null,
+                Message.Parameters = null
+            ]
+        ],
+        response =
+            try
+                GetData(
+                    TestSafeguardSessions.URL,
+                    TestSafeguardSessions.AuthenticationCredentials,
+                    [],
+                    false,
+                    [
+                        AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                        InfoResponse = infoResponse
+                    ]
+                )
+    in
+        Fact("Check error is raised", expectedResponse, response);
 
 TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringAuthenication = () =>
     let
@@ -387,6 +485,7 @@ TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringAut
                         TestSafeguardSessions.URL,
                         TestSafeguardSessions.AuthenticationCredentials,
                         [],
+                        false,
                         [
                             Authenticate = errorMock
                         ]
@@ -420,8 +519,10 @@ TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringDat
                         TestSafeguardSessions.URL,
                         TestSafeguardSessions.AuthenticationCredentials,
                         [],
+                        false,
                         [
                             AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                            InfoResponse = TestSafeguardSessions.InfoResponse,
                             FetchData = errorMock
                         ]
                     )
@@ -462,8 +563,10 @@ TestGetDataHandlesSchemaApplyError = () =>
             TestSafeguardSessions.URL,
             TestSafeguardSessions.AuthenticationCredentials,
             [],
+            false,
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                InfoResponse = TestSafeguardSessions.InfoResponse,
                 GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(25),
                 OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
                 GetPageResponseMap = fakeResponses,
@@ -477,12 +580,14 @@ shared TestSafeguardSessions.IntegrationTest = [
     facts = {
         TestEmptyResponseIsHandled(),
         TestGetDataWithoutError(),
+        TestFirmwareCheckCanBeBypassed(),
         TestGetDataWithQueryInputs(),
         TestGetDataWithActualData(),
         TestGetDataHandlesAuthenticationError(),
         TestGetDataHandlesBadRequest(),
         TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringAuth(),
         TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringDataFetch(),
+        TestGetDataReturnsWithErrorInCaseOfUnsupportedSPSVersion(),
         TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringAuthenication(),
         TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringDataFetch(),
         TestGetDataHandlesSchemaApplyError()
