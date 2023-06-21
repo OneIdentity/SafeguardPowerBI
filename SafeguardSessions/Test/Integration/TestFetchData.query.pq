@@ -312,9 +312,9 @@ TestFetchDataRaisesErrorWhenAdvancedSearchInitialResponseFails = () =>
     in
         facts;
 
-TestFetchDataRaisesErrorWhenAdvancedSearchSuccessiveResponseFails = () =>
+TestErrorIsContainedWhenAdvancedSearchSuccessiveResponseFails = () =>
     let
-        AssertErrorIsRaised = (
+        AssertErrorIsContained = (
             statusCode as number, expectedReason as text, expectedMessage as text, expectedErrorCode as number
         ) =>
             let
@@ -326,18 +326,26 @@ TestFetchDataRaisesErrorWhenAdvancedSearchSuccessiveResponseFails = () =>
                         ]
                     )
                 ],
-                facts = TestErrorIsRaised(
-                    try
-                        FetchData(
-                            TestSafeguardSessions.URL,
-                            [],
-                            TestSafeguardSessions.SessionId,
-                            [
-                                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
-                                OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
-                                GetPageResponseMap = fakeResponses
-                            ]
-                        ),
+                actualResponse = FetchData(
+                    TestSafeguardSessions.URL,
+                    [],
+                    TestSafeguardSessions.SessionId,
+                    [
+                        GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
+                        OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                        GetPageResponseMap = fakeResponses,
+                        Schema = TestSafeguardSessions.Schema
+                    ]
+                ),
+                dataFacts = {
+                    Fact(
+                        "First row contains valid data",
+                        [ session_id = "id1", subtable.field1 = 1, subtable.field2 = "value1", flatvalue1 = 1, flatvalue2 = true ],
+                        actualResponse{0}
+                    )
+                },
+                errorFacts = TestErrorIsRaised(
+                    try actualResponse{1},
                     expectedReason,
                     expectedMessage,
                     [
@@ -348,7 +356,7 @@ TestFetchDataRaisesErrorWhenAdvancedSearchSuccessiveResponseFails = () =>
                     ]
                 )
             in
-                facts,
+                List.Combine({dataFacts, errorFacts}),
         cases = {
             {
                 400,
@@ -372,7 +380,7 @@ TestFetchDataRaisesErrorWhenAdvancedSearchSuccessiveResponseFails = () =>
             {429, "Snapshot Quota Error", "Error 4290: Snapshot quota exceeded.", 4290},
             {500, "Server Error", "Error 5000: The source IP responded with a server error.", 5000}
         },
-        facts = ProvideDataForTest(cases, AssertErrorIsRaised)
+        facts = ProvideDataForTest(cases, AssertErrorIsContained)
     in
         facts;
 
@@ -496,7 +504,7 @@ shared TestSafeguardSessions.IntegrationTest = [
         TestFetchDataIsSuccessful(),
         TestFetchDataWithInvalidTypeForField(),
         TestFetchDataRaisesErrorWhenAdvancedSearchInitialResponseFails(),
-        TestFetchDataRaisesErrorWhenAdvancedSearchSuccessiveResponseFails(),
+        TestErrorIsContainedWhenAdvancedSearchSuccessiveResponseFails(),
         TestFetchDataRaisesErrorWhenCountRequestFails(),
         TestFetchDataRaisesErrorWhenSnapshotRequestFails()
     },

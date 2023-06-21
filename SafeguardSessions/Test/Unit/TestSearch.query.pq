@@ -89,7 +89,7 @@ TestAdvancedSearchIsSuccessful = () =>
     in
         Fact("Advance search returns all pages", expectedData, result);
 
-TestAdvancedSearchRaisesError = () =>
+TestErrorIsContainedInAdvancedSearchResponse = () =>
     let
         fakeResponses = [
             #"http://dummy_url/api/audit/sessions?snapshot=dummy_snapshot" = TestSafeguardSessions.Response.First,
@@ -101,6 +101,13 @@ TestAdvancedSearchRaisesError = () =>
                 ]
             )
         ],
+        actualResponse = Search.AdvancedSearch(
+            "dummy_url",
+            [],
+            "dummy_snapshot",
+            "dummy_session_id",
+            [GetPageResponseMap = fakeResponses, Schema = TestSafeguardSessions.Schema]
+        ),
         expectedReason = "Not Found",
         expectedMessage = "Error 4040: The requested resource is not found.",
         expectedDetail = [
@@ -108,17 +115,27 @@ TestAdvancedSearchRaisesError = () =>
             Cause = [#"error" = "reason"],
             RequestUrl = "http://dummy_url/dummy_url_final",
             ErrorCode = 4040
-        ]
-    in
-        TestErrorIsRaised(
-            try
-                Search.AdvancedSearch(
-                    "dummy_url", [], "dummy_snapshot", "dummy_session_id", [GetPageResponseMap = fakeResponses]
-                ),
+        ],
+        dataFacts = {
+            Fact(
+                "First row contains valid data",
+                [ session_id = "id1", subtable.field1 = 1, subtable.field2 = "value1", flatvalue1 = 1, flatvalue2 = true ],
+                actualResponse{0}
+            ),
+            Fact(
+                "Second row contains valid data",
+                [ session_id = "id2", subtable.field1 = 2, subtable.field2 = "value2", flatvalue1 = 2, flatvalue2 = false ],
+                actualResponse{1}
+            )
+        },
+        errorFacts = TestErrorIsRaised(
+            try actualResponse{2},
             expectedReason,
             expectedMessage,
             expectedDetail
-        );
+        )
+    in
+        List.Combine({dataFacts, errorFacts});
 
 TestGetSessionsCountIsSuccesful = () =>
     let
@@ -224,7 +241,7 @@ TestOpenSnapshotRaisesError = () =>
 shared Testsearch.UnitTest = [
     facts = {
         TestAdvancedSearchIsSuccessful(),
-        TestAdvancedSearchRaisesError(),
+        TestErrorIsContainedInAdvancedSearchResponse(),
         TestGetSessionsCountIsSuccesful(),
         TestGetSessionsCountRaisesError(),
         TestOpenSnapshotIsSuccessful(),
