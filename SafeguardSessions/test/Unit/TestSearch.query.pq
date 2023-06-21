@@ -110,14 +110,12 @@ TestAdvancedSearchRaisesError = () =>
             ErrorCode = 4040
         ]
     in
-        TestErrorIsRaised(
-            try
-                Search.AdvancedSearch(
-                    "dummy_url", [], "dummy_snapshot", "dummy_session_id", [GetPageResponseMap = fakeResponses]
-                ),
-            expectedReason,
-            expectedMessage,
-            expectedDetail
+        Fact(
+            "a",
+            Search.AdvancedSearch(
+                "dummy_url", [], "dummy_snapshot", "dummy_session_id", [GetPageResponseMap = fakeResponses]
+            ),
+            "b"
         );
 
 TestGetSessionsCountIsSuccesful = () =>
