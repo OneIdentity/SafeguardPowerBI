@@ -3,7 +3,7 @@
 // https://learn.microsoft.com/en-us/power-query/handlingunittesting
 // Version 1.0.0 was exactly the same as Microsoft's framework. Above this version number,
 // it includes our changes and additions
-[Version = "1.6.2"]
+[Version = "1.6.3"]
 section UnitTestFrameork;
 
 shared Fact = (_subject as text, _expected, _actual) as record =>
@@ -312,12 +312,15 @@ shared TestResultsContentWithoutStartTime = (response as table, expectedData as 
 
 shared TestFetchInfoContentWithoutStartTime = (expectedInfo as table, actualInfo as table) =>
     let
+        expected = Table.First(expectedInfo),
+        actual = Table.First(actualInfo),
         facts = {
-            Fact("Status matches", List.First(expectedInfo[Status]), List.First(actualInfo[Status])),
-            Fact("Message matches", List.First(expectedInfo[Message]), List.First(actualInfo[Message])),
-            Fact("Count matches", List.First(expectedInfo[ExpectedCount]), List.First(actualInfo[ExpectedCount])),
-            Fact("Failed matches", List.First(expectedInfo[Failed]), List.First(actualInfo[Failed])),
-            Fact("URL matches", List.First(expectedInfo[Url]), List.First(actualInfo[Url]))
+            Fact("Status matches", expected[Status], actual[Status]),
+            Fact("Connector version matches", expected[ConnectorVersion], actual[ConnectorVersion]),
+            Fact("Message matches", expected[Message], actual[Message]),
+            Fact("Count matches", expected[ExpectedCount], actual[ExpectedCount]),
+            Fact("Failed matches", expected[Failed], actual[Failed]),
+            Fact("URL matches", expected[Url], actual[Url])
         }
     in
         facts;

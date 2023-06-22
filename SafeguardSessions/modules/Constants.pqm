@@ -1,10 +1,12 @@
 let
+    // Statuses
     Constants.SuccessStatus = "Success",
     Constants.ErrorStatus = "Error",
     Constants.NotAvailableStatus = "N/A",
-    
+    // Endpoints
     Constants.ApiEndpoint = "/api",
     Constants.AuthEndpoint = Text.Combine({Constants.ApiEndpoint, "/authentication"}),
+    Constants.InfoEndpoint = Text.Combine({Constants.ApiEndpoint, "/info"}),
     Constants.SessionsEndpoint = Text.Combine({Constants.ApiEndpoint, "/audit/sessions"}),
     Constants.SessionsCountEndpoint = Text.Combine({Constants.SessionsEndpoint, "/_count"}),
     Constants.SessionsSnapshotEndpoint = Text.Combine({Constants.SessionsEndpoint, "/_snapshot"})
@@ -13,9 +15,9 @@ in
         SuccessStatus = Constants.SuccessStatus,
         ErrorStatus = Constants.ErrorStatus,
         NotAvailableStatus = Constants.NotAvailableStatus,
-    
         ApiEndpoint = Constants.ApiEndpoint,
         AuthEndpoint = Constants.AuthEndpoint,
+        InfoEndpoint = Constants.InfoEndpoint,
         SessionsEndpoint = Constants.SessionsEndpoint,
         SessionsCountEndpoint = Constants.SessionsCountEndpoint,
         SessionsSnapshotEndpoint = Constants.SessionsSnapshotEndpoint

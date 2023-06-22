@@ -1,0 +1,7 @@
+let
+    SupportedVersions.LatestVersion = "7.3.0", SupportedVersions.Versions = {"7.3"}
+in
+    [
+        Versions = SupportedVersions.Versions,
+        LatestVersion = SupportedVersions.LatestVersion
+    ]

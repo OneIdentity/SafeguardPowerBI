@@ -11,6 +11,7 @@
     <RequestPath>$(ModulesPath)\request\</RequestPath>
     <ErrorPath>$(ModulesPath)\error\</ErrorPath>
     <SchemaPath>$(ModulesPath)\schema\</SchemaPath>
+    <VersionPath>$(ModulesPath)\version\</VersionPath>
     <DefinitionsPath>$(Schemapath)\definitions\</DefinitionsPath>
   </PropertyGroup>
   <ItemGroup>
@@ -21,10 +22,13 @@
     <MezContent Include="$(ModulesPath)Types.pqm" />
     <MezContent Include="$(ModulesPath)Search.pqm" />
     <MezContent Include="$(ModulesPath)Utils.pqm" />
+    <MezContent Include="$(VersionPath)Version.pqm" />
+    <MezContent Include="$(VersionPath)SupportedVersions.pqm" />
     <MezContent Include="$(ErrorPath)ErrorBase.pqm" />
     <MezContent Include="$(ErrorPath)SchemaTransformationErrors.pqm" />
     <MezContent Include="$(ErrorPath)QueryTransformErrors.pqm" />
     <MezContent Include="$(ErrorPath)RequestErrors.pqm" />
+    <MezContent Include="$(ErrorPath)VersionErrors.pqm" />
     <MezContent Include="$(RequestPath)UrlBuilder.pqm" />
     <MezContent Include="$(RequestPath)QueryParameterTransformer.pqm" />
     <MezContent Include="$(RequestPath)Request.pqm" />

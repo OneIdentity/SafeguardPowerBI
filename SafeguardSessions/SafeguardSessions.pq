@@ -13,7 +13,8 @@ shared SafeguardSessions.ContentsImpl = (
     filterField2 as nullable text,
     filterValue2 as nullable text,
     filterField3 as nullable text,
-    filterValue3 as nullable text
+    filterValue3 as nullable text,
+    skipVersionCheck as nullable logical
 ) as table =>
     let
         sessions = FetchSessions(
@@ -26,13 +27,14 @@ shared SafeguardSessions.ContentsImpl = (
             filterField2,
             filterValue2,
             filterField3,
-            filterValue3
+            filterValue3,
+            skipVersionCheck
         )
     in
         sessions;
 
 shared FetchSessions = (
-    sps_ip as text,
+    spsIp as text,
     credentials as record,
     from as nullable datetimezone,
     to as nullable datetimezone,
@@ -42,6 +44,7 @@ shared FetchSessions = (
     filterValue2 as nullable text,
     filterField3 as nullable text,
     filterValue3 as nullable text,
+    skipVersionCheck as nullable logical,
     optional mocks as nullable record
 ) =>
     let
@@ -55,35 +58,68 @@ shared FetchSessions = (
             from = from,
             to = to
         ],
-        data = GetData(sps_ip, credentials, query, mocks)
+        data = GetData(spsIp, credentials, query, skipVersionCheck ?? false, mocks)
     in
         data;
 
-shared GetData = (sps_ip as text, credentials as record, query as record, optional mocks as nullable record) =>
+shared GetData = (
+    spsIp as text, credentials as record, query as record, skipVersionCheck as logical, optional mocks as nullable record
+) =>
     let
         startTime = DateTimeZone.LocalNow(),
-        spsUrl = UrlBuilder.GenerateBaseUrl("https", sps_ip),
+        spsUrl = UrlBuilder.GenerateBaseUrl("https", spsIp),
         authResponse =
             if IsMocked(mocks, "Authenticate") then
                 mocks[Authenticate][Value]
             else
                 Authenticate(spsUrl, credentials, mocks),
+        sessionId = ValidateSPSVersion(
+            spsUrl,
+            BaseAuthentication.MineSessionIdFromCookie(Request.GetHeader(Value.Metadata(authResponse), "Set-Cookie")),
+            skipVersionCheck,
+            mocks
+        ),
         response =
             if IsMocked(mocks, "FetchData") then
                 mocks[FetchData][Value]
             else
-                FetchData(
-                    spsUrl,
-                    UrlBuilder.GetDefaultQuery() & query,
-                    BaseAuthentication.MineSessionIdFromCookie(
-                        Request.GetHeader(Value.Metadata(authResponse), "Set-Cookie")
-                    ),
-                    mocks
-                ),
+                FetchData(spsUrl, UrlBuilder.GetDefaultQuery() & query, sessionId, mocks),
         data = HandleIfThereIsAnError(try (response)),
         result = BuildSPSResult(data, startTime)
     in
         result;
+
+ValidateSPSVersion = (
+    spsUrl as text, sessionId as text, skipVersionCheck as logical, optional mocks as nullable record
+) =>
+    let
+        sessionIdOrError =
+            if skipVersionCheck then
+                sessionId
+            else
+                let
+                    version = Version.GetVersion(spsUrl, sessionId, mocks),
+                    checkedVersion = try Version.CheckVersion(version, SupportedVersions.Versions),
+                    validatedVersion =
+                        if checkedVersion[HasError] then
+                            error checkedVersion[Error]
+                        else if not checkedVersion[Value] then
+                            let
+                                notSupportedError = VersionErrors.NotSupportedVersion(version),
+                                log = Logger.ErrorLog(
+                                    "Connector tried to connect to an unsupported SPS", [
+                                        Error = notSupportedError
+                                    ]
+                                )
+                            in
+                                error log[Error]
+                        else
+                            sessionId
+                in
+                    validatedVersion
+    in
+        sessionIdOrError;
+
 shared Authenticate = (spsUrl as text, credentials as record, optional mocks as nullable record) as record =>
     let
         authUrl = UrlBuilder.GenerateUrl(spsUrl, AuthEndpoint),
@@ -192,6 +228,17 @@ Request.GetHeader = Request[GetHeader];
 Schema.GetSchema = Extension.ImportFunction("GetSchema", "Schema.pqm");
 
 SchemaUtils.ApplySchema = Extension.ImportFunction("ApplySchema", "SchemaUtils.pqm");
+
+Version = Extension.ImportModule("Version.pqm");
+
+Version.GetVersion = Version[GetVersion];
+Version.CheckVersion = Version[CheckVersion];
+
+SupportedVersions = Extension.ImportModule("SupportedVersions.pqm");
+
+SupportedVersions.Versions = SupportedVersions[Versions];
+
+VersionErrors.NotSupportedVersion = Extension.ImportFunction("NotSupportedVersion", "VersionErrors.pqm");
 
 Search = Extension.ImportModule("Search.pqm");
 

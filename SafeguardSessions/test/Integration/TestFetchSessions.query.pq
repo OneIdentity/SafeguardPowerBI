@@ -4,6 +4,8 @@ FetchInfo = Extension.ImportFunction("FetchInfo", "Utils.pqm");
 
 CreateSchema = Extension.ImportFunction("CreateSchema", "SchemaUtils.pqm");
 
+SupportedVersions.LatestVersion = Extension.ImportFunction("LatestVersion", "SupportedVersions.pqm");
+
 TestSafeguardSessions.URL = "dummy_url";
 
 TestSafeguardSessions.AuthenticationCredentials = [
@@ -20,6 +22,10 @@ TestSafeguardSessions.SuccessfulAuthenticationResponse = FakeRawResponse(
         ]
     ]
 );
+
+TestSafeguardSessions.InfoResponse = FakeRawResponse([
+    body = [firmware_version = SupportedVersions.LatestVersion]
+]);
 
 TestSafeguardSessions.GetExpectedCountResponse = (optional expectedCount as number) =>
     FakeRawResponse([count = expectedCount ?? 0]);
@@ -78,6 +84,7 @@ TestSafeguardSessions.Schema = [
 
 TestSafeguardSessions.Mocks = [
     AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+    InfoResponse = TestSafeguardSessions.InfoResponse,
     OpenSnapshotResponse = TestSafeguardSessions.SuccessfulOpenSnapshotResponse,
     Schema = TestSafeguardSessions.Schema
 ];
@@ -108,8 +115,49 @@ TestFetchSessionsWithOnlyOneFilterFieldInput = () =>
                         null,
                         null,
                         null,
+                        null,
                         [
-                            AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse
+                            AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                            InfoResponse = TestSafeguardSessions.InfoResponse
+                        ]
+                    )
+                )
+    in
+        Fact("Check error is raised", expectedResult, response);
+
+TestFetchingSessionsWithFromSPSWithUnsupportedVersion = () =>
+    let
+        infoResponse = FakeRawResponse([
+            body = [firmware_version = "unsupported_version"]
+        ]),
+        expectedResult = [
+            HasError = true,
+            Error = [
+                Reason = "Not Supported Version",
+                Message = "Your version of the connector (v1.0.0+sps7.3.0) is not compatible with your SPS version (unsupported_version). For a connector version that is compatible with your SPS version, visit the official release page of the connector: https://github.com/OneIdentity/SafeguardPowerBI/releases",
+                Detail = [Version = "unsupported_version", SupportedVersions = "7.3", ManuallyHandled = false],
+                Message.Format = null,
+                Message.Parameters = null
+            ]
+        ],
+        response =
+            try
+                (
+                    FetchSessions(
+                        TestSafeguardSessions.URL,
+                        TestSafeguardSessions.AuthenticationCredentials,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        [
+                            AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
+                            InfoResponse = infoResponse
                         ]
                     )
                 )
@@ -134,6 +182,7 @@ TestFetchingSessions = () =>
                 {
                     #datetimezone(2023, 1, 1, 0, 0, 0, 0, 0),
                     #datetimezone(2023, 1, 15, 0, 0, 0, 0, 0),
+                    null,
                     null,
                     null,
                     null,
@@ -180,7 +229,7 @@ TestFetchingSessions = () =>
             },
             {
                 "Fetching sessions with field-value pairs",
-                {null, null, "protocol", "SSH", "user.name", "balabit", null, null},
+                {null, null, "protocol", "SSH", "user.name", "balabit", null, null, null},
                 [
                     GetSessionsCountResponse = TestSafeguardSessions.GetExpectedCountResponse(1),
                     GetPageResponseMap = [
@@ -213,7 +262,7 @@ TestFetchingSessions = () =>
             },
             {
                 "Fetching sessions with only filter value",
-                {null, null, null, "SSH", null, null, null, null},
+                {null, null, null, "SSH", null, null, null, null, null},
                 [
                     GetSessionsCountResponse = TestSafeguardSessions.GetExpectedCountResponse(1),
                     GetPageResponseMap = [
@@ -246,7 +295,7 @@ TestFetchingSessions = () =>
             },
             {
                 "Fetching sessions with invalid field-value pair",
-                {null, null, "apple", "peach", null, null, null, null},
+                {null, null, "apple", "peach", null, null, null, null, null},
                 [
                     GetSessionsCountResponse = TestSafeguardSessions.GetExpectedCountResponse(),
                     GetPageResponseMap = [
@@ -282,6 +331,10 @@ TestFetchingSessions = () =>
         facts;
 
 shared TestSafeguardSessions.IntegrationTest = [
-    facts = {TestFetchingSessions(), TestFetchSessionsWithOnlyOneFilterFieldInput()},
+    facts = {
+        TestFetchingSessions(),
+        TestFetchSessionsWithOnlyOneFilterFieldInput(),
+        TestFetchingSessionsWithFromSPSWithUnsupportedVersion()
+    },
     report = Facts.Summarize(facts)
 ][report];
