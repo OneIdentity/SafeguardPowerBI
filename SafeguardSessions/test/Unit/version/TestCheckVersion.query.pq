@@ -14,14 +14,8 @@ AssertVersionCheck = (description as text, version as text, supportedVersions as
 
 TestCheckVersion = () =>
     let
-        dummySupportedVersions = {"custom", "1.1", "2.0", "2.1"},
+        dummySupportedVersions = {"1.1", "2.0", "2.1"},
         cases = {
-            {
-                "Custom SPS version for testing is supported by the custom connector",
-                "custom_version_for_testing",
-                dummySupportedVersions,
-                true
-            },
             {
                 "Latest supported SPS version is supported by the custom connector",
                 "2.1",
@@ -45,6 +39,12 @@ TestCheckVersion = () =>
             {
                 "Future SPS version with breaking change is not supported by the custom connector",
                 "2.2",
+                dummySupportedVersions,
+                false
+            },
+            {
+                "Far-future SPS version with breaking change is not supported by the custom connector",
+                "2.10",
                 dummySupportedVersions,
                 false
             },
