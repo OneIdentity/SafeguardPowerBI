@@ -1,9 +1,16 @@
 let
     ErrorBase = Extension.ImportModule("ErrorBase.pqm"),
+    ErrorCodes.CustomCodes = Extension.ImportFunction("CustomCodes", "ErrorCodes.pqm"),
     SchemaTransformationErrors.ListToTextConversionError = (detail as record) =>
-        ErrorBase("List To Text Conversion Error", "The list contains other types than text.", detail),
+        ErrorBase(
+            ErrorCodes.CustomCodes[ListToTextConversionError],
+            "List To Text Conversion Error",
+            "The list contains other types than text.",
+            detail
+        ),
     SchemaTransformationErrors.SchemaApplyError = (detail as record) =>
         ErrorBase(
+            ErrorCodes.CustomCodes[SchemaApplyError],
             "Schema Apply Error",
             "An error happened when applying schema.",
             detail

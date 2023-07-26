@@ -97,6 +97,12 @@ let
         for the filter field. For the From and To search fields, if only one of them is specified, the search in the other direction remains open."
     ],
     CustomErrors.ErrorBaseType = type function (
+        errorCode as (
+            type number meta [
+                Documentation.FieldCaption = "Error code",
+                Documentation.FieldDescription = "The raised error's code"
+            ]
+        ),
         reason as (
             type text meta [
                 Documentation.FieldCaption = "Error reason",

@@ -23,9 +23,10 @@ TestGetVersionRaisesError = () =>
             RequestUrl = requestUrl
         ]),
         expectedReason = "Not Parsable Response",
-        expectedMessage = "The source IP returned a response with missing fields.",
+        expectedMessage = "Error 10002: The source IP returned a response with missing fields.",
         expectedDetail = [
             ManuallyHandled = true,
+            ErrorCode =  10002,
             Cause = [invalid = "response"],
             MissingField = "body.firmware_version",
             RequestUrl = requestUrl

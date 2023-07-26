@@ -271,18 +271,19 @@ TestGetDataHandlesAuthenticationError = () =>
         ]),
         expectedData = [
             Reason = "Authentication Error",
-            Message = "The username or password you have specified is invalid.",
+            Message = "Error 4010: The username or password you have specified is invalid.",
             Detail = [
                 ManuallyHandled = true,
                 Cause = [#"error" = "value"],
-                RequestUrl = "https://dummy_url/api/authentication"
+                RequestUrl = "https://dummy_url/api/authentication",
+                ErrorCode = 4010
             ],
             Message.Format = null,
             Message.Parameters = null
         ],
         expectedInfo = FetchInfo(
             "Error",
-            "The username or password you have specified is invalid.",
+            "Error 4010: The username or password you have specified is invalid.",
             null,
             0,
             true,
@@ -343,18 +344,19 @@ TestGetDataHandlesBadRequest = () =>
         ],
         expectedData = [
             Reason = "Server Error",
-            Message = "The source IP responded with a server error.",
+            Message = "Error 5000: The source IP responded with a server error.",
             Detail = [
                 ManuallyHandled = true,
                 Cause = [#"error" = "reason"],
-                RequestUrl = "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id"
+                RequestUrl = "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id",
+                ErrorCode = 5000
             ],
             Message.Format = null,
             Message.Parameters = null
         ],
         expectedInfo = FetchInfo(
             "Error",
-            "The source IP responded with a server error.",
+            "Error 5000: The source IP responded with a server error.",
             null,
             0,
             true,
@@ -439,8 +441,13 @@ TestGetDataReturnsWithErrorInCaseOfUnsupportedSPSVersion = () =>
             HasError = true,
             Error = [
                 Reason = "Not Supported Version",
-                Message = "Your version of the connector (v1.0.0+sps7.3.0) is not compatible with your SPS version (unsupported_version). For a connector version that is compatible with your SPS version, visit the official release page of the connector: https://github.com/OneIdentity/SafeguardPowerBI/releases",
-                Detail = [Version = "unsupported_version", SupportedVersions = "7.3", ManuallyHandled = false],
+                Message = "Error 10001: Your version of the connector (v1.0.0+sps7.3.0) is not compatible with your SPS version (unsupported_version). For a connector version that is compatible with your SPS version, visit the official release page of the connector: https://github.com/OneIdentity/SafeguardPowerBI/releases",
+                Detail = [
+                    Version = "unsupported_version",
+                    SupportedVersions = "7.3",
+                    ManuallyHandled = false,
+                    ErrorCode = 10001
+                ],
                 Message.Format = null,
                 Message.Parameters = null
             ]
@@ -472,8 +479,12 @@ TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringAut
             HasError = true,
             Error = [
                 Reason = "Wrong variable",
-                Message = "Variable type mismatch error",
-                Detail = "The variable badVariable is of the type text, but it should be of the type number",
+                Message = "Error 99999: Variable type mismatch error",
+                Detail = [
+                    originalDetails = "The variable badVariable is of the type text, but it should be of the type number",
+                    ErrorCode = 99999,
+                    ManuallyHandled = false
+                ],
                 Message.Format = null,
                 Message.Parameters = null
             ]
@@ -506,8 +517,12 @@ TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringDat
             HasError = true,
             Error = [
                 Reason = "Wrong variable",
-                Message = "Variable type mismatch error",
-                Detail = "The variable badVariable is of the type text, but it should be of the type number",
+                Message = "Error 99999: Variable type mismatch error",
+                Detail = [
+                    originalDetails = "The variable badVariable is of the type text, but it should be of the type number",
+                    ErrorCode = 99999,
+                    ManuallyHandled = false
+                ],
                 Message.Format = null,
                 Message.Parameters = null
             ]
@@ -542,18 +557,19 @@ TestGetDataHandlesSchemaApplyError = () =>
         ],
         expectedData = [
             Reason = "Schema Apply Error",
-            Message = "An error happened when applying schema.",
+            Message = "Error 10004: An error happened when applying schema.",
             Detail = [
                 Cause = TestSafeguardSessions.ActualResponseData,
                 RequestUrl = "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id",
-                ManuallyHandled = true
+                ManuallyHandled = true,
+                ErrorCode = 10004
             ],
             Message.Format = null,
             Message.Parameters = null
         ],
         expectedInfo = FetchInfo(
             "Error",
-            "An error happened when applying schema.",
+            "Error 10004: An error happened when applying schema.",
             null,
             0,
             true,

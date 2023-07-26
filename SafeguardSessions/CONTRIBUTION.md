@@ -65,6 +65,13 @@ When writing **commit messages**, consider the following:
     - If it both has a work item in Azure DevOps and a GitHub issue: `References: azure #<azure-id>, #<github-id>`
 - For examples, view the [Commit history of the main branch]
 
+## Error codes
+
+When introducing a new error code, please consider the following:
+
+- The error codes from the HTTP Requests should have a zero at the end if there is already an error ending with a zero then the next error code falling in the same HTTP Request category should be incremented by one.
+- The error code for errors originating from the connector should be incremented by one.
+
 ## How to contribute to the project
 
 1. Fork the [GitHub project]

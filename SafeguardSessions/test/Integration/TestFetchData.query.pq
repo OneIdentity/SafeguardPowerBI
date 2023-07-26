@@ -251,7 +251,9 @@ TestFetchDataWithInvalidTypeForField = () =>
 
 TestFetchDataRaisesErrorWhenAdvancedSearchInitialResponseFails = () =>
     let
-        AssertErrorIsRaised = (statusCode as number, expectedReason as text, expectedMessage as text) =>
+        AssertErrorIsRaised = (
+            statusCode as number, expectedReason as text, expectedMessage as text, expectedErrorCode as number
+        ) =>
             let
                 fakeResponses = [
                     #"http://dummy_url/api/audit/sessions?snapshot=dummy_snapshot_id" = FakeRawResponse(
@@ -277,17 +279,34 @@ TestFetchDataRaisesErrorWhenAdvancedSearchInitialResponseFails = () =>
                     [
                         ManuallyHandled = true,
                         Cause = [#"error" = "reason"],
-                        RequestUrl = "http://dummy_url/api/audit/sessions?snapshot=dummy_snapshot_id"
+                        RequestUrl = "http://dummy_url/api/audit/sessions?snapshot=dummy_snapshot_id",
+                        ErrorCode = expectedErrorCode
                     ]
                 )
             in
                 facts,
         cases = {
-            {400, "Bad Request", "The source IP interpreted a malformed request. Your filter parameter(s) might be invalid."},
-            {401, "Authentication Error", "The username or password you have specified is invalid."},
-            {403, "Authorization Error", "You are not authorized to access the specified resource."},
-            {404, "Not Found", "The requested resource is not found."},
-            {500, "Server Error", "The source IP responded with a server error."}
+            {
+                400,
+                "Bad Request",
+                "Error 4000: The source IP interpreted a malformed request. Your filter parameter(s) might be invalid.",
+                4000
+            },
+            {
+                401,
+                "Authentication Error",
+                "Error 4010: The username or password you have specified is invalid.",
+                4010
+            },
+            {
+                403,
+                "Authorization Error",
+                "Error 4030: You are not authorized to access the specified resource.",
+                4030
+            },
+            {404, "Not Found", "Error 4040: The requested resource is not found.", 4040},
+            {429, "Snapshot Quota Error", "Error 4290: Snapshot quota exceeded.", 4290},
+            {500, "Server Error", "Error 5000: The source IP responded with a server error.", 5000}
         },
         facts = ProvideDataForTest(cases, AssertErrorIsRaised)
     in
@@ -295,7 +314,9 @@ TestFetchDataRaisesErrorWhenAdvancedSearchInitialResponseFails = () =>
 
 TestFetchDataRaisesErrorWhenAdvancedSearchSuccessiveResponseFails = () =>
     let
-        AssertErrorIsRaised = (statusCode as number, expectedReason as text, expectedMessage as text) =>
+        AssertErrorIsRaised = (
+            statusCode as number, expectedReason as text, expectedMessage as text, expectedErrorCode as number
+        ) =>
             let
                 fakeResponses = [
                     #"http://dummy_url/api/audit/sessions?snapshot=dummy_snapshot_id" = TestSafeguardSessions.Response.First,
@@ -322,17 +343,34 @@ TestFetchDataRaisesErrorWhenAdvancedSearchSuccessiveResponseFails = () =>
                     [
                         ManuallyHandled = true,
                         Cause = [#"error" = "reason"],
-                        RequestUrl = "http://dummy_url/dummy_url_next"
+                        RequestUrl = "http://dummy_url/dummy_url_next",
+                        ErrorCode = expectedErrorCode
                     ]
                 )
             in
                 facts,
         cases = {
-            {400, "Bad Request", "The source IP interpreted a malformed request. Your filter parameter(s) might be invalid."},
-            {401, "Authentication Error", "The username or password you have specified is invalid."},
-            {403, "Authorization Error", "You are not authorized to access the specified resource."},
-            {404, "Not Found", "The requested resource is not found."},
-            {500, "Server Error", "The source IP responded with a server error."}
+            {
+                400,
+                "Bad Request",
+                "Error 4000: The source IP interpreted a malformed request. Your filter parameter(s) might be invalid.",
+                4000
+            },
+            {
+                401,
+                "Authentication Error",
+                "Error 4010: The username or password you have specified is invalid.",
+                4010
+            },
+            {
+                403,
+                "Authorization Error",
+                "Error 4030: You are not authorized to access the specified resource.",
+                4030
+            },
+            {404, "Not Found", "Error 4040: The requested resource is not found.", 4040},
+            {429, "Snapshot Quota Error", "Error 4290: Snapshot quota exceeded.", 4290},
+            {500, "Server Error", "Error 5000: The source IP responded with a server error.", 5000}
         },
         facts = ProvideDataForTest(cases, AssertErrorIsRaised)
     in
@@ -340,7 +378,9 @@ TestFetchDataRaisesErrorWhenAdvancedSearchSuccessiveResponseFails = () =>
 
 TestFetchDataRaisesErrorWhenCountRequestFails = () =>
     let
-        AssertErrorIsRaised = (statusCode as number, expectedReason as text, expectedMessage as text) =>
+        AssertErrorIsRaised = (
+            statusCode as number, expectedReason as text, expectedMessage as text, expectedErrorCode as number
+        ) =>
             let
                 fakeCountResponse = FakeRawResponse([#"error" = "reason"], [
                     Response.Status = statusCode
@@ -360,17 +400,34 @@ TestFetchDataRaisesErrorWhenCountRequestFails = () =>
                     [
                         ManuallyHandled = true,
                         Cause = [#"error" = "reason"],
-                        RequestUrl = "http://dummy_url/api/audit/sessions/_count"
+                        RequestUrl = "http://dummy_url/api/audit/sessions/_count",
+                        ErrorCode = expectedErrorCode
                     ]
                 )
             in
                 facts,
         cases = {
-            {400, "Bad Request", "The source IP interpreted a malformed request. Your filter parameter(s) might be invalid."},
-            {401, "Authentication Error", "The username or password you have specified is invalid."},
-            {403, "Authorization Error", "You are not authorized to access the specified resource."},
-            {404, "Not Found", "The requested resource is not found."},
-            {500, "Server Error", "The source IP responded with a server error."}
+            {
+                400,
+                "Bad Request",
+                "Error 4000: The source IP interpreted a malformed request. Your filter parameter(s) might be invalid.",
+                4000
+            },
+            {
+                401,
+                "Authentication Error",
+                "Error 4010: The username or password you have specified is invalid.",
+                4010
+            },
+            {
+                403,
+                "Authorization Error",
+                "Error 4030: You are not authorized to access the specified resource.",
+                4030
+            },
+            {404, "Not Found", "Error 4040: The requested resource is not found.", 4040},
+            {429, "Snapshot Quota Error", "Error 4290: Snapshot quota exceeded.", 4290},
+            {500, "Server Error", "Error 5000: The source IP responded with a server error.", 5000}
         },
         facts = ProvideDataForTest(cases, AssertErrorIsRaised)
     in
@@ -378,7 +435,9 @@ TestFetchDataRaisesErrorWhenCountRequestFails = () =>
 
 TestFetchDataRaisesErrorWhenSnapshotRequestFails = () =>
     let
-        AssertErrorIsRaised = (statusCode as number, expectedReason as text, expectedMessage as text) =>
+        AssertErrorIsRaised = (
+            statusCode as number, expectedReason as text, expectedMessage as text, expectedErrorCode as number
+        ) =>
             let
                 fakeSnapshotResponse = FakeRawResponse([#"error" = "reason"], [
                     Response.Status = statusCode
@@ -399,18 +458,34 @@ TestFetchDataRaisesErrorWhenSnapshotRequestFails = () =>
                     [
                         ManuallyHandled = true,
                         Cause = [#"error" = "reason"],
-                        RequestUrl = "http://dummy_url/api/audit/sessions/_snapshot"
+                        RequestUrl = "http://dummy_url/api/audit/sessions/_snapshot",
+                        ErrorCode = expectedErrorCode
                     ]
                 )
             in
                 facts,
         cases = {
-            {400, "Bad Request", "The source IP interpreted a malformed request. Your filter parameter(s) might be invalid."},
-            {401, "Authentication Error", "The username or password you have specified is invalid."},
-            {403, "Authorization Error", "You are not authorized to access the specified resource."},
-            {404, "Not Found", "The requested resource is not found."},
-            {429, "Snapshot Quota Error", "Snapshot quota exceeded."},
-            {500, "Server Error", "The source IP responded with a server error."}
+            {
+                400,
+                "Bad Request",
+                "Error 4000: The source IP interpreted a malformed request. Your filter parameter(s) might be invalid.",
+                4000
+            },
+            {
+                401,
+                "Authentication Error",
+                "Error 4010: The username or password you have specified is invalid.",
+                4010
+            },
+            {
+                403,
+                "Authorization Error",
+                "Error 4030: You are not authorized to access the specified resource.",
+                4030
+            },
+            {404, "Not Found", "Error 4040: The requested resource is not found.", 4040},
+            {429, "Snapshot Quota Error", "Error 4290: Snapshot quota exceeded.", 4290},
+            {500, "Server Error", "Error 5000: The source IP responded with a server error.", 5000}
         },
         facts = ProvideDataForTest(cases, AssertErrorIsRaised)
     in

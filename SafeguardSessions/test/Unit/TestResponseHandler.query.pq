@@ -14,11 +14,12 @@ TestValidateByStatusCodeRaisesError = () =>
         facts = TestErrorIsRaised(
             try ValidateByStatusCode(fake_auth_response),
             "Authentication Error",
-            "The username or password you have specified is invalid.",
+            "Error 4010: The username or password you have specified is invalid.",
             [
                 ManuallyHandled = true,
                 Cause = fake_auth_response,
-                RequestUrl = url
+                RequestUrl = url,
+                ErrorCode = 4010
             ]
         )
     in
@@ -75,12 +76,13 @@ TestGetDataFromResponse = () =>
                     HasError = true,
                     Error = [
                         Reason = "Not Parsable Response",
-                        Message = "The source IP returned a response with missing fields.",
+                        Message = "Error 10002: The source IP returned a response with missing fields.",
                         Detail = [
                             ManuallyHandled = true,
                             Cause = fake_response,
                             MissingField = "",
-                            RequestUrl = "dummy_url"
+                            RequestUrl = "dummy_url",
+                            ErrorCode = 10002 
                         ],
                         Message.Format = null,
                         Message.Parameters = null
@@ -94,12 +96,13 @@ TestGetDataFromResponse = () =>
                     HasError = true,
                     Error = [
                         Reason = "Not Parsable Response",
-                        Message = "The source IP returned a response with missing fields.",
+                        Message = "Error 10002: The source IP returned a response with missing fields.",
                         Detail = [
                             ManuallyHandled = true,
                             Cause = fake_response,
                             MissingField = "body/svc1/protocol",
-                            RequestUrl = "dummy_url"
+                            RequestUrl = "dummy_url",
+                            ErrorCode = 10002
                         ],
                         Message.Format = null,
                         Message.Parameters = null

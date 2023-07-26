@@ -1,24 +1,52 @@
 let
     ErrorBase = Extension.ImportModule("ErrorBase.pqm"),
     ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm"),
+    ErrorCodes.ExtendedHTTPCodes = Extension.ImportFunction("ExtendedHTTPCodes", "ErrorCodes.pqm"),
+    ErrorCodes.CustomCodes = Extension.ImportFunction("CustomCodes", "ErrorCodes.pqm"),
     RequestErrors.NotParsableResponse = (detail as anynonnull) =>
-        ErrorBase("Not Parsable Response", "The source IP returned a response with missing fields.", detail),
+        ErrorBase(
+            ErrorCodes.CustomCodes[NotParsableResponse],
+            "Not Parsable Response",
+            "The source IP returned a response with missing fields.",
+            detail
+        ),
     RequestErrors.BadRequest = (detail as record) =>
         ErrorBase(
+            ErrorCodes.ExtendedHTTPCodes[BadRequest],
             "Bad Request",
             "The source IP interpreted a malformed request. Your filter parameter(s) might be invalid.",
             detail
         ),
     RequestErrors.AuthenticationError = (detail as record) =>
-        ErrorBase("Authentication Error", "The username or password you have specified is invalid.", detail),
+        ErrorBase(
+            ErrorCodes.ExtendedHTTPCodes[AuthenticationError],
+            "Authentication Error",
+            "The username or password you have specified is invalid.",
+            detail
+        ),
     RequestErrors.AuthorizationError = (detail as record) =>
-        ErrorBase("Authorization Error", "You are not authorized to access the specified resource.", detail),
+        ErrorBase(
+            ErrorCodes.ExtendedHTTPCodes[AuthorizationError],
+            "Authorization Error",
+            "You are not authorized to access the specified resource.",
+            detail
+        ),
     RequestErrors.NotFound = (detail as record) =>
-        ErrorBase("Not Found", "The requested resource is not found.", detail),
+        ErrorBase(
+            ErrorCodes.ExtendedHTTPCodes[NotFound], "Not Found", "The requested resource is not found.", detail
+        ),
     RequestErrors.SnapshotQuotaError = (detail as record) =>
-        ErrorBase("Snapshot Quota Error", "Snapshot quota exceeded.", detail),
+        ErrorBase(
+            ErrorCodes.ExtendedHTTPCodes[SnapshotQuotaError], "Snapshot Quota Error", "Snapshot quota exceeded.",
+            detail
+        ),
     RequestErrors.ServerError = (detail as record) =>
-        ErrorBase("Server Error", "The source IP responded with a server error.", detail),
+        ErrorBase(
+            ErrorCodes.ExtendedHTTPCodes[ServerError],
+            "Server Error",
+            "The source IP responded with a server error.",
+            detail
+        ),
     RequestErrors.ErrorMap = [
         400 = RequestErrors.BadRequest,
         401 = RequestErrors.AuthenticationError,
