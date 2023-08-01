@@ -147,7 +147,7 @@ shared FetchData = (spsUrl as text, queryParams as record, sessionId as text, op
     in
         sessionsWithCountMetadata;
 
-HandleIfThereIsAnError = (input as record) =>
+shared HandleIfThereIsAnError = (input as record) =>
     if input[HasError] = true then
         if input[Error][Detail] is record and Record.HasFields(input[Error][Detail], "ManuallyHandled") then
             if input[Error][Detail][ManuallyHandled] = true then
@@ -156,7 +156,10 @@ HandleIfThereIsAnError = (input as record) =>
                 error input[Error]
         else
             let
-                logNotExpectedError = Logger.ErrorLog("An unexpected error happend during execution", input[Error])
+                transformedError = TransformUnexpectedError(input[Error]),
+                logNotExpectedError = Logger.ErrorLog(
+                    "An unexpected error happend during execution", transformedError
+                )
             in
                 error logNotExpectedError
     else
@@ -255,3 +258,5 @@ UrlBuilder.GetDefaultQuery = UrlBuilder[GetDefaultQuery];
 Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm");
 
 AuthEndpoint = Extension.ImportFunction("AuthEndpoint", "Constants.pqm");
+
+TransformUnexpectedError = Extension.ImportFunction("TransformUnexpectedError", "UnexpectedErrorWrapper.pqm");

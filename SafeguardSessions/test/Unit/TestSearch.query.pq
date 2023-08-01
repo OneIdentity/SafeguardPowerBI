@@ -102,11 +102,12 @@ TestAdvancedSearchRaisesError = () =>
             )
         ],
         expectedReason = "Not Found",
-        expectedMessage = "The requested resource is not found.",
+        expectedMessage = "Error 4040: The requested resource is not found.",
         expectedDetail = [
             ManuallyHandled = true,
             Cause = [#"error" = "reason"],
-            RequestUrl = "http://dummy_url/dummy_url_final"
+            RequestUrl = "http://dummy_url/dummy_url_final",
+            ErrorCode = 4040
         ]
     in
         TestErrorIsRaised(
@@ -138,12 +139,13 @@ TestGetSessionsCountRaisesError = () =>
             RequestUrl = requestUrl
         ]),
         expectedReason = "Not Parsable Response",
-        expectedMessage = "The source IP returned a response with missing fields.",
+        expectedMessage = "Error 10002: The source IP returned a response with missing fields.",
         expectedDetail = [
-            ManuallyHandled = true,
             Cause = [invalid = "response"],
             MissingField = "count",
-            RequestUrl = requestUrl
+            RequestUrl = requestUrl,
+            ManuallyHandled = true,
+            ErrorCode = 10002
         ]
     in
         TestErrorIsRaised(
@@ -194,11 +196,12 @@ TestOpenSnapshotRaisesError = () =>
             {
                 FakeRawResponse([invalid = "response"]),
                 "Not Parsable Response",
-                "The source IP returned a response with missing fields.",
+                "Error 10002: The source IP returned a response with missing fields.",
                 [
-                    ManuallyHandled = true,
                     Cause = [invalid = "response"],
-                    MissingField = "body.snapshot"
+                    MissingField = "body.snapshot", 
+                    ManuallyHandled = true,
+                    ErrorCode = 10002
                 ]
             },
             {
@@ -206,10 +209,11 @@ TestOpenSnapshotRaisesError = () =>
                     Response.Status = 429
                 ]),
                 "Snapshot Quota Error",
-                "Snapshot quota exceeded.",
+                "Error 4290: Snapshot quota exceeded.",
                 [
+                    Cause = [#"error" = "reason"],
                     ManuallyHandled = true,
-                    Cause = [#"error" = "reason"]
+                    ErrorCode = 4290
                 ]
             }
         },

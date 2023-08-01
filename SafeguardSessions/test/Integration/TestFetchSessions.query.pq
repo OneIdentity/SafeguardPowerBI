@@ -95,8 +95,8 @@ TestFetchSessionsWithOnlyOneFilterFieldInput = () =>
             HasError = true,
             Error = [
                 Reason = "Filter Field Without Value",
-                Message = "There is a field value missing from one or more of your filter fields.",
-                Detail = [ManuallyHandled = false, Cause = "protocol", RequestUrl = null],
+                Message = "Error 10000: There is a field value missing from one or more of your filter fields.",
+                Detail = [ManuallyHandled = false, Cause = "protocol", RequestUrl = null, ErrorCode = 10000],
                 Message.Format = null,
                 Message.Parameters = null
             ]
@@ -134,8 +134,8 @@ TestFetchingSessionsWithFromSPSWithUnsupportedVersion = () =>
             HasError = true,
             Error = [
                 Reason = "Not Supported Version",
-                Message = "Your version of the connector (v1.0.0+sps7.3.0) is not compatible with your SPS version (unsupported_version). For a connector version that is compatible with your SPS version, visit the official release page of the connector: https://github.com/OneIdentity/SafeguardPowerBI/releases",
-                Detail = [Version = "unsupported_version", SupportedVersions = "7.3", ManuallyHandled = false],
+                Message = "Error 10001: Your version of the connector (v1.0.0+sps7.3.0) is not compatible with your SPS version (unsupported_version). For a connector version that is compatible with your SPS version, visit the official release page of the connector: https://github.com/OneIdentity/SafeguardPowerBI/releases",
+                Detail = [Version = "unsupported_version", SupportedVersions = "7.3", ManuallyHandled = false, ErrorCode = 10001],
                 Message.Format = null,
                 Message.Parameters = null
             ]
@@ -307,18 +307,19 @@ TestFetchingSessions = () =>
                     & TestSafeguardSessions.Mocks,
                 [
                     Reason = "Bad Request",
-                    Message = "The source IP interpreted a malformed request. Your filter parameter(s) might be invalid.",
+                    Message = "Error 4000: The source IP interpreted a malformed request. Your filter parameter(s) might be invalid.",
                     Detail = [
                         ManuallyHandled = true,
                         Cause = [#"error" = "value"],
-                        RequestUrl = "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&q=apple%3Apeach&snapshot=dummy_snapshot_id"
+                        RequestUrl = "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&q=apple%3Apeach&snapshot=dummy_snapshot_id",
+                        ErrorCode = 4000
                     ],
                     Message.Format = null,
                     Message.Parameters = null
                 ],
                 FetchInfo(
                     "Error",
-                    "The source IP interpreted a malformed request. Your filter parameter(s) might be invalid.",
+                    "Error 4000: The source IP interpreted a malformed request. Your filter parameter(s) might be invalid.",
                     null,
                     0,
                     true,

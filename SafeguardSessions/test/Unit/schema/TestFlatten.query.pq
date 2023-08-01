@@ -54,11 +54,12 @@ TestFlattenListsHandlesListWithNonTextValue = () =>
             TestErrorIsRaised(
                 cellValue,
                 "List To Text Conversion Error",
-                "The list contains other types than text.",
+                "Error 10003: The list contains other types than text.",
                 [
-                    ManuallyHandled = true,
                     Cause = "[""3"",4]",
-                    RequestUrl = null
+                    RequestUrl = null,
+                    ManuallyHandled = true,
+                    ErrorCode = 10003
                 ]
             ),
             Fact(

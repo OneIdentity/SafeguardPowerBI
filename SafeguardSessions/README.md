@@ -78,37 +78,37 @@ https://github.com/OneIdentity/SafeguardPowerBI/releases
 
 I see "Error" in the **Status** column of the **Info** table, and the **Message** column contains the following:
 
-**A)** The source IP returned a response with missing fields.
+**A)** Error 10003: The source IP returned a response with missing fields.
 
 A response returned by SPS does not contain a field that the Power BI Connector requires for processing data.
 Reproduce the error with trace logging enabled, and create a technical case, as described in the [Troubleshooting] section.
 Attach the mashup trace logs to the issue.
 
-**B)** The source IP interpreted a malformed request.
+**B)** Error 4000: The source IP interpreted a malformed request.
 
 Your filter might be invalid. Make sure you specify your filter parameters correctly. For more information on the available search fields, see **List of available search queries** in the **One Identity Safeguard for Privileged Sessions Administration Guide** on the [Technical documents for One Identity Safeguard for Priviledged Sessions] page.
 
-**C)** The username or password you have specified is invalid.
+**C)** Error 4010: The username or password you have specified is invalid.
 
 Make sure you use a local user to access SPS with a valid username and password. One Identity recommends creating a dedicated local user for the purpose of importing data from SPS into Power BI.
 
-**D)** You are not authorized to access the specified resource.
+**D)** Error 4030: You are not authorized to access the specified resource.
 
 In order to access audit data, the user you use to access SPS must have search access rights.
 
-**E)** The requested resource is not found.
+**E)** Error 4040: The requested resource is not found.
 
 In order to fetch audit data from SPS, the Power BI Connector relies on the advanced search method, which uses database snapshots to ensure data consistency throughout data fetching. If for some reason, the database snapshot disappears, this error can occur. To resolve the issue, try initiating the data fetching again.
 
-**F)** Snapshot quota exceeded.
+**F)** Error 4290: Snapshot quota exceeded.
 
 This happens if multiple users from different computers or using different programs want to use advanced search relying on database snapshots at the same time. In this case, try initiating the data fetching process at least 5 minutes later so that an existing snapshot expires in the system, and a new one can be opened.
 
-**G)** The source IP responded with a server error.
+**G)** Error 5000: The source IP responded with a server error.
 
 This error indicates issues with the SPS appliance. Try the suggestions written in the [Troubleshooting] section.
 
-**H)** An error happened when applying schema.
+**H)** Error 10005: An error happened when applying schema.
 
 In order to display the session records from SPS in a user-friendly way in Power BI, schema must be mapped to the session records. This error means that at least one session occurred in the SPS response that the schema application could not handle correctly and caused an unexpected error.
 Reproduce the error with trace logging enabled, and create a technical case, as described in the [Troubleshooting] section.
