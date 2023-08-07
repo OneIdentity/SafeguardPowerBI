@@ -43,6 +43,10 @@ To use the connector,
 
 You can read a more comprehensive guide on using the Power BI Connector and the Report Template in the One Idenity Safeguard Power BI Connector Tutorial that can be found on the [Technical documents for One Identity Safeguard for Priviledged Sessions] page.
 
+### Fetching data from multiple SPS instances
+
+You can fetch data from multiple SPS instances by repeating steps 10. to 13. from [Installation and usage]. If you want to append your queries, follow the [Append queries] official tutorial.
+
 ## Common errors
 
 I cannot find **One Identity Safeguard** under **Home > Get data**.
@@ -226,6 +230,8 @@ Distributed under the One Identity - Open Source License. For more information, 
 [Releases]: https://github.com/OneIdentity/SafeguardPowerBI/releases
 [License]: https://github.com/OneIdentity/SafeguardPowerBI/blob/main/LICENSE
 [Contribution]: CONTRIBUTION.md
+
+[Append queries]: https://learn.microsoft.com/en-us/power-query/append-queries
 
 [Install imported certificates]: https://learn.microsoft.com/en-us/troubleshoot/windows-server/windows-security/install-imported-certificates
 [Collecting Power BI mashup trace logs]: https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-diagnostics#collecting-mashup-traces
