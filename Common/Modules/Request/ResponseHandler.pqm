@@ -1,0 +1,57 @@
+let
+    Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm"),
+    RequestErrors.ErrorMap = Extension.ImportFunction("ErrorMap", "RequestErrors.pqm"),
+    RequestErrors.NotParsableResponse = Extension.ImportFunction("NotParsableResponse", "RequestErrors.pqm"),
+
+    ResponseHandler.GetDataFromResponse = (response as record, path as text, optional separator as text) =>
+        let
+            GetRecordSafe = (response as record, pathAsList as list) =>
+                let
+                    currentField = List.First(pathAsList),
+                    currentResponse = if currentField <> -1 then Record.FieldOrDefault(response, currentField, null) else response,
+                    handledResponse =
+                        if currentResponse = null then
+                            RequestErrors.NotParsableResponse(
+                                [
+                                    Cause = response,
+                                    MissingField = path,
+                                    RequestUrl = Value.Metadata(response)[RequestUrl]
+                                ]
+                            )
+                        else
+                            currentResponse,
+                    nextPathAsList = List.RemoveFirstN(pathAsList, 1),
+                    result = if List.Count(nextPathAsList) > 0 then @GetRecordSafe(handledResponse, nextPathAsList) else handledResponse
+                in
+                    result,
+            _separator = separator ?? ".",
+            pathAsList = Text.Split(path, _separator),
+            data = GetRecordSafe(response, pathAsList)
+        in
+            data,
+    ResponseHandler.ValidateByStatusCode = (response as record) =>
+        let
+           responseMeta = Value.Metadata(response),
+            httpStatus = Text.From(responseMeta[Response.Status]),
+            log = Logger.ErrorLog(
+                "SPS returned with an error response",
+                [
+                    Response = response,
+                    Response.Status = responseMeta[Response.Status],
+                    RequestUrl = responseMeta[RequestUrl]
+                ]
+            ),
+            details = [
+                Cause = response,
+                RequestUrl = log[RequestUrl]
+            ]
+        in
+            if Record.HasFields(RequestErrors.ErrorMap, httpStatus) then
+                Record.Field(RequestErrors.ErrorMap, httpStatus)(details)
+            else
+                response
+in
+    [
+        GetDataFromResponse = ResponseHandler.GetDataFromResponse,
+        ValidateByStatusCode = ResponseHandler.ValidateByStatusCode
+    ]

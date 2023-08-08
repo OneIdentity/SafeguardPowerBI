@@ -1,0 +1,114 @@
+let
+    IsMocked = Extension.ImportFunction("IsMocked", "Utils.pqm"),
+    SessionsEndpoint = Extension.ImportFunction("SessionsEndpoint", "Constants.pqm"),
+    SessionsCountEndpoint = Extension.ImportFunction("SessionsCountEndpoint", "Constants.pqm"),
+    SessionsSnapshotEndpoint = Extension.ImportFunction("SessionsSnapshotEndpoint", "Constants.pqm"),
+    Logger.InfoLog = Extension.ImportFunction("InfoLog", "Logger.pqm"),
+    Request.Generate = Extension.ImportFunction("Generate", "Request.pqm"),
+    Request.GetDefaultParameters = Extension.ImportFunction("GetDefaultParameters", "Request.pqm"),
+    ResponseHandler.GetDataFromResponse = Extension.ImportFunction("GetDataFromResponse", "ResponseHandler.pqm"),
+    ResponseHandler.ValidateByStatusCode = Extension.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
+    UrlBuilder.GenerateUrl = Extension.ImportFunction("GenerateUrl", "UrlBuilder.pqm"),
+    Schema.GetSchema = Extension.ImportFunction("GetSchema", "Schema.pqm"),
+    SchemaUtils.ApplySchema = Extension.ImportFunction("ApplySchema", "SchemaUtils.pqm"),
+    Search.AdvancedSearch = (
+        spsUrl as text, queryParams as record, snapshot as text, sessionId as text, optional mocks as nullable record
+    ) as table =>
+        let
+            fetchUrl = UrlBuilder.GenerateUrl(spsUrl, SessionsEndpoint, queryParams & [snapshot = snapshot]),
+            result = Search.GetAllPagesByNextLink(spsUrl, fetchUrl, sessionId, mocks),
+            resultWithMetadata = Value.ReplaceMetadata(result, [RequestUrl = fetchUrl])
+        in
+            resultWithMetadata,
+    Search.OpenSnapshot = (spsUrl as text, sessionId as text, optional mocks as nullable record) as text =>
+        let
+            openSnapshotUrl = UrlBuilder.GenerateUrl(spsUrl, SessionsSnapshotEndpoint),
+            openSnapshotResponse = ResponseHandler.ValidateByStatusCode(
+                if IsMocked(mocks, "OpenSnapshotResponse") then
+                    Request.Generate(
+                        openSnapshotUrl,
+                        Request.GetDefaultParameters(sessionId),
+                        [
+                            Response = mocks[OpenSnapshotResponse]
+                        ]
+                    )
+                else
+                    Request.Generate(openSnapshotUrl, Request.GetDefaultParameters(sessionId))
+            ),
+            snapshot = ResponseHandler.GetDataFromResponse(openSnapshotResponse, "body.snapshot")
+        in
+            snapshot,
+    Search.GetSessionsCount = (
+        spsUrl as text, queryParams as record, sessionId as text, optional mocks as nullable record
+    ) as number =>
+        let
+            sessionsCountUrl = UrlBuilder.GenerateUrl(spsUrl, SessionsCountEndpoint, queryParams),
+            countResponse = ResponseHandler.ValidateByStatusCode(
+                if IsMocked(mocks, "GetSessionsCountResponse") then
+                    Request.Generate(
+                        sessionsCountUrl,
+                        Request.GetDefaultParameters(sessionId),
+                        [
+                            Response = mocks[GetSessionsCountResponse]
+                        ]
+                    )
+                else
+                    Request.Generate(sessionsCountUrl, Request.GetDefaultParameters(sessionId))
+            ),
+            count = ResponseHandler.GetDataFromResponse(countResponse, "count")
+        in
+            count,
+    Search.GetAllPagesByNextLink = (
+        spsUrl as text, start_url as text, sessionId as text, optional mocks as nullable record
+    ) as table =>
+        Search.GenerateByPage(
+            (previous) =>
+                let
+                    nextUrl = if (previous = null) then start_url else Search.GetNextUrl(spsUrl, previous),
+                    page = if (nextUrl <> null) then Search.GetPage(nextUrl, sessionId, mocks) else null
+                in
+                    page
+        ),
+    Search.GetNextUrl = (spsUrl as text, response as table) as nullable text =>
+        let
+            nextLink = Value.Metadata(response)[NextLink],
+            nextUrl = if nextLink <> null then UrlBuilder.GenerateUrl(spsUrl, nextLink) else null
+        in
+            nextUrl,
+    Search.GetPage = (url as text, sessionId as text, optional mocks as nullable record) as table =>
+        let
+            response = ResponseHandler.ValidateByStatusCode(
+                if IsMocked(mocks, "GetPageResponseMap") then
+                    Request.Generate(
+                        url,
+                        Request.GetDefaultParameters(sessionId),
+                        [
+                            Response = Record.Field(mocks[GetPageResponseMap], url)
+                        ]
+                    )
+                else
+                    Request.Generate(url, Request.GetDefaultParameters(sessionId))
+            ),
+            nextLink = response[meta][next]?,
+            schema =
+                if IsMocked(mocks, "Schema") then
+                    Record.Field(mocks[Schema], "Sessions")
+                else
+                    Schema.GetSchema("Sessions"),
+            page = SchemaUtils.ApplySchema(response, schema, mocks) meta [NextLink = nextLink]
+        in
+            page,
+    Search.GenerateByPage = (getNextPage as function) as table =>
+        let
+            listOfPages = List.Generate(
+                () => getNextPage(null), (lastPage) => lastPage <> null, (lastPage) => getNextPage(lastPage)
+            ),
+            combined = Table.Combine(listOfPages)
+        in
+            combined
+in
+    [
+        AdvancedSearch = Search.AdvancedSearch,
+        GetSessionsCount = Search.GetSessionsCount,
+        OpenSnapshot = Search.OpenSnapshot
+    ]

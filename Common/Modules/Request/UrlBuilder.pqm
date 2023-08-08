@@ -1,0 +1,69 @@
+let
+    QueryParameterTransformerMap = Extension.ImportFunction("Map","QueryParameterTransformer.pqm"),
+    UrlBuilder.GenerateBaseUrl = (scheme as text, bareUrl as text) => Text.Combine({scheme & ":", bareUrl}, "//"),
+    UrlBuilder.GenerateUrl = (baseUrl as text, path as nullable text, optional query as nullable record) as text =>
+        let
+            newUrlWithoutQuery = if path <> null and path <> "" then Uri.Combine(baseUrl, path) else baseUrl,
+            query = if query <> null then query else [],
+            newUrl = UrlBuilder._generateNewUrl(newUrlWithoutQuery, query)
+        in
+            newUrl,
+    UrlBuilder.GetBaseUrlFromUrl = (url as text) as text =>
+        let
+            urlParts = Uri.Parts(url)
+        in
+            UrlBuilder.GenerateBaseUrl(urlParts[Scheme], urlParts[Host]),
+    UrlBuilder.GetQueryFromUrl = (url as text) as record => Uri.Parts(url)[Query],
+    UrlBuilder.GetDefaultQuery = () => [fields = "*", sort = "-start_time"],
+    UrlBuilder._generateNewUrl = (newUrlWithoutQuery as text, query as record) =>
+        let
+            transformedQueryRecordList = List.Accumulate(
+                Record.FieldNames(query),
+                {},
+                (state, current) =>
+                    let
+                        transformFunction = Record.FieldOrDefault(QueryParameterTransformerMap, current),
+                        queryParameterValue = Record.Field(query, current),
+                        queryParameter =
+                            if queryParameterValue <> null then
+                                if transformFunction <> null then
+                                    transformFunction(queryParameterValue)
+                                else
+                                    Record.AddField([], current, queryParameterValue)
+                            else
+                                []
+                    in
+                        if queryParameter = [] then
+                            List.Combine({state, {}})
+                        else
+                            List.Combine({state, {queryParameter}})
+            )
+        in
+            if List.Count(transformedQueryRecordList) > 0 then
+                let
+                    queryString = Uri.BuildQueryString(Record.Combine(transformedQueryRecordList)),
+                    newUrlWithQuery = Text.Combine({newUrlWithoutQuery, "?", queryString})
+                in
+                    newUrlWithQuery
+            else
+                newUrlWithoutQuery,
+    UrlBuilder._removeBackslashAtTheEndOfPath = (path as text) =>
+        if Text.EndsWith(path, "/") then
+            Text.RemoveRange(path, Text.Length(path) - 1)
+        else
+            path,
+    UrlBuilder.GetSppHost = (applianceName as text) =>
+        let
+            parts = Uri.Parts(applianceName),
+            port = if (parts[Scheme] = "https" and parts[Port] = 443) or (parts[Scheme] = "http" and parts[Port] = 80) then "" else ":" & Text.From(parts[Port])
+        in
+            parts[Scheme] & "://" & parts[Host] & port
+in
+    [
+        GenerateBaseUrl = UrlBuilder.GenerateBaseUrl,
+        GenerateUrl = UrlBuilder.GenerateUrl,
+        GetBaseUrlFromUrl = UrlBuilder.GetBaseUrlFromUrl,
+        GetQueryFromUrl = UrlBuilder.GetQueryFromUrl,
+        GetDefaultQuery = UrlBuilder.GetDefaultQuery,
+        GetSppHost = UrlBuilder.GetSppHost
+    ]
