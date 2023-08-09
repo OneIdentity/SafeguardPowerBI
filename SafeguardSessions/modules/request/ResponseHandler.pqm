@@ -2,15 +2,18 @@ let
     Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm"),
     RequestErrors.ErrorMap = Extension.ImportFunction("ErrorMap", "RequestErrors.pqm"),
     RequestErrors.NotParsableResponse = Extension.ImportFunction("NotParsableResponse", "RequestErrors.pqm"),
-
     ResponseHandler.GetDataFromResponse = (response as record, path as text, optional separator as text) =>
         let
-            GetRecordSafe = (response as record, pathAsList as list) =>
+            GetRecordSafe = (content as record, pathAsList as list) =>
                 let
                     currentField = List.First(pathAsList),
-                    currentResponse = if currentField <> -1 then Record.FieldOrDefault(response, currentField, null) else response,
-                    handledResponse =
-                        if currentResponse = null then
+                    currentContent =
+                        if currentField <> -1 then
+                            Record.FieldOrDefault(content, currentField, null) meta Value.Metadata(response)
+                        else
+                            content,
+                    handledContent =
+                        if currentContent = null then
                             RequestErrors.NotParsableResponse(
                                 [
                                     Cause = response,
@@ -19,9 +22,13 @@ let
                                 ]
                             )
                         else
-                            currentResponse,
+                            currentContent,
                     nextPathAsList = List.RemoveFirstN(pathAsList, 1),
-                    result = if List.Count(nextPathAsList) > 0 then @GetRecordSafe(handledResponse, nextPathAsList) else handledResponse
+                    result =
+                        if List.Count(nextPathAsList) > 0 then
+                            @GetRecordSafe(handledContent, nextPathAsList)
+                        else
+                            handledContent
                 in
                     result,
             _separator = separator ?? ".",
@@ -31,7 +38,7 @@ let
             data,
     ResponseHandler.ValidateByStatusCode = (response as record) =>
         let
-           responseMeta = Value.Metadata(response),
+            responseMeta = Value.Metadata(response),
             httpStatus = Text.From(responseMeta[Response.Status]),
             log = Logger.ErrorLog(
                 "SPS returned with an error response",
