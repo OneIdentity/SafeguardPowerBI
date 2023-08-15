@@ -163,27 +163,27 @@ SafeguardPasswords.Publish = [
 
 SafeguardPasswords.GetDataTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text) as table => 
     let
-        _validated = ValidateInput(applianceName,resourcePath,filter,fields,queryOptions),
+        validated = ValidateInput(applianceName,resourcePath,filter,fields,queryOptions),
 
-        _host = GetHost("https://" & applianceName),
+        host = GetHost("https://" & applianceName),
 
-        _loginToken = GetLoginToken(_host),
+        loginToken = GetLoginToken(host),
 
-        _hasFilter = if filter = null or Text.Length(filter) = 0 then false else true,
-        _hasFields = if fields = null or Text.Length(fields) = 0 then false else true,
-        _hasQueryOptions = if queryOptions = null or Text.Length(queryOptions) = 0 then false else true,
+        hasFilter = if filter = null or Text.Length(filter) = 0 then false else true,
+        hasFields = if fields = null or Text.Length(fields) = 0 then false else true,
+        hasQueryOptions = if queryOptions = null or Text.Length(queryOptions) = 0 then false else true,
 
-        _query1 = if resourcePath = null or Text.Length(resourcePath) = 0 then _host & "?" else Uri.Combine(_host, Text.Trim(resourcePath, "/")) & "?",
-        _query2 = if filter = null or Text.Length(filter) = 0 then _query1 else _query1 & "filter=" & Text.Trim(filter,"&") & "&",
-        _query3 = if fields = null or Text.Length(fields) = 0 then _query2 else _query2 & "fields=" & Text.Trim(fields,"&") & "&",
-        _query4 = if queryOptions = null or Text.Length(queryOptions) = 0 then _query3 else _query3 & Text.Trim(queryOptions, "&"),
-        _query = Text.Trim(Text.Trim(Text.Trim(_query4, "/"), "?"), "&"),
+        query1 = if resourcePath = null or Text.Length(resourcePath) = 0 then host & "?" else Uri.Combine(host, Text.Trim(resourcePath, "/")) & "?",
+        query2 = if filter = null or Text.Length(filter) = 0 then query1 else query1 & "filter=" & Text.Trim(filter,"&") & "&",
+        query3 = if fields = null or Text.Length(fields) = 0 then query2 else query2 & "fields=" & Text.Trim(fields,"&") & "&",
+        query4 = if queryOptions = null or Text.Length(queryOptions) = 0 then query3 else query3 & Text.Trim(queryOptions, "&"),
+        query = Text.Trim(Text.Trim(Text.Trim(query4, "/"), "?"), "&"),
 
         // we will never act on the else case - if validation fails we throw in the ValidateInput method.
         // But ValidateInput() doesn't evalute until the var is referenced.
-       _data = if _validated = true then Logger.InfoLog("Executing Query", GetResponse(_query, [#"Content-Type"="application/json", Authorization="Bearer " & _loginToken])) else null,
+       data = if validated = true then Logger.InfoLog("Executing Query", GetResponse(query, [#"Content-Type"="application/json", Authorization="Bearer " & loginToken])) else null,
 
-        a = if _data is list then Table.FromRecords(_data) else Table.FromValue(_data)
+        a = if data is list then Table.FromRecords(data) else Table.FromValue(data)
     in
         a;
 
