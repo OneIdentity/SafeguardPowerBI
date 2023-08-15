@@ -164,9 +164,11 @@ SafeguardPasswords.Publish = [
 SafeguardPasswords.GetDataTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text) as table => 
     let
         _validated = ValidateInput(applianceName,resourcePath,filter,fields,queryOptions),
-        _log = Logger.InfoLog("testing logging",null),
+
         _host = GetHost("https://" & applianceName),
+
         _loginToken = GetLoginToken(_host),
+
         _hasFilter = if filter = null or Text.Length(filter) = 0 then false else true,
         _hasFields = if fields = null or Text.Length(fields) = 0 then false else true,
         _hasQueryOptions = if queryOptions = null or Text.Length(queryOptions) = 0 then false else true,
@@ -178,7 +180,8 @@ SafeguardPasswords.GetDataTable = (applianceName as text, optional resourcePath 
         _query = Text.Trim(Text.Trim(Text.Trim(_query4, "/"), "?"), "&"),
 
         // we will never act on the else case - if validation fails we throw in the ValidateInput method.
-       _data = if _validated = true then GetResponse(_query, [#"Content-Type"="application/json", Authorization="Bearer " & _loginToken]) else null,
+        // But ValidateInput() doesn't evalute until the var is referenced.
+       _data = if _validated = true then Logger.InfoLog("Executing Query", GetResponse(_query, [#"Content-Type"="application/json", Authorization="Bearer " & _loginToken])) else null,
 
         a = if _data is list then Table.FromRecords(_data) else Table.FromValue(_data)
     in
