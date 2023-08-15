@@ -209,51 +209,51 @@ ValidateInput = (applianceName as text, optional resourcePath as text, optional 
 
 GetLoginToken = (host) =>
     let
-        _creds = Extension.CurrentCredential(),
-        _user = User.GetDomain(_creds[Username]),
-        _providerScope = User.GetProvider(host, _user[Domain]),
+        creds = Extension.CurrentCredential(),
+        user = User.GetDomain(creds[Username]),
+        providerScope = User.GetProvider(host, user[Domain]),
 
-        _rstsResponse = GetResponse(host,[#"Content-Type"="application/json"], Constants[RstsRelativePath], Json.FromValue([
+        rstsResponse = GetResponse(host,[#"Content-Type"="application/json"], Constants[RstsRelativePath], Json.FromValue([
             grant_type="password",
-            scope=_providerScope,
-            username=_user[Username],
-            password=_creds[Password]
+            scope=providerScope,
+            username=user[Username],
+            password=creds[Password]
         ])),
 
-        _loginToken = Function.InvokeAfter(() => GetLoginResponse(host, _rstsResponse), #duration(0,0,0,Number.RandomBetween(1,5)))
+        loginToken = Function.InvokeAfter(() => GetLoginResponse(host, rstsResponse), #duration(0,0,0,Number.RandomBetween(1,5)))
     in
-        _loginToken;
+        loginToken;
 
 GetLoginResponse = (host as text, rstsResponse as any) =>
     let
-        _loginResponse = GetResponse(host, [#"Content-Type"="application/json"], Constants[Endpoints][LoginResponse], Json.FromValue([
+        loginResponse = GetResponse(host, [#"Content-Type"="application/json"], Constants[Endpoints][LoginResponse], Json.FromValue([
             StsAccessToken=rstsResponse[#"access_token"]
         ])),
 
-        _loginToken = _loginResponse[UserToken]
+        loginToken = loginResponse[UserToken]
     in
-        _loginToken;
+        loginToken;
 
 User.GetDomain = (userName) =>
     let
-        _upnList = Text.Split(userName, "@"),
-        _netbiosList = Text.Split(userName, "\"),
+        upnList = Text.Split(userName, "@"),
+        netbiosList = Text.Split(userName, "\"),
 
-        _userName = if List.Count(_upnList) = 2 then _upnList{0} else if List.Count(_netbiosList) = 2 then _netbiosList{1} else userName,
-        _domain = if List.Count(_upnList) = 2 then _upnList{1} else if List.Count(_netbiosList) = 2 then _netbiosList{0} else ""
+        userName = if List.Count(upnList) = 2 then upnList{0} else if List.Count(netbiosList) = 2 then netbiosList{1} else userName,
+        domain = if List.Count(upnList) = 2 then upnList{1} else if List.Count(netbiosList) = 2 then netbiosList{0} else ""
     in
-        [ Username = _userName, Domain = _domain ];
+        [ Username = userName, Domain = domain ];
 
         
 User.GetProvider = (host, domainName) =>
     let
-        _domainName = if domainName = "" then "local" else domainName,
+        domainName = if domainName = "" then "local" else domainName,
 
-        _providers = GetResponse(host, [ #"Content-Type"="application/json" ], Constants[Endpoints][AuthenticationProviders],null, [filter = "Name ieq '" & _domainName & "'"]),
+        providers = GetResponse(host, [ #"Content-Type"="application/json" ], Constants[Endpoints][AuthenticationProviders],null, [filter = "Name ieq '" & domainName & "'"]),
         
-        _scope = if List.Count(_providers) = 1 then _providers{0}[RstsProviderScope] else "rsts:sts:primaryproviderid:local"
+        scope = if List.Count(providers) = 1 then providers{0}[RstsProviderScope] else "rsts:sts:primaryproviderid:local"
     in
-        _scope;
+        scope;
 
 SafeguardPasswords.Icons = [
     Icon16 = {
