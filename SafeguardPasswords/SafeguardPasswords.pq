@@ -234,12 +234,12 @@ GetLoginResponse = (host as text, rstsResponse as any) =>
     in
         loginToken;
 
-User.GetDomain = (userName) =>
+User.GetDomain = (fullUserName) =>
     let
-        upnList = Text.Split(userName, "@"),
-        netbiosList = Text.Split(userName, "\"),
+        upnList = Text.Split(fullUserName, "@"),
+        netbiosList = Text.Split(fullUserName, "\"),
 
-        userName = if List.Count(upnList) = 2 then upnList{0} else if List.Count(netbiosList) = 2 then netbiosList{1} else userName,
+        userName = if List.Count(upnList) = 2 then upnList{0} else if List.Count(netbiosList) = 2 then netbiosList{1} else fullUserName,
         domain = if List.Count(upnList) = 2 then upnList{1} else if List.Count(netbiosList) = 2 then netbiosList{0} else ""
     in
         [ Username = userName, Domain = domain ];
@@ -247,9 +247,9 @@ User.GetDomain = (userName) =>
         
 User.GetProvider = (host, domainName) =>
     let
-        domainName = if domainName = "" then "local" else domainName,
+        localOrDomainName = if domainName = "" then "local" else domainName,
 
-        providers = GetResponse(host, [ #"Content-Type"="application/json" ], Constants[Endpoints][AuthenticationProviders],null, [filter = "Name ieq '" & domainName & "'"]),
+        providers = GetResponse(host, [ #"Content-Type"="application/json" ], Constants[Endpoints][AuthenticationProviders],null, [filter = "Name ieq '" & localOrDomainName & "'"]),
         
         scope = if List.Count(providers) = 1 then providers{0}[RstsProviderScope] else "rsts:sts:primaryproviderid:local"
     in
