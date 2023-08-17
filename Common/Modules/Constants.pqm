@@ -106,6 +106,19 @@ in
                     Status = Text.Combine({Constants.SppClusterEndpoint,"/Status"}),
                     PlatformTaskLoadStatus = Text.Combine({Constants.SppClusterEndpoint,"/PlatformTaskLoadStatus"})
                 ]
+            ],
+            Fields = [
+                Assets = "PlatformDisplayName,CreatedDate,Name,NetworkAddress,AssetPartitionName,TaskProperties.HasAssetTaskFailure,TaskProperties.FailedAccountDiscoveryAttempts,"
+                    & "TaskProperties.FailedServiceDiscoveryAttempts,TaskProperties.FailedTestConnectionAttempts,TaskProperties.FailedDependentServiceUpdateAttempts,"
+                    & "SessionAccessProperties.AllowSessionRequests,Tags,AssetDiscoveryJobName,AccountDiscoveryScheduleName,ConnectionProperties.ServiceAccountName,"
+                    & "ConnectionProperties.ServiceAccountCredentialType",
+                AssetAccounts = "Name,IsServiceAccount,IsApplicationAccount,Tags,Asset.Name,Asset.NetworkAddress,PasswordProfile.EffectiveName,"
+                    & "RequestProperties.AllowPasswordRequest,RequestProperties.AllowSessionRequest,RequestProperties.AllowSshKeyRequest,RequestProperties.AllowApiKeyRequest,"
+                    & "HasPassword,HasSshKey,HasTotpAuthenticator,HasApiKeys,TaskProperties.HasAccountTaskFailure,TaskProperties.FailedPasswordCheckAttempts,"
+                    & "TaskProperties.FailedPasswordChangeAttempts,TaskProperties.FailedSshKeyCheckAttempts,TaskProperties.FailedSshKeyChangeAttempts,"
+                    & "TaskProperties.FailedSshKeyDiscoveryAttempts,TaskProperties.FailedSshKeyRevokeAttempts,TaskProperties.FailedSuspendAccountAttempts,"
+                    & "TaskProperties.FailedRestoreAccountAttempts,TaskProperties.FailedApiKeyCheckAttempts,TaskProperties.FailedApiKeyChangeAttempts",
+                AssetPartitions = "Name,DefaultProfileName,DefaultSshKeyProfileName,ManagedBy"
             ]
         ]
     ]

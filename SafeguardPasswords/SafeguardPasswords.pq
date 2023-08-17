@@ -9,128 +9,199 @@ shared SafeguardPasswords.SafeguardNavTable = (
     optional resourcePath as text, 
     optional filter as text, 
     optional fields as text, 
-    optional queryOptions as text
+    optional queryOptions as text,
+    optional responseFormat as text
 ) as table =>
     let
         source = #table({"Name", "Data", "ItemKind", "ItemName", "IsLeaf"}, {
-            { "Custom", SafeguardPasswords.GetDataTable(applianceName, resourcePath, filter, fields, queryOptions), "Table", "Table", true },
-            { "Asset Management", SafeguardAssetNavTable(applianceName, resourcePath, filter, fields, queryOptions), "Function", "Function", false },
-            { "User Management", SafeguardUserNavTable(applianceName, resourcePath, filter, fields, queryOptions), "Function", "Function", false },
-            { "Policy Management", SafeguardPolicyNavTable(applianceName, resourcePath, filter, fields, queryOptions), "Function", "Function", false },
-            { "Audit", SafeguardAuditNavTable(applianceName, resourcePath, filter, fields, queryOptions), "Function", "Function", false },
-            { "Reports", SafeguardReportNavTable(applianceName, resourcePath, filter, fields, queryOptions), "Function", "Function", false },
-            { "Cluster", SafeguardClusterNavTable(applianceName, resourcePath, filter, fields, queryOptions), "Function", "Function", false },
-            { "Appliance", SafeguardApplianceNavTable(applianceName, resourcePath, filter, fields, queryOptions), "Function", "Function", false }
+            { "Custom", SafeguardPasswords.GetDataTable(applianceName, resourcePath, filter, fields, queryOptions, responseFormat), "Table", "Table", true },
+            { "Asset Management", SafeguardAssetNavTable(applianceName, resourcePath, filter, fields, queryOptions, responseFormat), "Function", "Function", false },
+            { "User Management", SafeguardUserNavTable(applianceName, resourcePath, filter, fields, queryOptions,responseFormat), "Function", "Function", false },
+            { "Policy Management", SafeguardPolicyNavTable(applianceName, resourcePath, filter, fields, queryOptions,responseFormat), "Function", "Function", false },
+            { "Audit", SafeguardAuditNavTable(applianceName, resourcePath, filter, fields, queryOptions,responseFormat), "Function", "Function", false },
+            { "Reports", SafeguardReportNavTable(applianceName, resourcePath, filter, fields, queryOptions,responseFormat), "Function", "Function", false },
+            { "Cluster", SafeguardClusterNavTable(applianceName, resourcePath, filter, fields, queryOptions,responseFormat), "Function", "Function", false },
+            { "Appliance", SafeguardApplianceNavTable(applianceName, resourcePath, filter, fields, queryOptions,responseFormat), "Function", "Function", false }
         }),
         navTable = Table.ToNavigationTable(source, {"Name"}, "Name", "Data", "ItemKind", "ItemName", "IsLeaf")
     in
         navTable;
 
-SafeguardAssetNavTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text) as table =>
+SafeguardAssetNavTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text, optional responseFormat as text) as table =>
     let
+        fieldsNullOrEmpty = fields = null or Text.Length(fields) = 0,
         source = #table({"Name", "Data", "ItemKind", "ItemName", "IsLeaf"}, {
-            { "Assets", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Assets], filter, fields, queryOptions), "Table", "Table", true },
-            { "Asset Accounts", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AssetAccounts], filter, fields, queryOptions), "Table", "Table", true },
-            { "Asset Partitions", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AssetPartitions], filter, fields, queryOptions), "Table", "Table", true },
-            { "Discovered Accounts", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][DiscoveredAccounts] , filter, fields, queryOptions), "Table", "Table", true },
-            { "Discovered Services", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][DiscoveredServices], filter, fields, queryOptions), "Table", "Table", true },
-            { "Discovered SSH Keys", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][DiscoveredSshKeys], filter, fields, queryOptions), "Table", "Table", true }
+            {
+                "Assets", 
+                SafeguardPasswords.GetDataTable(
+                    applianceName, 
+                    Constants[Endpoints][Assets], 
+                    filter, 
+                    if fieldsNullOrEmpty then Constants[Fields][Assets] else fields, 
+                    queryOptions,
+                    responseFormat),
+                "Table",
+                "Table",
+                true
+            },
+            {
+                "Asset Accounts",
+                SafeguardPasswords.GetDataTable(
+                    applianceName, 
+                    Constants[Endpoints][AssetAccounts], 
+                    filter, 
+                    if fieldsNullOrEmpty then Constants[Fields][AssetAccounts] else fields, 
+                    queryOptions,responseFormat), 
+                "Table", 
+                "Table", 
+                true 
+            },
+            { 
+                "Asset Partitions", 
+                SafeguardPasswords.GetDataTable(
+                    applianceName, 
+                    Constants[Endpoints][AssetPartitions], 
+                    filter, 
+                    if fieldsNullOrEmpty then Constants[Fields][AssetPartitions] else fields,
+                    queryOptions,
+                    responseFormat),
+                "Table", 
+                "Table",
+                true 
+            },
+            {
+                "Discovered Accounts",
+                SafeguardPasswords.GetDataTable(
+                    applianceName, 
+                    Constants[Endpoints][DiscoveredAccounts], 
+                    filter, 
+                    fields, 
+                    queryOptions,
+                    responseFormat), 
+                "Table", 
+                "Table", 
+                true
+            },
+            {
+                "Discovered Services", 
+                SafeguardPasswords.GetDataTable(
+                    applianceName, 
+                    Constants[Endpoints][DiscoveredServices], 
+                    filter, 
+                    fields, 
+                    queryOptions,responseFormat), 
+                "Table", 
+                "Table", 
+                true
+            },
+            { 
+                "Discovered SSH Keys", 
+                SafeguardPasswords.GetDataTable(
+                    applianceName, 
+                    Constants[Endpoints][DiscoveredSshKeys], 
+                    filter, 
+                    fields, 
+                    queryOptions,responseFormat), 
+                "Table", 
+                "Table", 
+                true
+            }
         }),
         navTable = Table.ToNavigationTable(source, {"Name"}, "Name", "Data", "ItemKind", "ItemName", "IsLeaf")
     in
         navTable;
         
-SafeguardUserNavTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text) as table =>
+SafeguardUserNavTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text, optional responseFormat as text) as table =>
     let
         source = #table({"Name", "Data", "ItemKind", "ItemName", "IsLeaf"}, {
-            { "Users", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Users], filter, fields, queryOptions), "Table", "Table", true },
-            { "User Groups", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][UserGroups], filter, fields, queryOptions), "Table", "Table", true },
-            { "Identity Providers", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][IdentityProviders], filter, fields, queryOptions), "Table", "Table", true }
+            { "Users", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Users], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "User Groups", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][UserGroups], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Identity Providers", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][IdentityProviders], filter, fields, queryOptions,responseFormat), "Table", "Table", true }
         }),
         navTable = Table.ToNavigationTable(source, {"Name"}, "Name", "Data", "ItemKind", "ItemName", "IsLeaf")
     in
         navTable;
         
-SafeguardPolicyNavTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text) as table =>
+SafeguardPolicyNavTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text, optional responseFormat as text) as table =>
     let
         source = #table({"Name", "Data", "ItemKind", "ItemName", "IsLeaf"}, {
-            { "Entitlements", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Roles], filter, fields, queryOptions), "Table", "Table", true },
-            { "Policies", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AccessPolicies], filter, fields, queryOptions), "Table", "Table", true },
-            { "Asset Groups", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AssetGroups], filter, fields, queryOptions), "Table", "Table", true },
-            { "Account Groups", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AccountGroups], filter, fields, queryOptions), "Table", "Table", true }
+            { "Entitlements", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Roles], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Policies", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AccessPolicies], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Asset Groups", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AssetGroups], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Account Groups", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AccountGroups], filter, fields, queryOptions,responseFormat), "Table", "Table", true }
         }),
         navTable = Table.ToNavigationTable(source, {"Name"}, "Name", "Data", "ItemKind", "ItemName", "IsLeaf")
     in
         navTable;
         
-SafeguardAuditNavTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text) as table =>
+SafeguardAuditNavTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text, optional responseFormat as text) as table =>
     let
         source = #table({"Name", "Data", "ItemKind", "ItemName", "IsLeaf"}, {
-            { "Search", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][AccessRequests], filter, fields, queryOptions), "Table", "Table", true },
-            { "Access Requests", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][AccessRequests], filter, fields, queryOptions), "Table", "Table", true },
-            { "Access Request Activity", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][Activities], filter, fields, queryOptions), "Table", "Table", true },
-            { "Access Request Session Activity", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][Sessions], filter, fields, queryOptions), "Table", "Table", true },
-            { "Appliance", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][Appliances], filter, fields, queryOptions), "Table", "Table", true },
-            { "Archives", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][Archives], filter, fields, queryOptions), "Table", "Table", true },
-            { "Directory Synchronization", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][DirectorySync], filter, fields, queryOptions), "Table", "Table", true },
-            { "Account Discovery", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][DiscoveredAccounts], filter, fields, queryOptions), "Table", "Table", true },
-            { "Asset Discovery", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][DiscoveredAssets], filter, fields, queryOptions), "Table", "Table", true },
-            { "Service Discovery", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][DiscoveredServices], filter, fields, queryOptions), "Table", "Table", true },
-            { "SSH Key Discovery", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][DiscoveredSshKeys], filter, fields, queryOptions), "Table", "Table", true },
-            { "Logins", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][Logins], filter, fields, queryOptions), "Table", "Table", true },
-            { "Object Changes", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][ObjectChanges], filter, fields, queryOptions), "Table", "Table", true },
-            { "Password Activity", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][Passwords], filter, fields, queryOptions), "Table", "Table", true }
+            { "Search", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][AccessRequests], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Access Requests", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][AccessRequests], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Access Request Activity", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][Activities], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Access Request Session Activity", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][Sessions], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Appliance", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][Appliances], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Archives", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][Archives], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Directory Synchronization", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][DirectorySync], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Account Discovery", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][DiscoveredAccounts], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Asset Discovery", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][DiscoveredAssets], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Service Discovery", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][DiscoveredServices], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "SSH Key Discovery", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][DiscoveredSshKeys], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Logins", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][Logins], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Object Changes", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][ObjectChanges], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Password Activity", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AuditLog][Passwords], filter, fields, queryOptions,responseFormat), "Table", "Table", true }
         }),
         navTable = Table.ToNavigationTable(source, {"Name"}, "Name", "Data", "ItemKind", "ItemName", "IsLeaf")
     in
         navTable;
         
-SafeguardReportNavTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text) as table =>
+SafeguardReportNavTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text, optional responseFormat as text) as table =>
     let
         source = #table({"Name", "Data", "ItemKind", "ItemName", "IsLeaf"}, {
-            { "Account Entitlements", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][AccountEntitlements], filter, fields, queryOptions), "Table", "Table", true },
-            { "Asset Entitlements", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][AssetEntitlements], filter, fields, queryOptions), "Table", "Table", true },
-            { "User Entitlements", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][UserEntitlements], filter, fields, queryOptions), "Table", "Table", true },
-            { "Account Ownership", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][AccountOwnership], filter, fields, queryOptions), "Table", "Table", true },
-            { "Asset Ownership", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][AssetOwnership], filter, fields, queryOptions), "Table", "Table", true },
-            { "Partition Ownership", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][PartitionOwnership], filter, fields, queryOptions), "Table", "Table", true },
-            { "Tag Ownership", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][TagOwnership], filter, fields, queryOptions), "Table", "Table", true },
-            { "User Ownership", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][UserOwnership], filter, fields, queryOptions), "Table", "Table", true },
-            { "Account Task Summary", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][AccountTaskSummary], filter, fields, queryOptions), "Table", "Table", true },
-            { "Failed Password Changes", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedChangePassword], filter, fields, queryOptions), "Table", "Table", true },
-            { "Failed Password Checks", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedCheckPasswords], filter, fields, queryOptions), "Table", "Table", true },
-            { "Failed SSH Key Changes", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedChangeSshKey], filter, fields, queryOptions), "Table", "Table", true },
-            { "Failed SSH Key Checks", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedCheckSshKey], filter, fields, queryOptions), "Table", "Table", true },
-            { "Failed Account Discovery", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedDiscoverAccounts], filter, fields, queryOptions), "Table", "Table", true },
-            { "Failed Service Discovery", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedDiscoverServices], filter, fields, queryOptions), "Table", "Table", true }
+            { "Account Entitlements", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][AccountEntitlements], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Asset Entitlements", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][AssetEntitlements], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "User Entitlements", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][UserEntitlements], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Account Ownership", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][AccountOwnership], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Asset Ownership", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][AssetOwnership], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Partition Ownership", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][PartitionOwnership], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Tag Ownership", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][TagOwnership], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "User Ownership", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][UserOwnership], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Account Task Summary", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][AccountTaskSummary], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Failed Password Changes", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedChangePassword], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Failed Password Checks", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedCheckPasswords], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Failed SSH Key Changes", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedChangeSshKey], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Failed SSH Key Checks", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedCheckSshKey], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Failed Account Discovery", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedDiscoverAccounts], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Failed Service Discovery", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedDiscoverServices], filter, fields, queryOptions,responseFormat), "Table", "Table", true }
         }),
         navTable = Table.ToNavigationTable(source, {"Name"}, "Name", "Data", "ItemKind", "ItemName", "IsLeaf")
     in
         navTable;
         
-SafeguardClusterNavTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text) as table =>
+SafeguardClusterNavTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text, optional responseFormat as text) as table =>
     let
         source = #table({"Name", "Data", "ItemKind", "ItemName", "IsLeaf"}, {
-            { "Managed Networks", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Cluster][ManagedNetworks], filter, fields, queryOptions), "Table", "Table", true },
-            { "Members", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Cluster][Members], filter, fields, queryOptions), "Table", "Table", true },
-            { "Status   ", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Cluster][Status], filter, fields, queryOptions), "Table", "Table", true },
-            { "Platform Task Load Status", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Cluster][PlatformTaskLoadStatus], filter, fields, queryOptions), "Table", "Table", true }
+            { "Managed Networks", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Cluster][ManagedNetworks], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Members", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Cluster][Members], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Status   ", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Cluster][Status], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Platform Task Load Status", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Cluster][PlatformTaskLoadStatus], filter, fields, queryOptions,responseFormat), "Table", "Table", true }
         }),
         navTable = Table.ToNavigationTable(source, {"Name"}, "Name", "Data", "ItemKind", "ItemName", "IsLeaf")
     in
         navTable;
         
-SafeguardApplianceNavTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text) as table =>
+SafeguardApplianceNavTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text, optional responseFormat as text) as table =>
     let
         source = #table({"Name", "Data", "ItemKind", "ItemName", "IsLeaf"}, {
-            { "Appliance Status", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][NotificationStatus], filter, fields, queryOptions), "Table", "Table", true },
-            { "Appliance Health", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Appliance][Health], filter, fields, queryOptions), "Table", "Table", true },
-            { "Backups", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Appliance][Backups], filter, fields, queryOptions), "Table", "Table", true },
-            { "CPU Status", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Appliance][CpuStatuses], filter, fields, queryOptions), "Table", "Table", true },
-            { "Disk Status", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Appliance][DiskStatus], filter, fields, queryOptions), "Table", "Table", true },
-            { "Hardware Status", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Appliance][HardwareStatus], filter, fields, queryOptions), "Table", "Table", true },
-            { "Memory Status", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Appliance][MemoryStatus], filter, fields, queryOptions), "Table", "Table", true },
-            { "NTP Status", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Appliance][NtpClientStatus], filter, fields, queryOptions), "Table", "Table", true }
+            { "Appliance Status", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][NotificationStatus], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Appliance Health", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Appliance][Health], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Backups", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Appliance][Backups], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "CPU Status", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Appliance][CpuStatuses], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Disk Status", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Appliance][DiskStatus], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Hardware Status", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Appliance][HardwareStatus], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Memory Status", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Appliance][MemoryStatus], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "NTP Status", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Appliance][NtpClientStatus], filter, fields, queryOptions,responseFormat), "Table", "Table", true }
         }),
         navTable = Table.ToNavigationTable(source, {"Name"}, "Name", "Data", "ItemKind", "ItemName", "IsLeaf")
     in
@@ -161,7 +232,7 @@ SafeguardPasswords.Publish = [
     SourceTypeImage = SafeguardPasswords.Icons
 ];
 
-SafeguardPasswords.GetDataTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text) as table => 
+SafeguardPasswords.GetDataTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text, optional responseFormat as text) as table => 
     let
         validated = ValidateInput(applianceName,resourcePath,filter,fields,queryOptions),
 
@@ -170,20 +241,30 @@ SafeguardPasswords.GetDataTable = (applianceName as text, optional resourcePath 
         loginToken = GetLoginToken(host),
 
         hasFilter = if filter = null or Text.Length(filter) = 0 then false else true,
-        hasFields = if fields = null or Text.Length(fields) = 0 then false else true,
+        hasFields = if fields = null or Text.Length(fields) = 0 or fields = "all" then false else true,
         hasQueryOptions = if queryOptions = null or Text.Length(queryOptions) = 0 then false else true,
 
         query1 = if resourcePath = null or Text.Length(resourcePath) = 0 then host & "?" else Uri.Combine(host, Text.Trim(resourcePath, "/")) & "?",
-        query2 = if filter = null or Text.Length(filter) = 0 then query1 else query1 & "filter=" & Text.Trim(filter,"&") & "&",
-        query3 = if fields = null or Text.Length(fields) = 0 then query2 else query2 & "fields=" & Text.Trim(fields,"&") & "&",
-        query4 = if queryOptions = null or Text.Length(queryOptions) = 0 then query3 else query3 & Text.Trim(queryOptions, "&"),
+        query2 = if not hasFilter then query1 else query1 & "filter=" & Text.Trim(filter,"&") & "&",
+        query3 = if not hasFields then query2 else query2 & "fields=" & Text.Trim(fields,"&") & "&",
+        query4 = if not hasQueryOptions then query3 else query3 & Text.Trim(queryOptions, "&"),
         query = Text.Trim(Text.Trim(Text.Trim(query4, "/"), "?"), "&"),
 
         // we will never act on the else case - if validation fails we throw in the ValidateInput method.
         // But ValidateInput() doesn't evalute until the var is referenced.
-       data = if validated = true then Logger.InfoLog("Executing Query", GetResponse(query, [#"Content-Type"="application/json", Authorization="Bearer " & loginToken])) else null,
+       data =   if validated = true then 
+                    if not (responseFormat = "CSV") or responseFormat = null or Text.Length(responseFormat) = 0 
+                        then Logger.InfoLog("Executing JSON Query", GetResponse(query, [#"Content-Type"="application/json", Authorization="Bearer " & loginToken])) 
+                    else Logger.InfoLog("Executing CSV Query", GetCsvResponse(query, [#"Content-Type"="text/csv", #"Accept"="text/csv", Authorization="Bearer " & loginToken])) 
+                else null,
 
-        a = if data is list then Table.FromRecords(data) else Table.FromValue(data)
+        // GetResponse returns either a list or value that needs to be parsed into a table.
+        // GetCsvResponse returns a table where the first row is the column names. We need to parse out (promote) the headers in that case.
+        a = if data is list 
+                then Table.FromRecords(data) 
+            else if data is table
+                then Table.PromoteHeaders(data)
+            else Table.FromValue(data)
     in
         a;
 
@@ -286,6 +367,7 @@ SafeguardPasswords.ContentsType = Extension.ImportFunction("ContentsType","Types
 Constants = Extension.ImportModule("Constants.pqm")[SppConstants];
 GetHost = Extension.ImportFunction("GetSppHost","UrlBuilder.pqm");
 GetResponse = Extension.ImportFunction("GetSppResponse","Request.pqm");
+GetCsvResponse = Extension.ImportFunction("GetCsvSppResponse","Request.pqm");
 Logger.ErrorLog = Extension.ImportFunction("ErrorLog","Logger.pqm");
 Logger.InfoLog = Extension.ImportFunction("InfoLog", "Logger.pqm");
 

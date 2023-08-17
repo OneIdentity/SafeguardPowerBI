@@ -65,6 +65,19 @@ let
 
             response = Json.Document(Web.Contents(host, headers))
         in
+            response,
+
+        Request.GetCsvSppResponse = (host as text, headers as record, optional relativePath as text, optional content as binary, optional query as record) =>
+        let
+            headers = [
+                Headers = headers,
+                RelativePath = relativePath,
+                Content = content,
+                Query = query
+            ],
+
+            response = Csv.Document(Web.Contents(host, headers))
+        in
             response
 in
     [
@@ -72,5 +85,6 @@ in
         GetDefaultParameters = Request.GetDefaultParameters,
         Generate = Request.Generate,
         GetHeader = Request.GetHeader,
-        GetSppResponse = Request.GetSppResponse
+        GetSppResponse = Request.GetSppResponse,
+        GetCsvSppResponse = Request.GetCsvSppResponse
     ]

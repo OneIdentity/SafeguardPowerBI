@@ -35,6 +35,13 @@ let
                 Documentation.FieldDescription = "Additional API Query options to be included in the SPP API Query. See SPP API documetation for all options.",
                 Documentation.SampleValues = {"limit=10&includeDetails=true"}
             ]
+        ),
+        optional ResponseFormat as (
+            type text meta [
+                Documentation.FieldCaption = "API Response Format",
+                Documentation.FieldDescription = "Format of Response. Default CSV. See SPP API documetation for all options.",
+                Documentation.AllowedValues = {"CSV", "JSON"}
+            ]
         )
     ) as record meta [
         Documentation.Name = Types.Constants[DataConnectorName],
