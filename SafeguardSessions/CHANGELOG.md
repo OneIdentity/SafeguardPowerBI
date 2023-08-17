@@ -17,6 +17,7 @@
 ### Other changes
 
 * Custom errors have been extended with an error code.
+* Only Source IP is taken into account when determining data source path. As a result, credentials must only be re-entered, when data is fetched from a different data source than before.
 
 ## [v1.0.0+sps7.3.0] - 2023-06-09
 

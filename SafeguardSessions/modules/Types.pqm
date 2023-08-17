@@ -20,7 +20,8 @@ let
                     "MM/DD/YYYY HH:MM:SS (XM) Z",
                     "ISO 8061 Date",
                     "ISO 8061 Date and time in UTC"
-                }
+                },
+                DataSource.Path = false
             ]
         ),
         to as (
@@ -36,56 +37,64 @@ let
                     "MM/DD/YYYY HH:MM:SS (XM) Z",
                     "ISO 8061 Date",
                     "ISO 8061 Date and time in UTC"
-                }
+                },
+                DataSource.Path = false
             ]
         ),
         filterField1 as (
             type nullable text meta [
                 Documentation.FieldCaption = "Filter field 1",
                 Documentation.FieldDescription = "This field allows you to specify a search field for sessions. Specify its value in Filter value 1.",
-                Documentation.SampleValues = {"protocol"}
+                Documentation.SampleValues = {"protocol"},
+                DataSource.Path = false
             ]
         ),
         filterValue1 as (
             type nullable text meta [
                 Documentation.FieldCaption = "Filter value 1",
                 Documentation.FieldDescription = "This field allows you to specify a search value for sessions. Specifies the value of Filter field 1.",
-                Documentation.SampleValues = {"SSH"}
+                Documentation.SampleValues = {"SSH"},
+                DataSource.Path = false
             ]
         ),
         filterField2 as (
             type nullable text meta [
                 Documentation.FieldCaption = "Filter field 2",
                 Documentation.FieldDescription = "This field allows you to specify a search field for sessions. Specify its value in Filter value 2.",
-                Documentation.SampleValues = {"verdict"}
+                Documentation.SampleValues = {"verdict"},
+                DataSource.Path = false
             ]
         ),
         filterValue2 as (
             type nullable text meta [
                 Documentation.FieldCaption = "Filter value 2",
                 Documentation.FieldDescription = "This field allows you to specify a search value for sessions. Specifies the value of Filter field 2.",
-                Documentation.SampleValues = {"ACCEPT"}
+                Documentation.SampleValues = {"ACCEPT"},
+                DataSource.Path = false
             ]
         ),
         filterField3 as (
             type nullable text meta [
                 Documentation.FieldCaption = "Filter field 3",
                 Documentation.FieldDescription = "This field allows you to specify a search field for sessions. Specify its value in Filter value 3.",
-                Documentation.SampleValues = {"active"}
+                Documentation.SampleValues = {"active"},
+                DataSource.Path = false
             ]
         ),
         filterValue3 as (
             type nullable text meta [
                 Documentation.FieldCaption = "Filter value 3",
                 Documentation.FieldDescription = "This field allows you to specify a search value for sessions. Specifies the value of Filter field 3.",
-                Documentation.SampleValues = {"false"}
+                Documentation.SampleValues = {"false"},
+                DataSource.Path = false
             ]
         ),
         skipVersionCheck as (
             type nullable logical meta [
                 Documentation.FieldCaption = "Skip Version Check",
                 Documentation.FieldDescription = "This field allows you to skip the SPS version check.",
-                Documentation.AllowedValues = {false, true}
+                Documentation.AllowedValues = {false, true},
+                DataSource.Path = false
             ]
         )
     ) as record meta [
