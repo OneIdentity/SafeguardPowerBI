@@ -15,10 +15,81 @@
 
 ## About the project
 
-The aim of One Identity Safeguard Power BI Connector (Power BI Connector) is to provide a solution for customers to visualize their audit data captured by [One Identity Safeguard for Priviledged Sessions] (SPS) in a highly configurable way compared to the on-box reporting system of SPS. The Power BI Connector uses basic authentication with the local login method to connect to SPS, and imports sessions metadata that matches the criteria specified in the Power BI Connector's input parameters. After successful data retrieval, the Power BI Connector returns two tables:
+The aim of One Identity Safeguard Power BI Connector (Power BI Connector) is to provide a solution for customers to visualize their audit data captured by [One Identity Safeguard for Priviledged Sessions] (SPS) in a highly configurable way compared to the on-box reporting system of SPS. The Power BI Connector uses basic authentication with the local login method to connect to SPS, and imports sessions metadata that matches the criteria specified in the Power BI Connector's input parameters. After successful data retrieval, the Power BI Connector returns the following two tables.
 
-- **Info**: contains information about the data fetching process for debugging purposes, and the version of the Power BI Connector.
-- **Sessions**: contains the actual sessions metadata
+### Info
+
+This table contains information about the data fetching process for debugging purposes, and the version of the Power BI Connector.
+
+### Sessions
+
+This table contains the actual sessions metadata. The Power BI Connector fetches all sessions from SPS. Fetched data will contain only the following session fields:
+
+- active
+- analytics.interesting_events
+- analytics.score.aggregated
+- analytics.score.details.command.score
+- analytics.score.details.fis.score
+- analytics.score.details.hostlogin.score
+- analytics.score.details.logintime.score
+- analytics.score.details.keystroke.score
+- analytics.score.details.mouse.score
+- analytics.score.details.windowtitle.score
+- analytics.scripted
+- analytics.similar_sessions
+- analytics.bucketed_duration
+- analytics.bucketed_starting_hour
+- analytics.tags
+- client.ip
+- client.name
+- client.port
+- creation_time
+- duration
+- end_time
+- log.adapter_name
+- log.auth_method
+- log.syslog_time
+- node_id
+- origin
+- protocol
+- recording.archive.date
+- recording.archive.path
+- recording.archive.policy
+- recording.archive.server
+- recording.archived
+- trail_download_link
+- recording.auth_method
+- recording.channel_policy
+- recording.command_extracted
+- recording.connection_policy
+- recording.connection_policy_id
+- recording.content_reference_id
+- recording.deny_reason
+- recording.index_status
+- recording.network_id
+- recording.server_local.ip
+- recording.server_local.name
+- recording.server_local.port
+- recording.session_id
+- recording.target.ip
+- recording.target.name
+- recording.target.port
+- recording.verdict
+- recording.window_title_extracted
+- server.address
+- server.ip
+- server.id
+- server.name
+- server.port
+- start_time
+- user.gateway_username
+- user.gateway_username_domain
+- user.id
+- user.name
+- user.name_domain
+- user.server_username
+- user.server_username_domain
+- verdict
 
 The project also a includes the One Identity Safeguard Power BI Report Template (Report Template) to quickstart report creation and visualize your audit data.
 
