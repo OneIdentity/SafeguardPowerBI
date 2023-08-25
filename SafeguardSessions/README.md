@@ -93,6 +93,18 @@ This table contains the actual sessions metadata. The Power BI Connector fetches
 
 The project also a includes the One Identity Safeguard Power BI Report Template (Report Template) to quickstart report creation and visualize your audit data.
 
+### Data Security
+
+One Identity Safeguard Power BI Connector uses https protocol to fetch data from SPS meaning that data is encrypted at the network level. Apart from this, One Identity does not implement additional data protection on top of Microsoft Power BI's security solutions. When using the Power BI Connector, consider applying the security options Microsoft provides for Power BI.
+
+To help you get started, we would like to draw your attention to the following details:
+
+- To have local files protected with encryption you will need to apply appropriately configured sensitivity labels.
+- When using Power BI connector with Power BI Desktop or Power BI Mobile, ensure cache files are also protected appropriately or data caching is turned off.
+- When using Power BI Service check if key management solution in use is sufficient for your needs.
+
+For further information, please refer to the Microsoft documentation on the topic.
+
 ## Installation and usage
 
 To use the connector,
