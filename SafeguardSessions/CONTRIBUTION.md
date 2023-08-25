@@ -84,7 +84,8 @@ Make sure you respect the [Coding style](#coding-style) and know the essentials 
 
 **For One Identity Developers:**
 
-Consider whether the change requires updating the One Idenity Safeguard Power BI Connector Tutorial documentation.
+- When accepting a contribution or commiting a change consider whether the change requires updating the CHANGELOG.md.
+- Consider whether the change requires updating the One Idenity Safeguard Power BI Connector Tutorial documentation.
 
 ## Useful documents
 
