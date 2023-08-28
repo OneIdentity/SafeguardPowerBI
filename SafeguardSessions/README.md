@@ -91,7 +91,7 @@ This table contains the actual sessions metadata. The Power BI Connector fetches
 - user.server_username_domain
 - verdict
 
-The project also a includes the One Identity Safeguard Power BI Report Template (Report Template) to quickstart report creation and visualize your audit data.
+The project also includes the One Identity Safeguard Power BI Report Template (Report Template) to quickstart report creation and visualize your audit data.
 
 ### Data Security
 
