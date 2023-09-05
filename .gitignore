@@ -43,8 +43,10 @@ bld/
 Generated\ Files/
 
 # Power Query SDK generated files
-bin/
-obj/
+[Bb]in/
+[Oo]bj/
+[Dd]eploy/
+
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
