@@ -68,24 +68,33 @@ shared GetData = (
     let
         startTime = DateTimeZone.LocalNow(),
         spsUrl = UrlBuilder.GenerateBaseUrl("https", spsIp),
+        queryParams = UrlBuilder.GetDefaultQuery() & query,
+
         authResponse =
             if IsMocked(mocks, "Authenticate") then
                 mocks[Authenticate][Value]
             else
                 Authenticate(spsUrl, credentials, mocks),
+        
         sessionId = ValidateSPSVersion(
             spsUrl,
             BaseAuthentication.MineSessionIdFromCookie(Request.GetHeader(Value.Metadata(authResponse), "Set-Cookie")),
             skipVersionCheck,
             mocks
         ),
-        response =
+        
+        sessionsDataResponse =
             if IsMocked(mocks, "FetchData") then
                 mocks[FetchData][Value]
             else
-                FetchData(spsUrl, UrlBuilder.GetDefaultQuery() & query, sessionId, mocks),
-        data = HandleIfThereIsAnError(try (response)),
-        result = BuildSPSResult(data, startTime)
+                FetchSessionsData(spsUrl, queryParams, sessionId, mocks),
+        
+        sessionsCountResponse = FetchSessionsCount(spsUrl, queryParams, sessionId, mocks),
+
+        sessionsData = HandleIfThereIsAnError(try (sessionsDataResponse)),
+        sessionsCount = HandleIfThereIsAnError(try (sessionsCountResponse)),
+        
+        result = BuildSPSResult(sessionsData, startTime, sessionsCount)
     in
         result;
 
@@ -134,18 +143,18 @@ shared Authenticate = (spsUrl as text, credentials as record, optional mocks as 
     in
         response;
 
-shared FetchData = (spsUrl as text, queryParams as record, sessionId as text, optional mocks as nullable record) as table =>
+shared FetchSessionsData = (spsUrl as text, queryParams as record, sessionId as text, optional mocks as nullable record) as table =>
     let
         snapshot = Search.OpenSnapshot(spsUrl, sessionId, mocks),
-        sessions = Search.AdvancedSearch(spsUrl, queryParams, snapshot, sessionId, mocks),
-        expectedSessionsCount = try Search.GetSessionsCount(spsUrl, queryParams, sessionId, mocks),
-        sessionsWithCountMetadata =
-            if expectedSessionsCount[HasError] = true then
-                error expectedSessionsCount[Error]
-            else
-                Value.ReplaceMetadata(sessions, Value.Metadata(sessions) & [Count = expectedSessionsCount[Value]])
+        sessions = Search.AdvancedSearch(spsUrl, queryParams, snapshot, sessionId, mocks)
     in
-        sessionsWithCountMetadata;
+        sessions;
+
+shared FetchSessionsCount = (spsUrl as text, queryParams as record, sessionId as text, optional mocks as nullable record) =>
+    let
+        sessionsCount = Search.GetSessionsCount(spsUrl, queryParams, sessionId, mocks)
+    in
+        sessionsCount;
 
 shared HandleIfThereIsAnError = (input as record) =>
     if input[HasError] = true then
