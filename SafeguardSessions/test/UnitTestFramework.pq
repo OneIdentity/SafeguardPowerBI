@@ -39,12 +39,12 @@ shared Facts.Summarize = (_facts as list) as table =>
             ][sum],
         passed = List.Accumulate(simplifiedFactsList, 0, Fact.CountSuccesses),
         total = List.Count(simplifiedFactsList),
-        format = if passed = total then "All #{0} Passed !!! ✓" else "#{0} Passed ☺  #{1} Failed ☹",
+        format = if passed = total then "All #{0} Passed !!!" else "#{0} Passed  #{1} Failed",
         outputFactList = if shortOutput then
             List.Select(simplifiedFactsList, each not Text.StartsWith([Result], "Success"))
         else
             simplifiedFactsList,
-        result = if passed = total then "Success" else "⛔",
+        result = if passed = total then "Success" else "-",
         rate = Number.IntegerDivide(100 * passed, total),
         header = [
             Result = result,
