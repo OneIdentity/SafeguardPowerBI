@@ -54,40 +54,24 @@ let
             navigationTable = Value.ReplaceType(source, newTableType)
         in
             navigationTable,
-    Utils.BuildSPSResult = (response as record, start_time as datetimezone) =>
+    Utils.BuildSPSResult = (response as anynonnull, start_time as datetimezone) =>
         let
             spsresult =
-                if response[HasError] then
-                    ErrorLog(
-                        "Error response of the http request",
-                        Utils.SPSResult(
-                            response[Error],
-                            Utils.FetchInfo(
-                                ErrorStatus,
-                                response[Error][Message],
-                                start_time,
-                                0,
-                                true,
-                                response[Error][Detail][RequestUrl]? ?? NotAvailableStatus
-                            )
+                [
+                    sessions = response,
+                    sessionsMeta = Value.Metadata(sessions),
+                    result = Utils.SPSResult(
+                        sessions,
+                        Utils.FetchInfo(
+                            SuccessStatus,
+                            "Data fetch succeeded.",
+                            start_time,
+                            sessionsMeta[Count],
+                            false,
+                            sessionsMeta[RequestUrl]
                         )
                     )
-                else
-                    [
-                        sessions = response[Value],
-                        sessionsMeta = Value.Metadata(sessions),
-                        result = Utils.SPSResult(
-                            sessions,
-                            Utils.FetchInfo(
-                                SuccessStatus,
-                                "Data fetch succeeded.",
-                                start_time,
-                                sessionsMeta[Count],
-                                false,
-                                sessionsMeta[RequestUrl]
-                            )
-                        )
-                    ][result]
+                ][result]
         in
             spsresult
 in

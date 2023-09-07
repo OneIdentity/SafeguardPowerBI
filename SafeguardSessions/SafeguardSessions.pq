@@ -84,8 +84,8 @@ shared GetData = (
                 mocks[FetchData][Value]
             else
                 FetchData(spsUrl, UrlBuilder.GetDefaultQuery() & query, sessionId, mocks),
-        data = HandleIfThereIsAnError(try (response)),
-        result = BuildSPSResult(data, startTime)
+
+        result = BuildSPSResult(response, startTime)
     in
         result;
 
