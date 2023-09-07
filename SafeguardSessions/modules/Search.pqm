@@ -100,28 +100,23 @@ let
             page,
     Search.GenerateByPage = (getNextPage as function) as table =>
         let
-            listOfPages = List.Select(
-                List.Generate(
-                    () => getNextPage(null),
-                    (lastPage) => lastPage <> null,
-                    // TODO: log if there is an error?
-                    (lastPage) => try getNextPage(lastPage) otherwise #table({}, {})
-                ),
-                each not Table.IsEmpty(_)
+            listOfPages = List.Generate(
+                () => getNextPage(null),
+                (lastPage) => lastPage <> null,
+                (lastPage) => getNextPage(lastPage)
             ),
             tableOfPages = Table.FromList(listOfPages, Splitter.SplitByNothing(), {"Page"}),
             firstRow = tableOfPages{0} ?,
-            combined = Table.RemoveRowsWithErrors(
-                Value.ReplaceType(
-                    Table.ExpandTableColumn(tableOfPages, "Page", Table.ColumnNames(firstRow[Page])),
-                    Value.Type(firstRow[Page])
-                )
-            )
+            combined = Value.ReplaceType(
+                Table.ExpandTableColumn(tableOfPages, "Page", Table.ColumnNames(firstRow[Page])),
+                Value.Type(firstRow[Page])
+            ),
+            removedLastNullRow = Table.RemoveLastN(combined, 1)
         in
             if firstRow = null then
                 Table.FromRows({})
             else
-                combined
+                removedLastNullRow
 in
     [
         AdvancedSearch = Search.AdvancedSearch,
