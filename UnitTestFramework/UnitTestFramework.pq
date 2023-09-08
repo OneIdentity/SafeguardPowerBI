@@ -4,7 +4,7 @@
 // Version 1.0.0 was exactly the same as Microsoft's framework. Above this version number,
 // it includes our changes and additions
 [Version = "1.6.3"]
-section UnitTestFrameork;
+section UnitTestFramework;
 
 shared Fact = (_subject as text, _expected, _actual) as record =>
     [
@@ -30,7 +30,7 @@ shared Facts = (_subject as text, _predicates as list) =>
 
 shared Facts.Summarize = (_facts as list) as table =>
     [
-        shortOutput = Text.Lower(Environment.FeatureSwitch("short", "true")) = "true",
+        shortOutput = Text.Lower(Environment.FeatureSwitch("output", "short")) = "short",
         simplifiedFactsList = _simplifyFactsList(_facts),
         Fact.CountSuccesses = (count, i) =>
             [

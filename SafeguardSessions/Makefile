@@ -14,7 +14,12 @@ TEST_FRAMEWORK=$(TEST_CONNECTOR_DIR)\bin\UnitTestFramework.mez
 
 REPORT_TEMPLATE=assets/template/OneIdentitySafeguard.pbit
 
-SHORT?=true
+OUTPUT?=short
+ALLOWED_OUTPUT:=short long
+
+ifeq ($(filter $(OUTPUT),$(ALLOWED_OUTPUT)),)
+    $(error OUTPUT must be set to 'short' or 'long')
+endif
 
 define calculate_checksum
 	(Get-FileHash "$(1)" -Algorithm SHA256).Hash.ToLower()
@@ -42,7 +47,7 @@ unit-test:
 	PQTest run-test \
 	--extension $(MAIN_CONNECTOR) \
 	--extension $(TEST_FRAMEWORK) \
-	--environmentConfiguration short=$(SHORT) \
+	--environmentConfiguration output=$(OUTPUT) \
 	--queryFile $(test_file) \
 	--prettyPrint
 
@@ -50,7 +55,7 @@ unit-tests:
 	PQTest run-test \
 	--extension $(MAIN_CONNECTOR) \
 	--extension $(TEST_FRAMEWORK) \
-	--environmentConfiguration short=$(SHORT) \
+	--environmentConfiguration output=$(OUTPUT) \
 	--queryFile $(TEST_CONNECTOR_DIR) \
 	--prettyPrint
 
