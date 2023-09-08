@@ -1,13 +1,13 @@
 let
-    IsMocked = Extension.ImportFunction("IsMocked", "Utils.pqm"),
-    PaddedTable.FromRecords = Extension.ImportFunction("PaddedTable.FromRecords", "Utils.pqm"),
+    IsMocked = Extension.ImportFunction("IsMocked", "CommonUtils.pqm"),
+    PaddedTable.FromRecords = Extension.ImportFunction("PaddedTable.FromRecords", "CommonUtils.pqm"),
     SchemaTransformationErrors.ListToTextConversionError = Extension.ImportFunction(
         "ListToTextConversionError", "SchemaTransformationErrors.pqm"
     ),
     SchemaTransformationErrors.SchemaApplyError = Extension.ImportFunction(
         "SchemaApplyError", "SchemaTransformationErrors.pqm"
     ),
-    Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm"),
+    Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "CommonLogger.pqm"),
     SchemaUtils.NameColumn = "Name",
     SchemaUtils.TypeColumn = "Type",
     SchemaUtils.Header = {SchemaUtils.NameColumn, SchemaUtils.TypeColumn},

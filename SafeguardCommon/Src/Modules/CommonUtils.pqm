@@ -1,0 +1,15 @@
+let
+    Utils.IsMocked = (mocks as nullable record, field as text) as logical =>
+        mocks <> null and Record.HasFields(mocks, field),
+    Utils.PaddedTable.FromRecords = (records as list) =>
+        let
+            fieldNames = List.Distinct(Record.FieldNames(Record.Combine(records))),
+            paddedRecords = List.Transform(records, each Record.SelectFields(_, fieldNames, MissingField.UseNull)),
+            asTable = Table.FromRecords(paddedRecords)
+        in
+            asTable
+in
+    [
+        IsMocked = Utils.IsMocked,
+        PaddedTable.FromRecords = Utils.PaddedTable.FromRecords
+    ]

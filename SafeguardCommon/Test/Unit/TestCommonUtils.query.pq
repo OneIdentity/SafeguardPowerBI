@@ -1,6 +1,6 @@
-section TestPaddedTableFromRecords;
+section TestCommonUtils;
 
-PaddedTable.FromRecords = Extension.ImportFunction("PaddedTable.FromRecords", "Utils.pqm");
+PaddedTable.FromRecords = Extension.ImportFunction("PaddedTable.FromRecords", "CommonUtils.pqm");
 
 PaddedTable.FromRecords.Name = "PaddedTable.FromRecords";
 
@@ -58,7 +58,7 @@ TestPaddedTableFromRecordsRaisesError = () =>
     in
         facts;
 
-shared TestPaddedTableFromRecords.UnitTest = [
+shared TestCommonUtils.UnitTest = [
     facts = {TestPaddedTableFromRecords(), TestPaddedTableFromRecordsRaisesError()},
     report = Facts.Summarize(facts)
 ][report];

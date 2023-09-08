@@ -104,48 +104,8 @@ let
         you specify. The Filter field - Filter value pairs are concatenated with ""AND"" in the q query parameter. 
         If only the Filter field is specified in the matching filter field-value pair, you will get an error indicating that a value has not been specified 
         for the filter field. For the From and To search fields, if only one of them is specified, the search in the other direction remains open."
-    ],
-    CustomErrors.ErrorBaseType = type function (
-        errorCode as (
-            type number meta [
-                Documentation.FieldCaption = "Error code",
-                Documentation.FieldDescription = "The raised error's code"
-            ]
-        ),
-        reason as (
-            type text meta [
-                Documentation.FieldCaption = "Error reason",
-                Documentation.FieldDescription = "Reason for the error"
-            ]
-        ),
-        message as (
-            type text meta [
-                Documentation.FieldCaption = "Error message",
-                Documentation.FieldDescription = "Descriptive message of the error"
-            ]
-        ),
-        detail as [
-            Cause = (
-                type any meta [
-                    Documentation.FieldCaption = "Cause of the error",
-                    Documentation.FieldDescription = "The data that triggered the error"
-                ]
-            ),
-            RequestUrl = (type nullable text meta [
-                Documentation.FieldCaption = "Request url"
-            ])
-        ],
-        optional manuallyHandled as (
-            type logical meta [
-                Documentation.FieldCaption = "Handled error",
-                Documentation.FieldDescription = "Whether the error is handled manually in the code or it should propagate up to the user"
-            ]
-        )
-    ) as table meta [
-        Documentation.Name = "ErrorBase"
     ]
 in
     [
-        ContentsType = SafeguardSessions.ContentsType,
-        ErrorBaseType = CustomErrors.ErrorBaseType
+        ContentsType = SafeguardSessions.ContentsType
     ]

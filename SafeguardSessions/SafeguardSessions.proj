@@ -1,5 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="BuildMez">
+  <!-- SafeguardCommon properties  -->
+  <PropertyGroup> 
+    <RepositoryPath>$([System.IO.Path]::GetDirectoryName($(MSBuildProjectDirectory)))\</RepositoryPath>
+    <SafeguardCommonPath>$(RepositoryPath)\SafeguardCommon\</SafeguardCommonPath>
+    <SafeguardCommonSourcePath>$(SafeguardCommonPath)\Src\</SafeguardCommonSourcePath>
+    <CommonModulesPath>$(SafeguardCommonSourcePath)Modules\</CommonModulesPath>
+    <CommonErrorPath>$(CommonModulesPath)Error\</CommonErrorPath>
+    <CommonRequestPath>$(CommonModulesPath)Request\</CommonRequestPath>
+  </PropertyGroup>
   <!-- SafeguardSessions properties  -->
   <PropertyGroup>
     <SrcPath>$(MSBuildProjectDirectory)\Src\</SrcPath>
@@ -22,14 +31,22 @@
     <MezIntermediatePath>$(IntermediateOutputPath)MEZ\</MezIntermediatePath>
     <MezOutputPath>$(OutputPath)OneIdentitySafeguard.mez</MezOutputPath>
   </PropertyGroup>
+  <ItemGroup Label="SafeguardCommon">
+    <MezContent Include="$(CommonErrorPath)CommonErrorBase.pqm" />
+    <MezContent Include="$(CommonErrorPath)CommonErrorCodes.pqm" />
+    <MezContent Include="$(CommonErrorPath)CommonRequestErrors.pqm" />
+    <MezContent Include="$(CommonRequestPath)CommonRequest.pqm" />
+    <MezContent Include="$(CommonRequestPath)CommonResponseHandler.pqm" />
+    <MezContent Include="$(CommonModulesPath)CommonLogger.pqm" />
+    <MezContent Include="$(CommonModulesPath)CommonTypes.pqm" />
+    <MezContent Include="$(CommonModulesPath)CommonUtils.pqm" />
+  </ItemGroup>
   <ItemGroup Label="SafeguardSessions">
     <MezContent Include="$(SrcPath)SafeguardSessions.pq" />
     <MezContent Include="$(ModulesPath)Constants.pqm" />
-    <MezContent Include="$(ModulesPath)Logger.pqm" />
     <MezContent Include="$(ModulesPath)Types.pqm" />
     <MezContent Include="$(ModulesPath)Search.pqm" />
     <MezContent Include="$(ModulesPath)Utils.pqm" />
-    <MezContent Include="$(ErrorPath)ErrorBase.pqm" />
     <MezContent Include="$(ErrorPath)ErrorCodes.pqm" />
     <MezContent Include="$(ErrorPath)QueryTransformErrors.pqm" />
     <MezContent Include="$(ErrorPath)RequestErrors.pqm" />

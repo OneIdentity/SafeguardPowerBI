@@ -1,5 +1,5 @@
 let
-    ErrorBase.Type = Extension.ImportFunction("ErrorBaseType", "Types.pqm"),
+    ErrorBase.Type = Extension.ImportFunction("ErrorBaseType", "CommonTypes.pqm"),
     ErrorBase.Implementation = (
         errorCode as number, reason as text, message as text, detail as record, optional manuallyHandled as logical
     ) =>
@@ -17,6 +17,6 @@ let
                 Message = message,
                 Detail = detailRecord
             ],
-    ErrorBase.Error = Value.ReplaceType(ErrorBase.Implementation, ErrorBase.Type)
+    CommonErrorBase.Error = Value.ReplaceType(ErrorBase.Implementation, ErrorBase.Type)
 in
-    ErrorBase.Error
+    CommonErrorBase.Error

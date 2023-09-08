@@ -1,0 +1,16 @@
+let
+    ErrorCodes.ExtendedHTTPCodes = [
+        BadRequest = 4000,
+        AuthenticationError = 4010,
+        AuthorizationError = 4030,
+        NotFound = 4040,
+        ServerError = 5000
+    ],
+    ErrorCodes.CustomCodes = [
+        NotParsableResponse = 10002
+    ]
+in
+    [
+        ExtendedHTTPCodes = ErrorCodes.ExtendedHTTPCodes,
+        CustomCodes = ErrorCodes.CustomCodes
+    ]

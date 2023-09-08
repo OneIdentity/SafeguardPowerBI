@@ -2,17 +2,7 @@ let
     SuccessStatus = Extension.ImportFunction("SuccessStatus", "Constants.pqm"),
     ErrorStatus = Extension.ImportFunction("ErrorStatus", "Constants.pqm"),
     NotAvailableStatus = Extension.ImportFunction("NotAvailableStatus", "Constants.pqm"),
-    ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm"),
-    InfoLog = Extension.ImportFunction("InfoLog", "Logger.pqm"),
-    Utils.IsMocked = (mocks as nullable record, field as text) as logical =>
-        mocks <> null and Record.HasFields(mocks, field),
-    Utils.PaddedTable.FromRecords = (records as list) =>
-        let
-            fieldNames = List.Distinct(Record.FieldNames(Record.Combine(records))),
-            paddedRecords = List.Transform(records, each Record.SelectFields(_, fieldNames, MissingField.UseNull)),
-            asTable = Table.FromRecords(paddedRecords)
-        in
-            asTable,
+    ErrorLog = Extension.ImportFunction("ErrorLog", "CommonLogger.pqm"),
     Utils.FetchInfo = (
         status as text,
         message as text,
@@ -92,8 +82,6 @@ let
             spsresult
 in
     [
-        IsMocked = Utils.IsMocked,
-        PaddedTable.FromRecords = Utils.PaddedTable.FromRecords,
         FetchInfo = Utils.FetchInfo,
         SPSResult = Utils.SPSResult,
         BuildSPSResult = Utils.BuildSPSResult

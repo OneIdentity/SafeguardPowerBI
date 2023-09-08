@@ -210,27 +210,18 @@ shared Extension.ImportFunction = (function_name as text, module_name as text) =
 
 SafeguardSessions.ContentsType = Extension.ImportFunction("ContentsType", "Types.pqm");
 
-Utils = Extension.ImportModule("Utils.pqm");
+IsMocked = Extension.ImportFunction("IsMocked", "CommonUtils.pqm");
 
-IsMocked = Utils[IsMocked];
-
-BuildSPSResult = Utils[BuildSPSResult];
+BuildSPSResult = Extension.ImportFunction("BuildSPSResult", "Utils.pqm");
 
 BaseAuthentication = Extension.ImportModule("BaseAuthentication.pqm");
 
 BaseAuthentication.EncodeCredentials = BaseAuthentication[EncodeCredentials];
 BaseAuthentication.MineSessionIdFromCookie = BaseAuthentication[MineSessionIdFromCookie];
 
-Request = Extension.ImportModule("Request.pqm");
-
-Request.GetAuthParameters = Request[GetAuthParameters];
-Request.GetDefaultParameters = Request[GetDefaultParameters];
-Request.Generate = Request[Generate];
-Request.GetHeader = Request[GetHeader];
-
-Schema.GetSchema = Extension.ImportFunction("GetSchema", "Schema.pqm");
-
-SchemaUtils.ApplySchema = Extension.ImportFunction("ApplySchema", "SchemaUtils.pqm");
+Request.GetAuthParameters = Extension.ImportFunction("GetAuthParameters", "Request.pqm");
+Request.Generate = Extension.ImportFunction("Generate", "Request.pqm");
+Request.GetHeader = Extension.ImportFunction("GetHeader", "CommonRequest.pqm");
 
 Version = Extension.ImportModule("Version.pqm");
 
@@ -255,7 +246,7 @@ UrlBuilder.GenerateBaseUrl = UrlBuilder[GenerateBaseUrl];
 UrlBuilder.GenerateUrl = UrlBuilder[GenerateUrl];
 UrlBuilder.GetDefaultQuery = UrlBuilder[GetDefaultQuery];
 
-Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "Logger.pqm");
+Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "CommonLogger.pqm");
 
 AuthEndpoint = Extension.ImportFunction("AuthEndpoint", "Constants.pqm");
 

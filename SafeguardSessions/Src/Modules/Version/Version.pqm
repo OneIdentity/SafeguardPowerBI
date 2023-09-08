@@ -1,10 +1,9 @@
 let
-    IsMocked = Extension.ImportFunction("IsMocked", "Utils.pqm"),
+    IsMocked = Extension.ImportFunction("IsMocked", "CommonUtils.pqm"),
     InfoEndpoint = Extension.ImportFunction("InfoEndpoint", "Constants.pqm"),
-    Logger.InfoLog = Extension.ImportFunction("InfoLog", "Logger.pqm"),
     Request.Generate = Extension.ImportFunction("Generate", "Request.pqm"),
     Request.GetDefaultParameters = Extension.ImportFunction("GetDefaultParameters", "Request.pqm"),
-    ResponseHandler.GetDataFromResponse = Extension.ImportFunction("GetDataFromResponse", "ResponseHandler.pqm"),
+    ResponseHandler.GetDataFromResponse = Extension.ImportFunction("GetDataFromResponse", "CommonResponseHandler.pqm"),
     ResponseHandler.ValidateByStatusCode = Extension.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
     UrlBuilder.GenerateUrl = Extension.ImportFunction("GenerateUrl", "UrlBuilder.pqm"),
     Version.Separator = ".",

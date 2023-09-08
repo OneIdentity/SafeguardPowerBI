@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="BuildMez">
+  <!-- SafeguardCommon properties  -->
+  <PropertyGroup>
+    <SrcPath>$(MSBuildProjectDirectory)\Src\</SrcPath>
+    <ModulesPath>$(SrcPath)Modules\</ModulesPath>
+    <ErrorPath>$(ModulesPath)Error\</ErrorPath>
+    <RequestPath>$(ModulesPath)Request\</RequestPath>
+  </PropertyGroup>
+  <!-- Deploy properties  -->
+  <PropertyGroup>
+    <DeployPath>$(MSBuildProjectDirectory)\Deploy\</DeployPath>
+    <DeployedConnectorPath>$(DeployPath)SafeguardCommon\</DeployedConnectorPath>
+    <OutputPath Condition="'$(OutputPath)' == ''">$(DeployedConnectorPath)Bin\</OutputPath>
+    <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">$(DeployedConnectorPath)Obj\</IntermediateOutputPath>
+    <MezIntermediatePath>$(IntermediateOutputPath)MEZ\</MezIntermediatePath>
+    <MezOutputPath>$(OutputPath)SafeguardCommon.mez</MezOutputPath>
+  </PropertyGroup>
+  <ItemGroup Label="SafeguardCommon">
+    <MezContent Include="$(ErrorPath)CommonErrorBase.pqm" />
+    <MezContent Include="$(ErrorPath)CommonErrorCodes.pqm" />
+    <MezContent Include="$(ErrorPath)CommonRequestErrors.pqm" />
+    <MezContent Include="$(RequestPath)CommonRequest.pqm" />
+    <MezContent Include="$(RequestPath)CommonResponseHandler.pqm" />
+    <MezContent Include="$(ModulesPath)CommonLogger.pqm" />
+    <MezContent Include="$(ModulesPath)CommonTypes.pqm" />
+    <MezContent Include="$(ModulesPath)CommonUtils.pqm" />
+    <MezContent Include="$(SrcPath)SafeguardCommon.pq" />
+  </ItemGroup>
+  <Target Name="BuildMez" AfterTargets="Build" Inputs="@(MezContent)" Outputs="$(MezOutputPath)">
+    <RemoveDir Directories="$(MezIntermediatePath)" />
+    <Copy SourceFiles="@(MezContent)" DestinationFolder="$(MezIntermediatePath)" />
+    <MakeDir Directories="$(OutputPath)" Condition="!Exists('$(OutputPath)')" />
+    <ZipDirectory SourceDirectory="$(MezIntermediatePath)" DestinationFile="$(MezOutputPath)" Overwrite="true" />
+  </Target>
+  <Target Name="Clean">
+    <RemoveDir Directories="$(MezIntermediatePath)" />
+    <Delete Files="$(MezOutputPath)" />
+  </Target>
+</Project>

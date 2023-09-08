@@ -5,13 +5,6 @@ Request = Extension.ImportModule("Request.pqm");
 Request.GetAuthParameters = Request[GetAuthParameters];
 Request.GetDefaultParameters = Request[GetDefaultParameters];
 Request.Generate = Request[Generate];
-Request.GetHeader = Request[GetHeader];
-
-requestMetaData = [
-    Headers = [
-        #"Set-Cookie" = "session_id=e8e5f0a0d3367043150187f81df3484e91e365d5; expires=Sat, 03 Dec 2022 02:27:48 GMT; HttpOnly; Max-Age=43200; Path=/; Secure"
-    ]
-];
 
 TestRequestGeneration = () =>
     let
@@ -53,11 +46,6 @@ shared TestRequest.UnitTest = [
                 IsRetry = true
             ],
             Request.GetDefaultParameters("session_id=47710719df1849b5b6aa2fd301e32a216cffe38b")
-        ),
-        Fact(
-            "Check request get header value:",
-            "session_id=e8e5f0a0d3367043150187f81df3484e91e365d5; expires=Sat, 03 Dec 2022 02:27:48 GMT; HttpOnly; Max-Age=43200; Path=/; Secure",
-            Request.GetHeader(requestMetaData, "Set-Cookie")
         ),
         TestRequestGeneration()
     },

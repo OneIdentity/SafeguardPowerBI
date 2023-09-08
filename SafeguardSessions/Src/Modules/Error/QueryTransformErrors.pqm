@@ -1,5 +1,5 @@
 let
-    ErrorBase = Extension.ImportModule("ErrorBase.pqm"),
+    ErrorBase = Extension.ImportModule("CommonErrorBase.pqm"),
     ErrorCodes.CustomCodes = Extension.ImportFunction("CustomCodes", "ErrorCodes.pqm"),
     QueryTransformErrors.FilterFieldWithoutValue = (detail as record) =>
         ErrorBase(
