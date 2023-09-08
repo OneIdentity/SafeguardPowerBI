@@ -4,15 +4,17 @@
 # Install gnu make
 # choco install make
 
-TEST_CONNECTOR_DIR=test
+TEST_CONNECTOR_DIR=Test
+DEPLOY_DIR=Deploy
+REPORT_TEMPLATE_DIR = ReportTemplate
 
 MAIN_PROJECT_CONFIG=SafeguardSessions.proj
-TEST_PROJECT_CONFIG=$(TEST_CONNECTOR_DIR)\test.proj
+TEST_PROJECT_CONFIG=$(TEST_CONNECTOR_DIR)\SafeguardSessionsTest.proj
 
-MAIN_CONNECTOR=bin\OneIdentitySafeguard.mez
-TEST_FRAMEWORK=$(TEST_CONNECTOR_DIR)\bin\UnitTestFramework.mez
+MAIN_CONNECTOR=$(DEPLOY_DIR)\OneIdentitySafeguard\Bin\OneIdentitySafeguard.mez
+TEST_FRAMEWORK=$(DEPLOY_DIR)\UnitTestFramework\Bin\UnitTestFramework.mez
 
-REPORT_TEMPLATE=assets/template/OneIdentitySafeguard.pbit
+REPORT_TEMPLATE=ReportTemplate\OneIdentitySafeguard.pbit
 
 OUTPUT?=short
 ALLOWED_OUTPUT:=short long

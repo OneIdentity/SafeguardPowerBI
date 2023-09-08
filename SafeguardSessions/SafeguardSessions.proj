@@ -1,43 +1,52 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="BuildMez">
+  <!-- SafeguardSessions properties  -->
   <PropertyGroup>
-    <OutputPath Condition="'$(OutputPath)' == ''">$(MSBuildProjectDirectory)\bin\</OutputPath>
-    <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">$(MSBuildProjectDirectory)\obj\</IntermediateOutputPath>
+    <SrcPath>$(MSBuildProjectDirectory)\Src\</SrcPath>
+    <ModulesPath>$(SrcPath)Modules\</ModulesPath>
+    <ErrorPath>$(ModulesPath)Error\</ErrorPath>
+    <RequestPath>$(ModulesPath)Request\</RequestPath>
+    <SchemaPath>$(ModulesPath)Schema\</SchemaPath>
+    <DefinitionsPath>$(Schemapath)Definitions\</DefinitionsPath>
+    <VersionPath>$(ModulesPath)Version\</VersionPath>
+    <ResourcePath>$(SrcPath)\Res\</ResourcePath>
+    <AssetsPath>$(ResourcePath)Assets\</AssetsPath>
+    <IconsPath>$(AssetsPath)Icons\</IconsPath>
+  </PropertyGroup>
+  <!-- Deploy properties  -->
+  <PropertyGroup> 
+    <DeployPath>$(MSBuildProjectDirectory)\Deploy\</DeployPath>
+    <DeployedConnectorPath>$(DeployPath)OneIdentitySafeguard\</DeployedConnectorPath>
+    <OutputPath Condition="'$(OutputPath)' == ''">$(DeployedConnectorPath)Bin\</OutputPath>
+    <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">$(DeployedConnectorPath)Obj\</IntermediateOutputPath>
     <MezIntermediatePath>$(IntermediateOutputPath)MEZ\</MezIntermediatePath>
     <MezOutputPath>$(OutputPath)OneIdentitySafeguard.mez</MezOutputPath>
-    <AssetsPath>$(MSBuildProjectDirectory)\assets\</AssetsPath>
-    <IconsPath>$(AssetsPath)\icons\</IconsPath>
-    <ModulesPath>$(MSBuildProjectDirectory)\modules\</ModulesPath>
-    <RequestPath>$(ModulesPath)\request\</RequestPath>
-    <ErrorPath>$(ModulesPath)\error\</ErrorPath>
-    <SchemaPath>$(ModulesPath)\schema\</SchemaPath>
-    <VersionPath>$(ModulesPath)\version\</VersionPath>
-    <DefinitionsPath>$(Schemapath)\definitions\</DefinitionsPath>
   </PropertyGroup>
-  <ItemGroup>
-    <MezContent Include="SafeguardSessions.pq" />
-    <MezContent Include="$(ModulesPath)BaseAuthentication.pqm" />
+  <ItemGroup Label="SafeguardSessions">
+    <MezContent Include="$(SrcPath)SafeguardSessions.pq" />
     <MezContent Include="$(ModulesPath)Constants.pqm" />
     <MezContent Include="$(ModulesPath)Logger.pqm" />
     <MezContent Include="$(ModulesPath)Types.pqm" />
     <MezContent Include="$(ModulesPath)Search.pqm" />
     <MezContent Include="$(ModulesPath)Utils.pqm" />
-    <MezContent Include="$(VersionPath)Version.pqm" />
-    <MezContent Include="$(VersionPath)SupportedVersions.pqm" />
     <MezContent Include="$(ErrorPath)ErrorBase.pqm" />
     <MezContent Include="$(ErrorPath)ErrorCodes.pqm" />
-    <MezContent Include="$(ErrorPath)SchemaTransformationErrors.pqm" />
     <MezContent Include="$(ErrorPath)QueryTransformErrors.pqm" />
     <MezContent Include="$(ErrorPath)RequestErrors.pqm" />
+    <MezContent Include="$(ErrorPath)SchemaTransformationErrors.pqm" />
     <MezContent Include="$(ErrorPath)UnexpectedErrorWrapper.pqm" />
     <MezContent Include="$(ErrorPath)VersionErrors.pqm" />
-    <MezContent Include="$(RequestPath)UrlBuilder.pqm" />
+    <MezContent Include="$(RequestPath)BaseAuthentication.pqm" />
     <MezContent Include="$(RequestPath)QueryParameterTransformer.pqm" />
     <MezContent Include="$(RequestPath)Request.pqm" />
     <MezContent Include="$(RequestPath)ResponseHandler.pqm" />
+    <MezContent Include="$(RequestPath)UrlBuilder.pqm" />
     <MezContent Include="$(SchemaPath)Schema.pqm" />
     <MezContent Include="$(SchemaPath)SchemaUtils.pqm" />
     <MezContent Include="$(DefinitionsPath)Sessions.pqm" />
+    <MezContent Include="$(VersionPath)SupportedVersions.pqm" />
+    <MezContent Include="$(VersionPath)Version.pqm" />
+    <MezContent Include="$(ResourcePath)Resources.resx" />
     <MezContent Include="$(IconsPath)OneIdentitySafeguardPowerBIConnector16.png" />
     <MezContent Include="$(IconsPath)OneIdentitySafeguardPowerBIConnector20.png" />
     <MezContent Include="$(IconsPath)OneIdentitySafeguardPowerBIConnector24.png" />
@@ -46,7 +55,6 @@
     <MezContent Include="$(IconsPath)OneIdentitySafeguardPowerBIConnector48.png" />
     <MezContent Include="$(IconsPath)OneIdentitySafeguardPowerBIConnector64.png" />
     <MezContent Include="$(IconsPath)OneIdentitySafeguardPowerBIConnector80.png" />
-    <MezContent Include="resources.resx" />
   </ItemGroup>
   <Target Name="BuildMez" AfterTargets="Build" Inputs="@(MezContent)" Outputs="$(MezOutputPath)">
     <RemoveDir Directories="$(MezIntermediatePath)" />
