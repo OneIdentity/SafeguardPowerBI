@@ -1,0 +1,9 @@
+{
+    "unit_tests_path":  "C:\\Users\\szszeker.VB131\\Desktop\\repos\\SafeguardPowerBI\\SafeguardSessions\\Test",
+    "connector_proj_path":  "C:\\Users\\szszeker.VB131\\Desktop\\repos\\SafeguardPowerBI\\SafeguardSessions\\SafeguardSessions.proj",
+    "test_proj_path":  "C:\\Users\\szszeker.VB131\\Desktop\\repos\\SafeguardPowerBI\\SafeguardSessions\\Test\\SafeguardSessionsTest.proj",
+    "aliases_path":  "C:\\Users\\szszeker.VB131\\Desktop\\repos\\SafeguardPowerBI\\SafeguardSessions\\.venv\\aliases",
+    "connector_mez_path":  "C:\\Users\\szszeker.VB131\\Desktop\\repos\\SafeguardPowerBI\\SafeguardSessions\\Deploy\\OneIdentitySafeguard\\Bin\\OneIdentitySafeguard.mez",
+    "test_mez_path":  "C:\\Users\\szszeker.VB131\\Desktop\\repos\\SafeguardPowerBI\\SafeguardSessions\\Deploy\\UnitTestFramework\\Bin\\UnitTestFramework.mez",
+    "venv_path":  "C:\\Users\\szszeker.VB131\\Desktop\\repos\\SafeguardPowerBI\\SafeguardSessions\\.venv"
+}
