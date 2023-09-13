@@ -6,6 +6,8 @@ CreateSchema = Extension.ImportFunction("CreateSchema", "SchemaUtils.pqm");
 
 SupportedVersions.LatestVersion = Extension.ImportFunction("LatestVersion", "SupportedVersions.pqm");
 
+TestResultsContentWithoutStartTime =  UnitTestFramework.ImportFunction("TestResultsContentWithoutStartTime", "Asserts.pqm");
+
 TestSafeguardSessions.URL = "dummy_url";
 
 TestSafeguardSessions.AuthenticationCredentials = [

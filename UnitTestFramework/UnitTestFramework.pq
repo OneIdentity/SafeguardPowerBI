@@ -301,30 +301,6 @@ shared TestLogging = (logValues as record, expectedLogValues as record, inputTyp
 
 shared ProvideDataForTest = (data as list, func as function) => List.Transform(data, each Function.Invoke(func, _));
 
-shared TestResultsContentWithoutStartTime = (response as table, expectedData as any, expectedInfo as table) =>
-    let
-        facts = {
-            Fact("Data content of response matches", expectedData, response{[Name = "Sessions"]}[Data]),
-            TestFetchInfoContentWithoutStartTime(expectedInfo, response{[Name = "Info"]}[Data])
-        }
-    in
-        facts;
-
-shared TestFetchInfoContentWithoutStartTime = (expectedInfo as table, actualInfo as table) =>
-    let
-        expected = Table.First(expectedInfo),
-        actual = Table.First(actualInfo),
-        facts = {
-            Fact("Status matches", expected[Status], actual[Status]),
-            Fact("Connector version matches", expected[ConnectorVersion], actual[ConnectorVersion]),
-            Fact("Message matches", expected[Message], actual[Message]),
-            Fact("Count matches", expected[ExpectedCount], actual[ExpectedCount]),
-            Fact("Failed matches", expected[Failed], actual[Failed]),
-            Fact("URL matches", expected[Url], actual[Url])
-        }
-    in
-        facts;
-
 //
 // Load common library functions
 //

@@ -9,6 +9,7 @@
   <!-- SafeguardSessionsTest properties  -->
   <PropertyGroup>
     <ResourcePath>$(MSBuildProjectDirectory)\Res\</ResourcePath>
+    <UtilitiesPath>$(MSBuildProjectDirectory)\Utilities\</UtilitiesPath>
     <AssetsPath>$(ResourcePath)Assets\</AssetsPath>
     <SchemaPath>$(AssetsPath)Schema\</SchemaPath>
   </PropertyGroup>
@@ -27,6 +28,7 @@
   <ItemGroup Label="SafeguardSessionsTest">
     <MezContent Include="$(SchemaPath)GetDataAsset.pqm" />
     <MezContent Include="$(SchemaPath)SessionsSchemaAsset.pqm" />
+    <MezContent Include="$(UtilitiesPath)Asserts.pqm" />
   </ItemGroup>
   <Target Name="BuildMez" AfterTargets="Build" Inputs="@(MezContent)" Outputs="$(MezOutputPath)">
     <RemoveDir Directories="$(MezIntermediatePath)" />
