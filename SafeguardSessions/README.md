@@ -4,8 +4,7 @@
 
 - [About the project]
 - [Installation and usage]
-- [Common errors]
-- [Troubleshooting]
+- [Troubleshooting errors]
 - [Release policy]
 - [Refreshing your preloaded data]
 - [Upgrading the Power BI Connector]
@@ -130,82 +129,9 @@ You can read a more comprehensive guide on using the Power BI Connector and the 
 
 You can fetch data from multiple SPS instances by repeating steps 10. to 13. from [Installation and usage]. If you want to append your queries, follow the [Append queries] official tutorial.
 
-## Common errors
+## Troubleshooting errors
 
-I cannot find **One Identity Safeguard** under **Home > Get data**.
-
-**A)** You might have forgotten to enable loading non-certified connectors. Make sure you enable this option, as described in the [Installation and usage] section.
-
-**B)** You have built your Power BI Connector from source code, but it contains one or more errors.
-
----
-
-I get the following error when trying to connect to SPS:
-
-```
-Unable to connect
-We encountered an error while trying to connect. Details: "The underlying
-connection was closed: Could not establish trust relationship for the SSL/TLS
-secure channel."
-```
-
-You might have forgotten to import the CA X.509 certificate of your SPS appliance, as described in the [Installation and usage] section.
-
----
-
-If you have successfully upgraded your custom connector and tried to fetch data, but receive the following message, revisit the [Upgrading the Power BI Connector] section.
-
-```
-Your version of the connector (ConnectorVersion) is not compatible with your SPS version (SPSVersion). For a connector version that is compatible with your SPS
-version, visit the official release page of the connector:
-https://github.com/OneIdentity/SafeguardPowerBI/releases
-```
-
----
-
-I see "Error" in the **Status** column of the **Info** table, and the **Message** column contains the following:
-
-**A)** Error 10003: The source IP returned a response with missing fields.
-
-A response returned by SPS does not contain a field that the Power BI Connector requires for processing data.
-Reproduce the error with trace logging enabled, and create a technical case, as described in the [Troubleshooting] section.
-Attach the mashup trace logs to the issue.
-
-**B)** Error 4000: The source IP interpreted a malformed request.
-
-Your filter might be invalid. Make sure you specify your filter parameters correctly. For more information on the available search fields, see **List of available search queries** in the **One Identity Safeguard for Privileged Sessions Administration Guide** on the [Technical documents for One Identity Safeguard for Priviledged Sessions] page.
-
-**C)** Error 4010: The username or password you have specified is invalid.
-
-Make sure you use a local user to access SPS with a valid username and password. One Identity recommends creating a dedicated local user for the purpose of importing data from SPS into Power BI.
-
-**D)** Error 4030: You are not authorized to access the specified resource.
-
-In order to access audit data, the user you use to access SPS must have search access rights.
-
-**E)** Error 4040: The requested resource is not found.
-
-In order to fetch audit data from SPS, the Power BI Connector relies on the advanced search method, which uses database snapshots to ensure data consistency throughout data fetching. If for some reason, the database snapshot disappears, this error can occur. To resolve the issue, try initiating the data fetching again.
-
-**F)** Error 4290: Snapshot quota exceeded.
-
-This happens if multiple users from different computers or using different programs want to use advanced search relying on database snapshots at the same time. In this case, try initiating the data fetching process at least 5 minutes later so that an existing snapshot expires in the system, and a new one can be opened.
-
-**G)** Error 5000: The source IP responded with a server error.
-
-This error indicates issues with the SPS appliance. Try the suggestions written in the [Troubleshooting] section.
-
-**H)** Error 10005: An error happened when applying schema.
-
-In order to display the session records from SPS in a user-friendly way in Power BI, schema must be mapped to the session records. This error means that at least one session occurred in the SPS response that the schema application could not handle correctly and caused an unexpected error.
-Reproduce the error with trace logging enabled, and create a technical case, as described in the [Troubleshooting] section.
-Attach the mashup trace logs to the issue.
-
-## Troubleshooting
-
-If an error occurs during the data fetching process, you can check the **Info** table to see a descriptive message about the error type. In this case, the **Sessions** table will contain the exact error record that you can inspect if you go to **Home > Transform data** and select the **Sessions** table.
-
-If you cannot resolve the issue, you can collect the Power BI mashup trace logs, as described in the [Collecting Power BI mashup trace logs] documentation, and create a [One Identity Technical Case]. Attach the collected trace logs for debugging purposes.
+See the [Troubleshooting] guide.
 
 ## Release policy
 
@@ -288,17 +214,16 @@ Distributed under the One Identity - Open Source License. For more information, 
 
 - [One Identity Safeguard for Priviledged Sessions]
 - [Technical documents for One Identity Safeguard for Priviledged Sessions]
-- Create a [One Identity Technical Case]
 - [Releases] of the Power BI Connector
 - [License] of the Power BI Connector
 - [Contribution] to the Power BI Connector
+- [Troubleshooting] errors of the Power BI Connector
 
 <!-- Links -->
 
 [About the project]: #about-the-project
 [Installation and usage]: #installation-and-usage
-[Common errors]: #common-errors
-[Troubleshooting]: #troubleshooting
+[Troubleshooting errors]: #troubleshooting-errors
 [Release policy]: #release-policy
 [Refreshing your preloaded data]: #refreshing-your-preloaded-data
 [Upgrading the Power BI Connector]: #upgrading-the-power-bi-connector
@@ -308,15 +233,14 @@ Distributed under the One Identity - Open Source License. For more information, 
 
 [One Identity Safeguard for Priviledged Sessions]: https://www.oneidentity.com/products/one-identity-safeguard-for-privileged-sessions/
 [Technical documents for One Identity Safeguard for Priviledged Sessions]: https://support.oneidentity.com/one-identity-safeguard-for-privileged-sessions/technical-documents
-[One Identity Technical Case]: https://support.oneidentity.com/create-service-request
 
 [Releases]: https://github.com/OneIdentity/SafeguardPowerBI/releases
 [License]: https://github.com/OneIdentity/SafeguardPowerBI/blob/main/LICENSE
 [Contribution]: CONTRIBUTION.md
+[Troubleshooting]: TROUBLESHOOTING.md
 
 [Append queries]: https://learn.microsoft.com/en-us/power-query/append-queries
 
 [Install imported certificates]: https://learn.microsoft.com/en-us/troubleshoot/windows-server/windows-security/install-imported-certificates
-[Collecting Power BI mashup trace logs]: https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-diagnostics#collecting-mashup-traces
 
 <!-- Links END -->
