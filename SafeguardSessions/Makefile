@@ -34,13 +34,6 @@ define write_checksum
 		-InputObject \$\($(call calculate_checksum,$(1))\)
 endef
 
-define write_checksum
-	Out-File \
-		-FilePath '$(1).sha256' \
-		-Encoding ASCII \
-		-InputObject \$\($(call calculate_checksum,$(1))\)
-endef
-
 build:
 	MSBuild $(TEST_PROJECT_CONFIG) -t:Clean;BuildMez \
 	&& MSBuild $(MAIN_PROJECT_CONFIG) -t:Clean;BuildMez
