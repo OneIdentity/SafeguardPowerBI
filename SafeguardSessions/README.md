@@ -8,8 +8,8 @@
 - [Release policy]
 - [Refreshing your preloaded data]
 - [Upgrading the Power BI Connector]
-- [Contribution]
-- [License]
+- [Contributing to the project]
+- [Licensing of the project]
 - [References]
 
 ## About the project
@@ -202,11 +202,11 @@ You can check the current version number of your Power BI connector from the **I
 1. Get a connector MEZ file compatible with your SPS version from the [Releases] page, or build it from source code following the steps described in the [Contribution] guide.
 2. Copy the file to your `%USERPROFILE%\Documents\Power BI Desktop\Custom Connectors` folder.
 
-## Contribution
+## Contributing to the project
 
 For guidance on contribution and development quickstart, see [Contribution].
 
-## License
+## Licensing of the project
 
 Distributed under the One Identity - Open Source License. For more information, see [License].
 
@@ -227,15 +227,16 @@ Distributed under the One Identity - Open Source License. For more information, 
 [Release policy]: #release-policy
 [Refreshing your preloaded data]: #refreshing-your-preloaded-data
 [Upgrading the Power BI Connector]: #upgrading-the-power-bi-connector
-[Contribution]: #contribution
-[License]: #license
+[Contributing to the project]: #contributing-to-the-project
+[Licensing of the project]: #licensing-of-the-project
 [References]: #references
 
 [One Identity Safeguard for Priviledged Sessions]: https://www.oneidentity.com/products/one-identity-safeguard-for-privileged-sessions/
 [Technical documents for One Identity Safeguard for Priviledged Sessions]: https://support.oneidentity.com/one-identity-safeguard-for-privileged-sessions/technical-documents
 
 [Releases]: https://github.com/OneIdentity/SafeguardPowerBI/releases
-[License]: https://github.com/OneIdentity/SafeguardPowerBI/blob/main/LICENSE
+
+[License]: ../LICENSE
 [Contribution]: CONTRIBUTION.md
 [Troubleshooting]: TROUBLESHOOTING.md
 
