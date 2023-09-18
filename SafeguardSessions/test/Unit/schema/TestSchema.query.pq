@@ -1,6 +1,5 @@
 section TestSchema;
 
-SchemaTable = Extension.ImportFunction("SchemaTable", "Schema.pqm");
 GetSchema = Extension.ImportFunction("GetSchema", "Schema.pqm");
 
 ExpectedSessionsSchema = UnitTestFramework.ImportFunction("Schema", "SessionsSchemaAsset.pqm");

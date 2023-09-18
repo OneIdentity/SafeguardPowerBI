@@ -1,0 +1,17 @@
+let
+    ErrorBase = Extension.ImportModule("CommonErrorBase.pqm"),
+    CommonRequestErrors.ErrorMap = Extension.ImportFunction("ErrorMap", "CommonRequestErrors.pqm"),
+    ErrorCodes.ExtendedHTTPCodes = Extension.ImportFunction("ExtendedHTTPCodes", "ErrorCodes.pqm"),
+    RequestErrors.SnapshotQuotaError = (detail as record) =>
+        ErrorBase(
+            ErrorCodes.ExtendedHTTPCodes[SnapshotQuotaError], "Snapshot Quota Error", "Snapshot quota exceeded.",
+            detail
+        ),
+    RequestErrors.ErrorMap = CommonRequestErrors.ErrorMap & [
+        429 = RequestErrors.SnapshotQuotaError
+    ]
+in
+    [
+        ErrorCodes = List.Transform(Record.FieldNames(RequestErrors.ErrorMap), each Number.FromText(_)),
+        ErrorMap = RequestErrors.ErrorMap
+    ]

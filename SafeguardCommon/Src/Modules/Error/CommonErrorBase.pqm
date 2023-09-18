@@ -1,0 +1,22 @@
+let
+    ErrorBase.Type = Extension.ImportFunction("ErrorBaseType", "CommonTypes.pqm"),
+    ErrorBase.Implementation = (
+        errorCode as number, reason as text, message as text, detail as record, optional manuallyHandled as logical
+    ) =>
+        let
+            message = Text.Format(
+                "Error #[ErrorCode]: #[Message]", [
+                    ErrorCode = Number.ToText(errorCode),
+                    Message = message
+                ]
+            ),
+            detailRecord = detail & [ManuallyHandled = manuallyHandled ?? true] & [ErrorCode = errorCode]
+        in
+            error [
+                Reason = reason,
+                Message = message,
+                Detail = detailRecord
+            ],
+    CommonErrorBase.Error = Value.ReplaceType(ErrorBase.Implementation, ErrorBase.Type)
+in
+    CommonErrorBase.Error

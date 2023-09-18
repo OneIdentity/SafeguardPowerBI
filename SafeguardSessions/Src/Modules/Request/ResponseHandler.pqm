@@ -1,0 +1,28 @@
+let
+    Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "CommonLogger.pqm"),
+    RequestErrors.ErrorMap = Extension.ImportFunction("ErrorMap", "RequestErrors.pqm"),
+    ResponseHandler.ValidateByStatusCode = (response as record) =>
+        let
+            responseMeta = Value.Metadata(response),
+            httpStatus = Text.From(responseMeta[Response.Status]),
+            log = Logger.ErrorLog(
+                "SPS returned with an error response",
+                [
+                    Response = response,
+                    Response.Status = responseMeta[Response.Status],
+                    RequestUrl = responseMeta[RequestUrl]
+                ]
+            ),
+            details = [
+                Cause = response,
+                RequestUrl = log[RequestUrl]
+            ]
+        in
+            if Record.HasFields(RequestErrors.ErrorMap, httpStatus) then
+                Record.Field(RequestErrors.ErrorMap, httpStatus)(details)
+            else
+                response
+in
+    [
+        ValidateByStatusCode = ResponseHandler.ValidateByStatusCode
+    ]

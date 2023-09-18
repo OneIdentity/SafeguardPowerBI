@@ -5,16 +5,12 @@
 # choco install make
 
 TEST_CONNECTOR_DIR=Test
-DEPLOY_DIR=Deploy
-REPORT_TEMPLATE_DIR = ReportTemplate
 
-MAIN_PROJECT_CONFIG=SafeguardSessions.proj
-TEST_PROJECT_CONFIG=$(TEST_CONNECTOR_DIR)\SafeguardSessionsTest.proj
+MAIN_PROJECT_CONFIG=SafeguardCommon.proj
+TEST_PROJECT_CONFIG=$(TEST_CONNECTOR_DIR)\SafeguardCommonTest.proj
 
-MAIN_CONNECTOR=$(DEPLOY_DIR)\OneIdentitySafeguard\Bin\OneIdentitySafeguard.mez
-TEST_FRAMEWORK=$(DEPLOY_DIR)\UnitTestFramework\Bin\UnitTestFramework.mez
-
-REPORT_TEMPLATE=ReportTemplate\OneIdentitySafeguard.pbit
+MAIN_CONNECTOR=Deploy\SafeguardCommon\Bin\SafeguardCommon.mez
+TEST_FRAMEWORK=Deploy\UnitTestFramework\Bin\UnitTestFramework.mez
 
 OUTPUT?=short
 ALLOWED_OUTPUT:=short long
@@ -22,17 +18,6 @@ ALLOWED_OUTPUT:=short long
 ifeq ($(filter $(OUTPUT),$(ALLOWED_OUTPUT)),)
     $(error OUTPUT must be set to 'short' or 'long')
 endif
-
-define calculate_checksum
-	(Get-FileHash "$(1)" -Algorithm SHA256).Hash.ToLower()
-endef
-
-define write_checksum
-	Out-File \
-		-FilePath '$(1).sha256' \
-		-Encoding ASCII \
-		-InputObject \$\($(call calculate_checksum,$(1))\)
-endef
 
 build:
 	MSBuild $(TEST_PROJECT_CONFIG) -t:Clean;BuildMez \
@@ -53,13 +38,3 @@ unit-tests:
 	--environmentConfiguration output=$(OUTPUT) \
 	--queryFile $(TEST_CONNECTOR_DIR) \
 	--prettyPrint
-
-checksum:
-	@powershell $(call write_checksum,$(MAIN_CONNECTOR))
-	@powershell $(call write_checksum,$(REPORT_TEMPLATE))
-
-verify-checksum:
-	@powershell (Get-Content -Path $(MAIN_CONNECTOR).sha256) -eq \
-		$(call calculate_checksum,$(MAIN_CONNECTOR))
-	@powershell (Get-Content -Path $(REPORT_TEMPLATE).sha256) -eq \
-		$(call calculate_checksum,$(REPORT_TEMPLATE))

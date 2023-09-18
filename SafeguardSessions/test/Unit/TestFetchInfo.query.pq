@@ -2,6 +2,8 @@ section TestUtils;
 
 Utils.FetchInfo = Extension.ImportFunction("FetchInfo", "Utils.pqm");
 
+TestFetchInfoContentWithoutStartTime =  UnitTestFramework.ImportFunction("TestFetchInfoContentWithoutStartTime", "Asserts.pqm");
+
 TestFetchInfoContainsConnectorVersion = () =>
     let
         actualInfo = Utils.FetchInfo("dummy_status", "dummy_message", null, 0, false, "dummy_url"),

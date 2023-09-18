@@ -1,15 +1,15 @@
-section TestRequestErrors;
+section CommonTestRequestErrors;
 
-ErrorCodes = Extension.ImportFunction("ErrorCodes", "RequestErrors.pqm");
+ErrorCodes = Extension.ImportFunction("ErrorCodes", "CommonRequestErrors.pqm");
 
 TestErrorCodeListIsCorrect = () =>
     let
-        expectedErrorCodeList = {400, 401, 403, 404, 500, 429},
+        expectedErrorCodeList = {400, 401, 403, 404, 500},
         fact = Fact("Error code list is correct", expectedErrorCodeList, ErrorCodes)
     in
         fact;
 
-shared TestRequestErrors.UnitTest = [
+shared TestCommonRequestErrors.UnitTest = [
     facts = {TestErrorCodeListIsCorrect()},
     report = Facts.Summarize(facts)
 ][report];

@@ -1,0 +1,15 @@
+let
+    ErrorBase = Extension.ImportModule("CommonErrorBase.pqm"),
+    ErrorCodes.CustomCodes = Extension.ImportFunction("CustomCodes", "ErrorCodes.pqm"),
+    QueryTransformErrors.FilterFieldWithoutValue = (detail as record) =>
+        ErrorBase(
+            ErrorCodes.CustomCodes[FilterFieldWithoutValue],
+            "Filter Field Without Value",
+            "There is a field value missing from one or more of your filter fields.",
+            detail,
+            false
+        )
+in
+    [
+        FilterFieldWithoutValue = QueryTransformErrors.FilterFieldWithoutValue
+    ]

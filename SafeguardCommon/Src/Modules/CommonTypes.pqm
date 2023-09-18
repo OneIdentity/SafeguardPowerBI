@@ -1,0 +1,44 @@
+let
+    CustomErrors.ErrorBaseType = type function (
+        errorCode as (
+            type number meta [
+                Documentation.FieldCaption = "Error code",
+                Documentation.FieldDescription = "The raised error's code"
+            ]
+        ),
+        reason as (
+            type text meta [
+                Documentation.FieldCaption = "Error reason",
+                Documentation.FieldDescription = "Reason for the error"
+            ]
+        ),
+        message as (
+            type text meta [
+                Documentation.FieldCaption = "Error message",
+                Documentation.FieldDescription = "Descriptive message of the error"
+            ]
+        ),
+        detail as [
+            Cause = (
+                type any meta [
+                    Documentation.FieldCaption = "Cause of the error",
+                    Documentation.FieldDescription = "The data that triggered the error"
+                ]
+            ),
+            RequestUrl = (type nullable text meta [
+                Documentation.FieldCaption = "Request url"
+            ])
+        ],
+        optional manuallyHandled as (
+            type logical meta [
+                Documentation.FieldCaption = "Handled error",
+                Documentation.FieldDescription = "Whether the error is handled manually in the code or it should propagate up to the user"
+            ]
+        )
+    ) as table meta [
+        Documentation.Name = "ErrorBase"
+    ]
+in
+    [
+        ErrorBaseType = CustomErrors.ErrorBaseType
+    ]

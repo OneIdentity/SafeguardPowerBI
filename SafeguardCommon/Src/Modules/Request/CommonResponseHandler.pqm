@@ -1,0 +1,40 @@
+let
+    RequestErrors.NotParsableResponse = Extension.ImportFunction("NotParsableResponse", "CommonRequestErrors.pqm"),
+    ResponseHandler.GetDataFromResponse = (response as record, path as text, optional separator as text) =>
+        let
+            GetRecordSafe = (content as record, pathAsList as list) =>
+                let
+                    currentField = List.First(pathAsList),
+                    currentContent =
+                        if currentField <> -1 then
+                            Record.FieldOrDefault(content, currentField, null) meta Value.Metadata(response)
+                        else
+                            content,
+                    handledContent =
+                        if currentContent = null then
+                            RequestErrors.NotParsableResponse(
+                                [
+                                    Cause = response,
+                                    MissingField = path,
+                                    RequestUrl = Value.Metadata(response)[RequestUrl]
+                                ]
+                            )
+                        else
+                            currentContent,
+                    nextPathAsList = List.RemoveFirstN(pathAsList, 1),
+                    result =
+                        if List.Count(nextPathAsList) > 0 then
+                            @GetRecordSafe(handledContent, nextPathAsList)
+                        else
+                            handledContent
+                in
+                    result,
+            _separator = separator ?? ".",
+            pathAsList = Text.Split(path, _separator),
+            data = GetRecordSafe(response, pathAsList)
+        in
+            data
+in
+    [
+        GetDataFromResponse = ResponseHandler.GetDataFromResponse
+    ]

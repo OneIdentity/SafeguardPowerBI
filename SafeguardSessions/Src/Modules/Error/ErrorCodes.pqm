@@ -1,0 +1,19 @@
+let
+    CommonErrorCodes.ExtendedHTTPCodes = Extension.ImportFunction("ExtendedHTTPCodes", "CommonErrorCodes.pqm"),
+    CommonErrorCodes.CustomCodes = Extension.ImportFunction("CustomCodes", "CommonErrorCodes.pqm"),
+    ErrorCodes.ExtendedHTTPCodes = CommonErrorCodes.ExtendedHTTPCodes & [
+        SnapshotQuotaError = 4290
+    ],
+    ErrorCodes.CustomCodes = CommonErrorCodes.CustomCodes
+        & [
+            FilterFieldWithoutValue = 10000,
+            NotSupportedVersion = 10001,
+            ListToTextConversionError = 10003,
+            SchemaApplyError = 10004,
+            Unexpected = 99999
+        ]
+in
+    [
+        ExtendedHTTPCodes = ErrorCodes.ExtendedHTTPCodes,
+        CustomCodes = ErrorCodes.CustomCodes
+    ]
