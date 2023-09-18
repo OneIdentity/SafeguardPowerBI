@@ -306,7 +306,8 @@ TestGetDataHandlesAuthenticationError = () =>
 TestGetDataWithActualData = () =>
     let
         fakeResponses = [
-            #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id" = TestSafeguardSessions.ActualResponse
+            #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id" = TestSafeguardSessions.ActualResponse,
+            #"https://dummy_url/dummy_url_final" = TestSafeguardSessions.Response.Last
         ],
         expectedData = TestSafeguardSessions.ExpectedDataForActualResponse,
         expectedInfo = FetchInfo(
