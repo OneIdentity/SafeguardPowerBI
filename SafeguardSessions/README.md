@@ -14,7 +14,7 @@
 
 ## About the project
 
-The aim of One Identity Safeguard Power BI Connector (Power BI Connector) is to provide a solution for customers to visualize their audit data captured by [One Identity Safeguard for Priviledged Sessions] (SPS) in a highly configurable way compared to the on-box reporting system of SPS. The Power BI Connector uses basic authentication with the local login method to connect to SPS, and imports sessions metadata that matches the criteria specified in the Power BI Connector's input parameters. After successful data retrieval, the Power BI Connector returns the following two tables.
+The aim of One Identity Safeguard Power BI Connector (Power BI Connector) is to provide a solution for customers to visualize their audit data captured by [One Identity Safeguard for Privileged Sessions] (SPS) in a highly configurable way compared to the on-box reporting system of SPS. The Power BI Connector uses basic authentication with the local login method to connect to SPS, and imports sessions metadata that matches the criteria specified in the Power BI Connector's input parameters. After successful data retrieval, the Power BI Connector returns the following two tables.
 
 ### Info
 
@@ -123,7 +123,7 @@ To use the connector,
 13. Select both the **Info** and **Sessions** tables, then click **Load**.
 14. Once data is imported into Power BI, you can start creating your reports by either creating them from scratch or by using the Report Template.
 
-You can read a more comprehensive guide on using the Power BI Connector and the Report Template in the One Idenity Safeguard Power BI Connector Tutorial that can be found on the [Technical documents for One Identity Safeguard for Priviledged Sessions] page.
+You can read a more comprehensive guide on using the Power BI Connector and the Report Template in the One Idenity Safeguard Power BI Connector Tutorial that can be found on the [Technical documents for One Identity Safeguard for Privileged Sessions] page.
 
 ### Fetching data from multiple SPS instances
 
@@ -212,8 +212,8 @@ Distributed under the One Identity - Open Source License. For more information, 
 
 ## References
 
-- [One Identity Safeguard for Priviledged Sessions]
-- [Technical documents for One Identity Safeguard for Priviledged Sessions]
+- [One Identity Safeguard for Privileged Sessions]
+- [Technical documents for One Identity Safeguard for Privileged Sessions]
 - [Releases] of the Power BI Connector
 - [License] of the Power BI Connector
 - [Contribution] to the Power BI Connector
@@ -231,8 +231,8 @@ Distributed under the One Identity - Open Source License. For more information, 
 [Licensing of the project]: #licensing-of-the-project
 [References]: #references
 
-[One Identity Safeguard for Priviledged Sessions]: https://www.oneidentity.com/products/one-identity-safeguard-for-privileged-sessions/
-[Technical documents for One Identity Safeguard for Priviledged Sessions]: https://support.oneidentity.com/one-identity-safeguard-for-privileged-sessions/technical-documents
+[One Identity Safeguard for Privileged Sessions]: https://www.oneidentity.com/products/one-identity-safeguard-for-privileged-sessions/
+[Technical documents for One Identity Safeguard for Privileged Sessions]: https://support.oneidentity.com/one-identity-safeguard-for-privileged-sessions/technical-documents
 
 [Releases]: https://github.com/OneIdentity/SafeguardPowerBI/releases
 
