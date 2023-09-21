@@ -99,12 +99,25 @@ let
             page,
     Search.GenerateByPage = (getNextPage as function) as table =>
         let
-            listOfPages = List.Generate(
-                () => getNextPage(null), (lastPage) => lastPage <> null, (lastPage) => getNextPage(lastPage)
+            listOfPages = List.Select(
+                List.Generate(
+                    () => getNextPage(null),
+                    (lastPage) => lastPage <> null,
+                    (lastPage) => getNextPage(lastPage)
+                ),
+                each not Table.IsEmpty(_)
             ),
-            combined = Table.Combine(listOfPages)
+            tableOfPages = Table.FromList(listOfPages, Splitter.SplitByNothing(), {"Page"}),
+            firstRow = tableOfPages{0}?,
+            combined = Value.ReplaceType(
+                Table.ExpandTableColumn(tableOfPages, "Page", Table.ColumnNames(firstRow[Page])),
+                Value.Type(firstRow[Page])
+            )
         in
-            combined
+            if firstRow = null then
+                Table.FromRows({})
+            else
+                combined
 in
     [
         AdvancedSearch = Search.AdvancedSearch,

@@ -13,6 +13,7 @@
 ### Bug fixes
 
 * ResponseHandler.GetDataFromResponse passes on the meta in recursive calls.
+* Fix memory consumption of the Power BI Connector and enable importing large number of sessions into Power BI.
 
 ### Other changes
 

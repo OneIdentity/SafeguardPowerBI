@@ -71,6 +71,7 @@ When introducing a new error code, please consider the following:
 
 - The error codes from the HTTP Requests should have a zero at the end if there is already an error ending with a zero then the next error code falling in the same HTTP Request category should be incremented by one.
 - The error code for errors originating from the connector should be incremented by one.
+- List the new error in the [Troubleshooting] guide.
 
 ## How to contribute to the project
 
@@ -113,5 +114,7 @@ Make sure you respect the [Coding style](#coding-style) and know the essentials 
 [MSBuild]: https://github.com/microsoft/vscode-powerquery-sdk/issues/192#issuecomment-1311882460
 
 [Creating good commits]: https://google.github.io/eng-practices/review/developer/
+
+[Troubleshooting]: TROUBLESHOOTING.md
 
 <!-- Links END -->

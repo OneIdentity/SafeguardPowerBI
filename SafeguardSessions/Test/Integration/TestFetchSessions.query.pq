@@ -36,7 +36,28 @@ TestSafeguardSessions.SuccessfulOpenSnapshotResponse = FakeRawResponse([
     body = [snapshot = "dummy_snapshot_id"]
 ]);
 
-TestSafeguardSessions.FirstHit = [
+TestSafeguardSessions.Response.SingleHit = FakeRawResponse(
+    [
+        items = {TestSafeguardSessions.FirstItem},
+        #"meta" = [next = "/dummy_next"]
+    ]
+);
+
+TestSafeguardSessions.Response.DoubleHit = FakeRawResponse(
+    [
+        items = {TestSafeguardSessions.FirstItem, TestSafeguardSessions.SecondItem},
+        #"meta" = [next = "/dummy_next"]
+    ]
+);
+
+TestSafeguardSessions.Response.LastHit = FakeRawResponse(
+    [
+        items = {},
+        #"meta" = [next = null]
+    ]
+);
+
+TestSafeguardSessions.FirstItem = [
     body = [
         start = #datetimezone(2022, 12, 31, 23, 59, 30, 0, 0),
         end = #datetimezone(2023, 1, 1, 7, 34, 11, 0, 0),
@@ -47,14 +68,7 @@ TestSafeguardSessions.FirstHit = [
     #"meta" = []
 ];
 
-TestSafeguardSessions.Response.SingleHit = FakeRawResponse(
-    [
-        items = {TestSafeguardSessions.FirstHit},
-        #"meta" = [next = null]
-    ]
-);
-
-TestSafeguardSessions.SecondHit = [
+TestSafeguardSessions.SecondItem = [
     body = [
         start = #datetimezone(2023, 1, 14, 22, 11, 33, 0, 0),
         end = #datetimezone(2023, 1, 16, 2, 3, 12, 0, 0),
@@ -64,13 +78,6 @@ TestSafeguardSessions.SecondHit = [
     key = "id2",
     #"meta" = []
 ];
-
-TestSafeguardSessions.Response.DoubleHit = FakeRawResponse(
-    [
-        items = {TestSafeguardSessions.FirstHit, TestSafeguardSessions.SecondHit},
-        #"meta" = [next = null]
-    ]
-);
 
 TestSafeguardSessions.Schema = [
     Sessions = CreateSchema(
@@ -200,7 +207,8 @@ TestFetchingSessions = () =>
                 [
                     GetSessionsCountResponse = TestSafeguardSessions.GetExpectedCountResponse(2),
                     GetPageResponseMap = [
-                        #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&start=2023-01-01T00%3A00%3A00.0000000%2B00%3A00&end=2023-01-15T00%3A00%3A00.0000000%2B00%3A00&snapshot=dummy_snapshot_id" = TestSafeguardSessions.Response.DoubleHit
+                        #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&start=2023-01-01T00%3A00%3A00.0000000%2B00%3A00&end=2023-01-15T00%3A00%3A00.0000000%2B00%3A00&snapshot=dummy_snapshot_id" = TestSafeguardSessions.Response.DoubleHit,
+                        #"https://dummy_url/dummy_next" = TestSafeguardSessions.Response.LastHit
                     ]
                 ]
                     & TestSafeguardSessions.Mocks,
@@ -240,7 +248,8 @@ TestFetchingSessions = () =>
                 [
                     GetSessionsCountResponse = TestSafeguardSessions.GetExpectedCountResponse(1),
                     GetPageResponseMap = [
-                        #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&q=protocol%3ASSH%20AND%20user.name%3Abalabit&snapshot=dummy_snapshot_id" = TestSafeguardSessions.Response.SingleHit
+                        #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&q=protocol%3ASSH%20AND%20user.name%3Abalabit&snapshot=dummy_snapshot_id" = TestSafeguardSessions.Response.SingleHit,
+                        #"https://dummy_url/dummy_next" = TestSafeguardSessions.Response.LastHit
                     ]
                 ]
                     & TestSafeguardSessions.Mocks,
@@ -273,7 +282,8 @@ TestFetchingSessions = () =>
                 [
                     GetSessionsCountResponse = TestSafeguardSessions.GetExpectedCountResponse(1),
                     GetPageResponseMap = [
-                        #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id" = TestSafeguardSessions.Response.SingleHit
+                        #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id" = TestSafeguardSessions.Response.SingleHit,
+                        #"https://dummy_url/dummy_next" = TestSafeguardSessions.Response.LastHit
                     ]
                 ]
                     & TestSafeguardSessions.Mocks,

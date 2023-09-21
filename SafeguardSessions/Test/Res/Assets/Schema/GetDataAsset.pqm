@@ -1163,7 +1163,7 @@
             href = "/api/audit/sessions",
             last = null,
             limit = 500,
-            next = null,
+            next = "/dummy_url_final",
             parent = "/api/audit",
             previous = null,
             remaining_seconds = 43200,
