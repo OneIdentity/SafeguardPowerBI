@@ -63,6 +63,9 @@ try {
     Write-Output "Installing PowerQuery SDK Tools"
     & nuget install Microsoft.PowerQuery.SdkTools -ConfigFile $SCRIPTS_DIR\nuget.config -DirectDownload `
         -Version $packageVersions.PowerQuerySDKVersion
+
+    Write-Output "Bootstrap finished"
+    [void](New-Item -ItemType "file" -Path "$VENV_DIR\BOOTSRAP_FINISHED_FLAG")
 }
 catch {
     Write-Output $_.Exception.Message

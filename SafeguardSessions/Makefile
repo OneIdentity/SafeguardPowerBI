@@ -1,65 +1,27 @@
-# Install chocolatey
-# Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+VIRTUAL_ENV = .venv
+BOOTSRAP_FINISHED_FLAG = $(VIRTUAL_ENV)/BOOTSRAP_FINISHED_FLAG
 
-# Install gnu make
-# choco install make
+bs: $(BOOTSRAP_FINISHED_FLAG)
 
-TEST_CONNECTOR_DIR=Test
-DEPLOY_DIR=Deploy
-REPORT_TEMPLATE_DIR = ReportTemplate
+$(BOOTSRAP_FINISHED_FLAG):
+	@powershell Scripts\Bootstrap.ps1
 
-MAIN_PROJECT_CONFIG=SafeguardSessions.proj
-TEST_PROJECT_CONFIG=$(TEST_CONNECTOR_DIR)\SafeguardSessionsTest.proj
+bootstrap: bs
 
-MAIN_CONNECTOR=$(DEPLOY_DIR)\OneIdentitySafeguard\Bin\OneIdentitySafeguard.mez
-TEST_FRAMEWORK=$(DEPLOY_DIR)\UnitTestFramework\Bin\UnitTestFramework.mez
+build: bs
+	@powershell Scripts\Build.ps1
 
-REPORT_TEMPLATE=ReportTemplate\OneIdentitySafeguard.pbit
+unit-test: bs
+	@powershell Scripts\RunUnitTests.ps1 -Output $(OUTPUT) -TestFile $(test_file)
 
-OUTPUT?=short
-ALLOWED_OUTPUT:=short long
-
-ifeq ($(filter $(OUTPUT),$(ALLOWED_OUTPUT)),)
-    $(error OUTPUT must be set to 'short' or 'long')
-endif
-
-define calculate_checksum
-	(Get-FileHash "$(1)" -Algorithm SHA256).Hash.ToLower()
-endef
-
-define write_checksum
-	Out-File \
-		-FilePath '$(1).sha256' \
-		-Encoding ASCII \
-		-InputObject \$\($(call calculate_checksum,$(1))\)
-endef
-
-build:
-	MSBuild $(TEST_PROJECT_CONFIG) -t:Clean;BuildMez \
-	&& MSBuild $(MAIN_PROJECT_CONFIG) -t:Clean;BuildMez
-
-unit-test:
-	PQTest run-test \
-	--extension $(MAIN_CONNECTOR) \
-	--extension $(TEST_FRAMEWORK) \
-	--environmentConfiguration output=$(OUTPUT) \
-	--queryFile $(test_file) \
-	--prettyPrint
-
-unit-tests:
-	PQTest run-test \
-	--extension $(MAIN_CONNECTOR) \
-	--extension $(TEST_FRAMEWORK) \
-	--environmentConfiguration output=$(OUTPUT) \
-	--queryFile $(TEST_CONNECTOR_DIR) \
-	--prettyPrint
+unit-tests: bs
+	@powershell Scripts\RunUnitTests.ps1 -Output $(OUTPUT)
 
 checksum:
-	@powershell $(call write_checksum,$(MAIN_CONNECTOR))
-	@powershell $(call write_checksum,$(REPORT_TEMPLATE))
+	@powershell Scripts\Checksum.ps1
 
 verify-checksum:
-	@powershell (Get-Content -Path $(MAIN_CONNECTOR).sha256) -eq \
-		$(call calculate_checksum,$(MAIN_CONNECTOR))
-	@powershell (Get-Content -Path $(REPORT_TEMPLATE).sha256) -eq \
-		$(call calculate_checksum,$(REPORT_TEMPLATE))
+	@powershell Scripts\Checksum.ps1 -Verify
+
+clean:
+	@powershell Scripts\Cleanup.ps1
