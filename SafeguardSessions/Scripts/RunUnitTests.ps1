@@ -1,4 +1,7 @@
-Param($Output)
+Param(
+    $Output,
+    $TestFile
+    )
 
 $ErrorActionPreference = "Stop"
 
@@ -11,9 +14,13 @@ if ($null -eq $Output) {
     $Output = "short"
 }
 
+if ($null -eq $TestFile) {
+    $TestFile = $config.unit_tests_path
+}
+
 & pqtest run-test `
     --extension $config.connector_mez_path `
     --extension $config.test_mez_path `
     --environmentConfiguration output=$Output `
-    --queryFile $config.unit_tests_path `
+    --queryFile $TestFile `
     --prettyPrint

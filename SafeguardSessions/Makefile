@@ -19,49 +19,25 @@ REPORT_TEMPLATE=ReportTemplate\OneIdentitySafeguard.pbit
 OUTPUT?=short
 ALLOWED_OUTPUT:=short long
 
-ifeq ($(filter $(OUTPUT),$(ALLOWED_OUTPUT)),)
-    $(error OUTPUT must be set to 'short' or 'long')
-endif
-
-define calculate_checksum
-	(Get-FileHash "$(1)" -Algorithm SHA256).Hash.ToLower()
-endef
-
-define write_checksum
-	Out-File \
-		-FilePath '$(1).sha256' \
-		-Encoding ASCII \
-		-InputObject \$\($(call calculate_checksum,$(1))\)
-endef
-
 bs: bootstrap
 
 bootstrap:
 	@powershell Scripts\Bootstrap.ps1
 
-build:
+build: bs
 	@powershell Scripts\Build.ps1
 
-unit-test:
-	PQTest run-test \
-	--extension $(MAIN_CONNECTOR) \
-	--extension $(TEST_FRAMEWORK) \
-	--environmentConfiguration output=$(OUTPUT) \
-	--queryFile $(test_file) \
-	--prettyPrint
+unit-test: bs
+	@powershell Scripts\RunUnitTests.ps1 -Output $(OUTPUT) -TestFile $(test_file)
 
-unit-tests:
+unit-tests: bs
 	@powershell Scripts\RunUnitTests.ps1 -Output $(OUTPUT)
 
 checksum:
-	@powershell $(call write_checksum,$(MAIN_CONNECTOR))
-	@powershell $(call write_checksum,$(REPORT_TEMPLATE))
+	@powershell Scripts\Checksum.ps1
 
 verify-checksum:
-	@powershell (Get-Content -Path $(MAIN_CONNECTOR).sha256) -eq \
-		$(call calculate_checksum,$(MAIN_CONNECTOR))
-	@powershell (Get-Content -Path $(REPORT_TEMPLATE).sha256) -eq \
-		$(call calculate_checksum,$(REPORT_TEMPLATE))
+	@powershell Scripts\Checksum.ps1 -Verify
 
 clean:
 	@powershell Scripts\Cleanup.ps1
