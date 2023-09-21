@@ -34,9 +34,13 @@ define write_checksum
 		-InputObject \$\($(call calculate_checksum,$(1))\)
 endef
 
+bs: bootstrap
+
+bootstrap:
+	@powershell Scripts\Bootstrap.ps1
+
 build:
-	MSBuild $(TEST_PROJECT_CONFIG) -t:Clean;BuildMez \
-	&& MSBuild $(MAIN_PROJECT_CONFIG) -t:Clean;BuildMez
+	@powershell Scripts\Build.ps1
 
 unit-test:
 	PQTest run-test \
@@ -47,12 +51,7 @@ unit-test:
 	--prettyPrint
 
 unit-tests:
-	PQTest run-test \
-	--extension $(MAIN_CONNECTOR) \
-	--extension $(TEST_FRAMEWORK) \
-	--environmentConfiguration output=$(OUTPUT) \
-	--queryFile $(TEST_CONNECTOR_DIR) \
-	--prettyPrint
+	@powershell Scripts\RunUnitTests.ps1 -Output $(OUTPUT)
 
 checksum:
 	@powershell $(call write_checksum,$(MAIN_CONNECTOR))
@@ -63,3 +62,6 @@ verify-checksum:
 		$(call calculate_checksum,$(MAIN_CONNECTOR))
 	@powershell (Get-Content -Path $(REPORT_TEMPLATE).sha256) -eq \
 		$(call calculate_checksum,$(REPORT_TEMPLATE))
+
+clean:
+	@powershell Scripts\Cleanup.ps1
