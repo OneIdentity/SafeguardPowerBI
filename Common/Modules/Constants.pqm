@@ -118,7 +118,8 @@ in
                     & "TaskProperties.FailedPasswordChangeAttempts,TaskProperties.FailedSshKeyCheckAttempts,TaskProperties.FailedSshKeyChangeAttempts,"
                     & "TaskProperties.FailedSshKeyDiscoveryAttempts,TaskProperties.FailedSshKeyRevokeAttempts,TaskProperties.FailedSuspendAccountAttempts,"
                     & "TaskProperties.FailedRestoreAccountAttempts,TaskProperties.FailedApiKeyCheckAttempts,TaskProperties.FailedApiKeyChangeAttempts",
-                AssetPartitions = "Name,DefaultProfileName,DefaultSshKeyProfileName,ManagedBy"
+                AssetPartitions = "Name,DefaultProfileName,DefaultSshKeyProfileName,ManagedBy",
+                AssetOwnershipReport = "Name,EmailAddress,PrincipalKind,IdentityProviderName,Direct"
             ]
         ]
     ]

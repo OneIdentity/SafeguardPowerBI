@@ -163,7 +163,6 @@ SafeguardReportNavTable = (applianceName as text, optional resourcePath as text,
             { "Asset Entitlements", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][AssetEntitlements], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
             { "User Entitlements", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][UserEntitlements], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
             { "Account Ownership", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][AccountOwnership], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
-            { "Asset Ownership", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][AssetOwnership], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
             { "Partition Ownership", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][PartitionOwnership], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
             { "Tag Ownership", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][TagOwnership], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
             { "User Ownership", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][UserOwnership], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
@@ -173,7 +172,8 @@ SafeguardReportNavTable = (applianceName as text, optional resourcePath as text,
             { "Failed SSH Key Changes", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedChangeSshKey], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
             { "Failed SSH Key Checks", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedCheckSshKey], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
             { "Failed Account Discovery", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedDiscoverAccounts], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
-            { "Failed Service Discovery", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedDiscoverServices], filter, fields, queryOptions,responseFormat), "Table", "Table", true }
+            { "Failed Service Discovery", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedDiscoverServices], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
+            { "Asset Ownership", SafeguardPasswords.ReportUtilities.GetAssetOwnershipDataTable(applianceName), "Table", "Table", true }
         }),
         navTable = Table.ToNavigationTable(source, {"Name"}, "Name", "Data", "ItemKind", "ItemName", "IsLeaf")
     in
@@ -267,6 +267,17 @@ SafeguardPasswords.GetDataTable = (applianceName as text, optional resourcePath 
             else Table.FromValue(data)
     in
         a;
+
+// Report Utilities //
+
+// Retrieves table of asset IDs, then for each ID queries the Assets/ID/EffectiveManagedBy endpoint to retrieve owners
+SafeguardPasswords.ReportUtilities.GetAssetOwnershipDataTable = (applianceName as text) as table => 
+    let
+        assetIds = SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Assets], null, "Id", null, "JSON"),
+        owners = Table.AddColumn(assetIds, "Custom", each SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Assets]&"/"&Number.ToText([Id])&"/EffectiveManagedBy", null, Constants[Fields][AssetOwnershipReport], null, "JSON")),
+        expandedOwners = Table.ExpandTableColumn(owners,"Custom", {"Name", "EmailAddress","PrincipalKind","IdentityProviderName","Direct"}, {"Custom.Name", "Custom.EmailAddress", "Custom.PrincipalKind", "Custom.IdentityProviderName", "Custom.Direct"})
+    in
+        expandedOwners;
 
 ValidateInput = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text) => 
     // M Language does not support regex so validation is ugly. (◡︵◡)
@@ -370,7 +381,6 @@ GetResponse = Extension.ImportFunction("GetSppResponse","Request.pqm");
 GetCsvResponse = Extension.ImportFunction("GetCsvSppResponse","Request.pqm");
 Logger.ErrorLog = Extension.ImportFunction("ErrorLog","Logger.pqm");
 Logger.InfoLog = Extension.ImportFunction("InfoLog", "Logger.pqm");
-
 
 Table.ToNavigationTable = (
     table as table,
