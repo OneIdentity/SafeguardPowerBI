@@ -1,4 +1,4 @@
-let
+﻿let
     // Statuses
     Constants.SuccessStatus = "Success",
     Constants.ErrorStatus = "Error",
@@ -40,6 +40,10 @@ in
         // SPP Constants
         SppConstants = [
             DataConnectorName = "One Identity SPP Power BI Connector",
+            // This needs to match the current version. DO NOT EDIT MANUALLY. 
+            // This is updated by the build script. Every time it executes, the version num here is overwritten by that script. 
+            // This may need to change because I don't think this is typically how, or where, version is tracked.
+            Version = "1.0.15",
             RstsRelativePath = "RSTS/oauth2/token",
             Endpoints = [
                 Assets = Text.Combine({Constants.SppCoreEndpoint,"/Assets"}),
@@ -119,7 +123,9 @@ in
                     & "TaskProperties.FailedSshKeyDiscoveryAttempts,TaskProperties.FailedSshKeyRevokeAttempts,TaskProperties.FailedSuspendAccountAttempts,"
                     & "TaskProperties.FailedRestoreAccountAttempts,TaskProperties.FailedApiKeyCheckAttempts,TaskProperties.FailedApiKeyChangeAttempts",
                 AssetPartitions = "Name,DefaultProfileName,DefaultSshKeyProfileName,ManagedBy",
-                AssetOwnershipReport = "Name,EmailAddress,PrincipalKind,IdentityProviderName,Direct"
+                AssetOwnershipReport = "Name,EmailAddress,PrincipalKind,IdentityProviderName,Direct,ViaTags",
+                AssetAccountOwnershipReport = "Name,EmailAddress,PrincipalKind,IdentityProviderName,Direct,ViaTags",
+                AssetPartitionOwnershipReport = "Name,EmailAddress,PrincipalKind,IdentityProviderName"
             ]
         ]
     ]
