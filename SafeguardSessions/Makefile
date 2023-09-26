@@ -12,10 +12,10 @@ build: bs
 	@powershell Scripts\Build.ps1
 
 unit-test: bs
-	@powershell Scripts\RunUnitTests.ps1 -Output $(OUTPUT) -TestFile $(test_file)
+	@powershell Scripts\RunUnitTests.ps1 -TestFile $(test_file)
 
 unit-tests: bs
-	@powershell Scripts\RunUnitTests.ps1 -Output $(OUTPUT)
+	@powershell Scripts\RunUnitTests.ps1
 
 checksum:
 	@powershell Scripts\Checksum.ps1
