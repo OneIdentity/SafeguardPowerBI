@@ -167,8 +167,6 @@ SafeguardReportNavTable = (applianceName as text, optional resourcePath as text,
             { "Ownership - Account", SafeguardPasswords.ReportUtilities.GetAssetAccountOwnershipDataTable(applianceName), "Table", "Table", true },
             { "Ownership - Partition", SafeguardPasswords.ReportUtilities.GetAssetPartitionOwnershipDataTable(applianceName), "Table", "Table", true },
             { "Ownership - Asset", SafeguardPasswords.ReportUtilities.GetAssetOwnershipDataTable(applianceName), "Table", "Table", true },
-            { "Ownership - Tag", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][TagOwnership], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
-            { "Ownership - User", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][UserOwnership], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
             { "Account Task Summary", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][AccountTaskSummary], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
             { "Failed Password Changes", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedChangePassword], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
             { "Failed Password Checks", SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Reports][FailedCheckPasswords], filter, fields, queryOptions,responseFormat), "Table", "Table", true },
@@ -275,7 +273,6 @@ SafeguardPasswords.GetDataTable = (applianceName as text, optional resourcePath 
 // Retrieves table of asset IDs, then for each ID queries the Assets/ID/EffectiveManagedBy endpoint to retrieve owners
 SafeguardPasswords.ReportUtilities.GetAssetOwnershipDataTable = (applianceName as text) as table => 
     let
-    //assetIds = if getTags then <get ids,tags> else get ids
         assetIds = SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Assets], null, "Id,Name", null, "JSON"),
         owners = Table.AddColumn(assetIds, "Owners", each SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Assets]&"/"&Number.ToText([Id])&"/EffectiveManagedBy", null, Constants[Fields][AssetOwnershipReport], null, "JSON")),
         expandedOwners = Table.ExpandTableColumn(owners,"Owners", {"Name", "EmailAddress","PrincipalKind","IdentityProviderName","Direct"}, {"Owners.Name", "Owners.EmailAddress", "Owners.PrincipalKind", "Owners.IdentityProviderName", "Owners.Direct"})
