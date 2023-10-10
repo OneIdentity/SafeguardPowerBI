@@ -5,7 +5,9 @@ let
     SessionsSnapshotEndpoint = Extension.ImportFunction("SessionsSnapshotEndpoint", "Constants.pqm"),
     Request.Generate = Extension.ImportFunction("Generate", "Request.pqm"),
     Request.GetDefaultParameters = Extension.ImportFunction("GetDefaultParameters", "Request.pqm"),
-    ResponseHandler.GetDataFromResponse = Extension.ImportFunction("GetDataFromResponse", "CommonResponseHandler.pqm"),
+    ResponseHandler.GetDataFromResponse = Extension.ImportFunction(
+        "GetDataFromResponse", "CommonResponseHandler.pqm"
+    ),
     ResponseHandler.ValidateByStatusCode = Extension.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
     UrlBuilder.GenerateUrl = Extension.ImportFunction("GenerateUrl", "UrlBuilder.pqm"),
     Schema.GetSchema = Extension.ImportFunction("GetSchema", "Schema.pqm"),
@@ -99,25 +101,19 @@ let
             page,
     Search.GenerateByPage = (getNextPage as function) as table =>
         let
-            listOfPages = List.Select(
-                List.Generate(
-                    () => getNextPage(null),
-                    (lastPage) => lastPage <> null,
-                    (lastPage) => getNextPage(lastPage)
-                ),
-                each not Table.IsEmpty(_)
+            listOfPages = List.Generate(
+                () => getNextPage(null), (lastPage) => lastPage <> null, (lastPage) => getNextPage(lastPage)
             ),
             tableOfPages = Table.FromList(listOfPages, Splitter.SplitByNothing(), {"Page"}),
-            firstRow = tableOfPages{0}?,
+            firstRow = tableOfPages{0},
             combined = Value.ReplaceType(
                 Table.ExpandTableColumn(tableOfPages, "Page", Table.ColumnNames(firstRow[Page])),
                 Value.Type(firstRow[Page])
             )
         in
-            if firstRow = null then
-                Table.FromRows({})
-            else
-                combined
+            Table.SelectRows(
+                combined, each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {null}))
+            )
 in
     [
         AdvancedSearch = Search.AdvancedSearch,
