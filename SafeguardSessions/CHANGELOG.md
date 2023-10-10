@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [v1.1.1+sps7.4.0] - 2023-10-11
+
 ### Compatible SPS versions
 
 * 7.3.0, 7.4.0
