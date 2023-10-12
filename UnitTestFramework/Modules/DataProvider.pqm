@@ -1,0 +1,7 @@
+let
+    DataProvider.ProvideDataForTest = (data as list, func as function) =>
+        List.Transform(data, each Function.Invoke(func, _))
+in
+    [
+        ProvideDataForTest = DataProvider.ProvideDataForTest
+    ]
