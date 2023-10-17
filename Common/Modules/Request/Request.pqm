@@ -53,7 +53,7 @@ let
     
     //Executes query against SPP API with specified host target, headers, path, and body (content). 
     //
-    //Returns response.
+    //Returns JSON response.
     Request.GetSppResponse = (host as text, headers as record, optional relativePath as text, optional content as binary, optional query as record) =>
         let
             headers = [
@@ -67,6 +67,7 @@ let
         in
             response,
 
+        //Returns CSV response.
         Request.GetCsvSppResponse = (host as text, headers as record, optional relativePath as text, optional content as binary, optional query as record) =>
         let
             headers = [

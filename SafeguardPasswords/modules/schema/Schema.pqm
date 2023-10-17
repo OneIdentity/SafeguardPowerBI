@@ -1,9 +1,0 @@
-let
-    Schema.Sessions = Extension.ImportFunction("Schema", "Sessions.pqm"),
-    Schema.SchemaMap = [Sessions = Schema.Sessions],
-    Schema.GetSchema = (entity as text) as table => Record.FieldOrDefault(Schema.SchemaMap, entity)
-in
-    [
-        SchemaMap = Schema.SchemaMap,
-        GetSchema = Schema.GetSchema
-    ]
