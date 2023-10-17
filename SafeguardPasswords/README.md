@@ -15,16 +15,27 @@
 
 ## About the project
 
-The aim of One Identity Safeguard Power BI Connector (Power BI Connector) is to provide a solution for customers to visualize their audit data captured by [One Identity Safeguard for Priviledged Sessions] (SPS) in a highly configurable way compared to the on-box reporting system of SPS. The Power BI Connector uses basic authentication with the local login method to connect to SPS, and imports sessions metadata that matches the criteria specified in the Power BI Connector's input parameters. After successful data retrieval, the Power BI Connector returns two tables:
+The aim of One Identity Safeguard Power BI Connector (Power BI Connector) is to provide a solution for customers to visualize their audit data captured by [One Identity Safeguard for Privileged Sessions] (SPS) and [One Identity Safeguard for Privileged Passwords] in a highly configurable way compared to the on-box reporting system of SPS / SPP. 
+
+The SPS Power BI Connector uses basic authentication with the local login method to connect to SPS, and imports sessions metadata that matches the criteria specified in the Power BI Connector's input parameters. After successful data retrieval, the Power BI Connector returns two tables:
 
 - **Info**: contains information about the data fetching process for debugging purposes, and the version of the Power BI Connector.
 - **Sessions**: contains the actual sessions metadata
 
 The project also a includes the One Identity Safeguard Power BI Report Template (Report Template) to quickstart report creation and visualize your audit data.
 
-## Installation and usage
+The SPP Power BI Connector also uses basic authentication to connect to SPP. After connection users are prompted to enter API query options and may select data from a variety of SPP API endpoints. This data is returned in a table. 
 
-To use the connector,
+Several SPP report templates are included:
+
+- **Entitlement report**: equivalent to SPP UI built-in Entitlement Report
+- **Asset Ownership report**: equivalent to SPP UI built-in Asset Ownership Report
+- **Account Ownership report**: equivalent to SPP UI built-in Account Ownership Report
+- **Metrics Report**: presents data about password management activity
+
+## SPS Installation and usage
+
+To use the SPS connector,
 
 1. Get a connector MEZ file compatible with your SPS version from the [Releases] page, or build it from source code following the steps described in the [Contribution] guide.
 2. Copy the file to your `%USERPROFILE%\Documents\Power BI Desktop\Custom Connectors` folder.
@@ -41,7 +52,23 @@ To use the connector,
 13. Select both the **Info** and **Sessions** tables, then click **Load**.
 14. Once data is imported into Power BI, you can start creating your reports by either creating them from scratch or by using the Report Template.
 
-You can read a more comprehensive guide on using the Power BI Connector and the Report Template in the One Idenity Safeguard Power BI Connector Tutorial that can be found on the [Technical documents for One Identity Safeguard for Priviledged Sessions] page.
+You can read a more comprehensive guide on using the Power BI Connector and the Report Template in the One Identity Safeguard Power BI Connector Tutorial that can be found on the [Technical documents for One Identity Safeguard for Privileged Sessions] page.
+
+## SPP Installation and usage
+
+First configure a trusted SSL Certificate on your SPP appliance. Refer to the Admin guide for additional details. 
+
+Once SSL Certificate trust is established, to use the SPP connector:
+
+1. Get a connector MEZ file compatible with your SPP version from the [Releases] page, or build it from source code following the steps described in the [Contribution] guide.
+2. Copy the file to your `%USERPROFILE%\Documents\Power BI Desktop\Custom Connectors` folder.
+3. In Power BI Desktop, go to **File > Options and settings > Options > Security > Data Extensions**, and select the **(Not Recommended) Allow any extension to load without validation or warning** option since the Power BI Connector is not signed.
+4. Restart Power BI Desktop.
+5. In Power BI Desktop, click **Home > Get data**, search for **One Identity Safeguard for Privileged Passwords**, then click **Connect**.
+6. Enter the input parameters for the Power BI Connector, and click **OK**.
+7. Enter the credentials that will be used to authenticate to the SPP appliance and click **Connect**.
+8. Select the API endpoints to query. 
+9. Once data is imported into Power BI, you can start creating your reports by either creating them from scratch or by using the Report Template.
 
 ## Common errors
 
@@ -53,7 +80,7 @@ I cannot find **One Identity Safeguard** under **Home > Get data**.
 
 ---
 
-I get the following error when trying to connect to SPS:
+I get the following error when trying to connect:
 
 ```
 Unable to connect
@@ -62,14 +89,14 @@ connection was closed: Could not establish trust relationship for the SSL/TLS
 secure channel."
 ```
 
-You might have forgotten to import the CA X.509 certificate of your SPS appliance, as described in the [Installation and usage] section.
+You might have forgotten to import the CA X.509 certificate of your SPS appliance, as described in the [SPS Installation and usage] and [SPP Installation and usage] sections.
 
 ---
 
 If you have successfully upgraded your custom connector and tried to fetch data, but receive the following message, revisit the [Upgrading the Power BI Connector] section.
 
 ```
-Your version of the connector (ConnectorVersion) is not compatible with your SPS version (SPSVersion). For a connector version that is compatible with your SPS
+Your version of the connector (ConnectorVersion) is not compatible with your SPP or SPS version (SPSVersion). For a connector version that is compatible with your SPP or SPS
 version, visit the official release page of the connector:
 https://github.com/OneIdentity/SafeguardPowerBI/releases
 ```
@@ -86,7 +113,7 @@ Attach the mashup trace logs to the issue.
 
 **B)** The source IP interpreted a malformed request.
 
-Your filter might be invalid. Make sure you specify your filter parameters correctly. For more information on the available search fields, see **List of available search queries** in the **One Identity Safeguard for Privileged Sessions Administration Guide** on the [Technical documents for One Identity Safeguard for Priviledged Sessions] page.
+Your filter might be invalid. Make sure you specify your filter parameters correctly. For more information on the available search fields, see **List of available search queries** in the **One Identity Safeguard for Privileged Sessions Administration Guide** on the [Technical documents for One Identity Safeguard for Privileged Sessions] page.
 
 **C)** The username or password you have specified is invalid.
 
@@ -122,11 +149,11 @@ If you cannot resolve the issue, you can collect the Power BI mashup trace logs,
 
 ## Release policy
 
-As of now, One Identity releases a new Power BI Connector with each feature release of SPS until 8 LTS.
+As of now, One Identity releases a new Power BI Connector with each feature release of SPP / SPS until 8 LTS.
 
 Releases have the following rules:
 
-- Release versioning follows the `v<connector-version>+sps-<sps-version>` convention
+- Release versioning follows the `v<connector-version>+[sps/spp]-<[sps/spp]-version>` convention
 - Connector versioning follows the `v<major.minor.patch(pre)>` convention
     - `major`: the new version includes breaking changes compared to the previous version
     - `minor`: the new version includes new functionalities without breaking changes compared to the previous version
@@ -136,7 +163,7 @@ Releases have the following rules:
 - Examples
     - v1.0.0+sps-7.3.0
     - v1.0.0pre1+sps7.3.0
-    - v1.0.0+sps-8.0.3
+    - v1.0.0+spp-8.0.3
 - A Report Template of a release is not only compatible with the connector from the same release but also with other connectors having the same major version
 
 When writing a release note, use the following template:
@@ -199,8 +226,10 @@ Distributed under the One Identity - Open Source License. For more information, 
 
 ## References
 
-- [One Identity Safeguard for Priviledged Sessions]
-- [Technical documents for One Identity Safeguard for Priviledged Sessions]
+- [One Identity Safeguard for Privileged Sessions]
+- [Technical documents for One Identity Safeguard for Privileged Sessions]
+- [One Identity Safeguard for Privileged Passwords]
+- [Technical documents for One Identity Safeguard for Privileged Passwords]
 - Create a [One Identity Technical Case]
 - [Releases] of the Power BI Connector
 - [License] of the Power BI Connector
@@ -209,7 +238,8 @@ Distributed under the One Identity - Open Source License. For more information, 
 <!-- Links -->
 
 [About the project]: #about-the-project
-[Installation and usage]: #installation-and-usage
+[SPS Installation and usage]: #sps-installation-and-usage
+[SPP Installation and usage]: #spp-installation-and-usage
 [Common errors]: #common-errors
 [Troubleshooting]: #troubleshooting
 [Release policy]: #release-policy
@@ -219,9 +249,12 @@ Distributed under the One Identity - Open Source License. For more information, 
 [License]: #license
 [References]: #references
 
-[One Identity Safeguard for Priviledged Sessions]: https://www.oneidentity.com/products/one-identity-safeguard-for-privileged-sessions/
-[Technical documents for One Identity Safeguard for Priviledged Sessions]: https://support.oneidentity.com/one-identity-safeguard-for-privileged-sessions/technical-documents
+[One Identity Safeguard for Privileged Sessions]: https://www.oneidentity.com/products/one-identity-safeguard-for-privileged-sessions/
+[Technical documents for One Identity Safeguard for Privileged Sessions]: https://support.oneidentity.com/one-identity-safeguard-for-privileged-sessions/technical-documents
 [One Identity Technical Case]: https://support.oneidentity.com/create-service-request
+
+[One Identity Safeguard for Privileged Passwords]: https://www.oneidentity.com/products/one-identity-safeguard-for-privileged-passwords/
+[Technical documents for One Identity Safeguard for Privileged Passwords]: https://support.oneidentity.com/one-identity-safeguard-for-privileged-passwords/technical-documents
 
 [Releases]: https://github.com/OneIdentity/SafeguardPowerBI/releases
 [License]: https://github.com/OneIdentity/SafeguardPowerBI/blob/main/LICENSE

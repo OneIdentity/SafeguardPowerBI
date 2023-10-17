@@ -27,6 +27,7 @@ To make development easier, you can use `make` commands for building the custom 
 4. Build the source code with one of the following options:
     - In Visual Studio Code: Go to **Terminal > Run Build Task...**, and select **Build connenctor project using MSBuild**
     - From the command line: use the `make build` command
+    - Alternatively, for the SafeguardPasswords project you may run the build.ps1 script.
 
 ### Testing
 

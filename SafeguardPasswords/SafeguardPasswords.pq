@@ -367,16 +367,16 @@ User.GetProvider = (host, domainName) =>
 
 SafeguardPasswords.Icons = [
     Icon16 = {
-        Extension.Contents("OneIdentitySafeguardForPrivilegedPasswordsPowerBIConnector16.png"),
-        Extension.Contents("OneIdentitySafeguardForPrivilegedPasswordsPowerBIConnector20.png"),
-        Extension.Contents("OneIdentitySafeguardForPrivilegedPasswordsPowerBIConnector24.png"),
-        Extension.Contents("OneIdentitySafeguardForPrivilegedPasswordsPowerBIConnector32.png")
+        Extension.Contents("OneIdentitySafeguardForPrivilegedPasswordsPowerBIConnector.png"),
+        Extension.Contents("OneIdentitySafeguardForPrivilegedPasswordsPowerBIConnector.png"),
+        Extension.Contents("OneIdentitySafeguardForPrivilegedPasswordsPowerBIConnector.png"),
+        Extension.Contents("OneIdentitySafeguardForPrivilegedPasswordsPowerBIConnector.png")
     },
     Icon32 = {
-        Extension.Contents("OneIdentitySafeguardForPrivilegedPasswordsPowerBIConnector32.png"),
-        Extension.Contents("OneIdentitySafeguardForPrivilegedPasswordsPowerBIConnector40.png"),
-        Extension.Contents("OneIdentitySafeguardForPrivilegedPasswordsPowerBIConnector48.png"),
-        Extension.Contents("OneIdentitySafeguardForPrivilegedPasswordsPowerBIConnector64.png")
+        Extension.Contents("OneIdentitySafeguardForPrivilegedPasswordsPowerBIConnector.png"),
+        Extension.Contents("OneIdentitySafeguardForPrivilegedPasswordsPowerBIConnector.png"),
+        Extension.Contents("OneIdentitySafeguardForPrivilegedPasswordsPowerBIConnector.png"),
+        Extension.Contents("OneIdentitySafeguardForPrivilegedPasswordsPowerBIConnector.png")
     }
 ];
 
