@@ -118,15 +118,15 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ReleaseVersion" xml:space="preserve">
-    <value>v1.0.0+sps7.3.0</value>
+    <value>v1.0.0+spp7.3.0</value>
   </data>
   <data name="ButtonTitle" xml:space="preserve">
-    <value>One Identity Safeguard</value>
+    <value>One Identity Safeguard for Privileged Passwords</value>
   </data>
   <data name="ButtonHelp" xml:space="preserve">
-    <value>Connect to One Identity Safeguard</value>
-  </data>
+    <value>Connect to One Identity Safeguard for Privileged Passwords</value>
+  </data> 
   <data name="DataSourceLabel" xml:space="preserve">
-    <value>One Identity Safeguard</value>
+    <value>One Identity Safeguard for Privileged Passwords</value>
   </data>
 </root>
