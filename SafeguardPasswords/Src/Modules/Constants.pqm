@@ -24,10 +24,6 @@ in
         // SPP Constants
         SppConstants = [
             DataConnectorName = "One Identity SPP Power BI Connector",
-            // This needs to match the current version. DO NOT EDIT MANUALLY. 
-            // This is updated by the build script. Every time it executes, the version num here is overwritten by that script. 
-            // This may need to change because I don't think this is typically how, or where, version is tracked.
-            Version = "1.0.16",
             RstsRelativePath = "RSTS/oauth2/token",
             Endpoints = [
                 Assets = Text.Combine({Constants.SppCoreEndpoint,"/Assets"}),

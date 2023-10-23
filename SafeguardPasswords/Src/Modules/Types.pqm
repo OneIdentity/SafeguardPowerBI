@@ -44,7 +44,7 @@ let
             ]
         )
     ) as record meta [
-        Documentation.Name = Types.Constants[DataConnectorName]&" "&Types.Constants[Version],
+        Documentation.Name = Types.Constants[DataConnectorName],
         Documentation.LongDescription = "Enter the required parameters to fetch data from Safeguard for Privileged Passwords (SPP). If no optional input fields are specified you can use the built in SPP API queries.
         Use the optional input fields (Custom Resource Path, Query Filter, Response Fields, Additional Query Options) to query different SPP API endpoints and / or different data.
         See SPP API documetation for all options."
