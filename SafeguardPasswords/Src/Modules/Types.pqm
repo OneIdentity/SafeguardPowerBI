@@ -1,0 +1,55 @@
+let
+    Types.Constants = Extension.ImportModule("Constants.pqm")[SppConstants],
+    SafeguardPasswords.ContentsType = type function (
+        applianceName as (
+            type text meta [
+                Documentation.FieldCaption = "Source FQDN or IP",
+                Documentation.FieldDescription = "The source IP address identifies the appliance from which you will fetch data.",
+                Documentation.SampleValues = {"10.12.230.21"}
+            ]
+        ),
+        optional resourcePath as (
+            type text meta [
+                Documentation.FieldCaption = "Custom Resource Path",
+                Documentation.FieldDescription = "The path to the API resource you wish to query.",
+                Documentation.SampleValues = {Types.Constants[Endpoints][Assets]}
+            ]
+        ),
+        optional filter as (
+            type text meta [
+                Documentation.FieldCaption = "Query Filter",
+                Documentation.FieldDescription = "The SPP API Query Filter. See SPP API documetation for all options.",
+                Documentation.SampleValues = {"AssetName eq 'MyAsset'"}
+            ]
+        ),
+        optional fields as (
+            type text meta [
+                Documentation.FieldCaption = "Response Fields",
+                Documentation.FieldDescription = "Fields to be returned from the SPP API Query. See SPP API documetation for all options.",
+                Documentation.SampleValues = {"Id,Name,Description"}
+            ]
+        ),
+        optional queryOptions as (
+            type text meta [
+                Documentation.FieldCaption = "Additional Query Options",
+                Documentation.FieldDescription = "Additional API Query options to be included in the SPP API Query. See SPP API documetation for all options.",
+                Documentation.SampleValues = {"limit=10&includeDetails=true"}
+            ]
+        ),
+        optional ResponseFormat as (
+            type text meta [
+                Documentation.FieldCaption = "API Response Format",
+                Documentation.FieldDescription = "Format of Response. Default CSV. See SPP API documetation for all options.",
+                Documentation.AllowedValues = {"CSV", "JSON"}
+            ]
+        )
+    ) as record meta [
+        Documentation.Name = Types.Constants[DataConnectorName]&" "&Types.Constants[Version],
+        Documentation.LongDescription = "Enter the required parameters to fetch data from Safeguard for Privileged Passwords (SPP). If no optional input fields are specified you can use the built in SPP API queries.
+        Use the optional input fields (Custom Resource Path, Query Filter, Response Fields, Additional Query Options) to query different SPP API endpoints and / or different data.
+        See SPP API documetation for all options."
+    ]
+in
+    [
+        ContentsType = SafeguardPasswords.ContentsType
+    ]

@@ -29,21 +29,6 @@ To make development easier, you can use `make` commands for building the custom 
     - From the command line: use the `make build` command
     - Alternatively, for the SafeguardPasswords project you may run the build.ps1 script.
 
-### Testing
-
-The test framework has been decoupled from the connector code, so running tests is only available from the command line. You can find the tests and the unit test framework under the `Test` subfolder. This is a separate Power Query SDK project, so it requires building separately. The `make build` command also builds the test project.
-
-You can run the tests with `PQTest.exe`, which comes with the Power Query SDK. By default, it is located in the SDK's extension folder, for example:
-
-```
-%USERPROFILE%\.vscode\extensions\powerquery.vscode-powerquery-sdk-0.2.2-win32-x64\.nuget\Microsoft.PowerQuery.SdkTools.2.114.4\tools\
-```
-
-To run tests using **make** targets, you must include the path of the `PQTest.exe` in your `PATH` variable. You have the following options:
-
-- Run all tests using `make unit-tests`
-- Run an individual test using `make unit-test test_file=<Path-To-The-Query-Pq-File>`
-
 ### Coding style
 
 To adhere with our coding style, consider the following when **writing code**:
@@ -66,6 +51,14 @@ When writing **commit messages**, consider the following:
     - If it both has a work item in Azure DevOps and a GitHub issue: `References: azure #<azure-id>, #<github-id>`
 - For examples, view the [Commit history of the main branch]
 
+## Error codes
+
+When introducing a new error code, please consider the following:
+
+- The error codes from the HTTP Requests should have a zero at the end if there is already an error ending with a zero then the next error code falling in the same HTTP Request category should be incremented by one.
+- The error code for errors originating from the connector should be incremented by one.
+- List the new error in the [Troubleshooting] guide.
+
 ## How to contribute to the project
 
 1. Fork the [GitHub project]
@@ -78,7 +71,8 @@ Make sure you respect the [Coding style](#coding-style) and know the essentials 
 
 **For One Identity Developers:**
 
-Consider whether the change requires updating the One Idenity Safeguard Power BI Connector Tutorial documentation.
+- When accepting a contribution or commiting a change consider whether the change requires updating the CHANGELOG.md.
+- Consider whether the change requires updating the One Idenity Safeguard Power BI Connector Tutorial documentation.
 
 ## Useful documents
 
@@ -106,5 +100,7 @@ Consider whether the change requires updating the One Idenity Safeguard Power BI
 [MSBuild]: https://github.com/microsoft/vscode-powerquery-sdk/issues/192#issuecomment-1311882460
 
 [Creating good commits]: https://google.github.io/eng-practices/review/developer/
+
+[Troubleshooting]: TROUBLESHOOTING.md
 
 <!-- Links END -->

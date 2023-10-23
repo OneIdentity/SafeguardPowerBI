@@ -1,0 +1,35 @@
+let  
+    //Executes query against SPP API with specified host target, headers, path, and body (content). 
+    //
+    //Returns JSON response.
+    Request.GetSppResponse = (host as text, headers as record, optional relativePath as text, optional content as binary, optional query as record) =>
+        let
+            headers = [
+                Headers = headers,
+                RelativePath = relativePath,
+                Content = content,
+                Query = query
+            ],
+
+            response = Json.Document(Web.Contents(host, headers))
+        in
+            response,
+
+        //Returns CSV response.
+        Request.GetCsvSppResponse = (host as text, headers as record, optional relativePath as text, optional content as binary, optional query as record) =>
+        let
+            headers = [
+                Headers = headers,
+                RelativePath = relativePath,
+                Content = content,
+                Query = query
+            ],
+
+            response = Csv.Document(Web.Contents(host, headers))
+        in
+            response
+in
+    [
+        GetSppResponse = Request.GetSppResponse,
+        GetCsvSppResponse = Request.GetCsvSppResponse
+    ]
