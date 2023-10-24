@@ -52,7 +52,7 @@ try {
         Invoke-WebRequest -Uri https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.ps1 -OutFile $(Get-Alias -Name dotnet-install).Definition
     }
 
-    & dotnet-install -InstallDir $DOTNET -NoCdn -NoPath -Runtime dotnet -Verbose -Version $packageVersions.DotnetVersion
+    & dotnet-install -InstallDir $DOTNET -NoCdn -NoPath -Verbose -Version $packageVersions.DotnetVersion
 
     Write-Output "Downloading nuget executable"
     if (-Not (Test-Path($(Get-Alias -Name nuget).Definition))) {
