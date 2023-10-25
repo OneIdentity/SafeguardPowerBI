@@ -38,27 +38,28 @@ TestPaddedTableFromRecords = () =>
 TestPaddedTableFromRecordsRaisesError = () =>
     let
         records = {"not_a_record"},
-        result = try PaddedTable.FromRecords(records),
-        facts = {
-            Fact(Text.Format("#{0}: Error is raised", {PaddedTable.FromRecords.Name}), result[HasError], true),
-            Fact(
-                Text.Format("#{0}: Error reason is correct", {PaddedTable.FromRecords.Name}),
-                result[Error][Reason],
-                "Expression.Error"
-            ),
-            Fact(
-                Text.Format("#{0}: Error details are correct", {PaddedTable.FromRecords.Name}),
-                result[Error][Detail],
+        facts = AssertError(
+            Text.Format(
+                "#[MethodName] raises error if the data provided is not a record",
                 [
+                    MethodName = PaddedTable.FromRecords.Name
+                ]
+            ),
+            PaddedTable.FromRecords,
+            records,
+            [
+                Reason = "Expression.Error",
+                Message = "We cannot convert the value ""not_a_record"" to type Record.",
+                Detail = [
                     Value = "not_a_record",
                     Type = type record
                 ]
-            )
-        }
+            ]
+        )
     in
         facts;
 
 shared TestCommonUtils.UnitTest = [
     facts = {TestPaddedTableFromRecords(), TestPaddedTableFromRecordsRaisesError()},
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];
