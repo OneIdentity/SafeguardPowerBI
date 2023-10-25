@@ -82,5 +82,5 @@ TestHandleIfThereIsAnError = () =>
 
 shared TestRequestErrors.UnitTest = [
     facts = {TestHandleIfThereIsAnError()},
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];

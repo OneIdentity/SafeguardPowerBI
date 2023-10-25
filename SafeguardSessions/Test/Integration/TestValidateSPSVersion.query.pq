@@ -61,19 +61,22 @@ TestValidateSPSVersionRaisesError = () =>
             expectedMessage as text,
             expectedDetail as record
         ) =>
-            TestErrorIsRaised(
-                try
-                    ValidateSPSVersion(
-                        TestValidateSPSVersion.SpsURL,
-                        TestValidateSPSVersion.SessionId,
-                        No,
-                        [
-                            InfoResponse = fakeInfoResponse
-                        ]
-                    ),
-                expectedReason,
-                expectedMessage,
-                expectedDetail
+            AssertError(
+                description,
+                ValidateSPSVersion,
+                {
+                    TestValidateSPSVersion.SpsURL,
+                    TestValidateSPSVersion.SessionId,
+                    No,
+                    [
+                        InfoResponse = fakeInfoResponse
+                    ]
+                },
+                [
+                    Reason = expectedReason,
+                    Message = expectedMessage,
+                    Detail = expectedDetail
+                ]
             ),
         cases = {
             {
@@ -110,5 +113,5 @@ TestValidateSPSVersionRaisesError = () =>
 
 shared TestSafeguardSessions.IntegrationTest = [
     facts = {TestValidateSPSVersionReturnsSessionId(), TestValidateSPSVersionRaisesError()},
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];

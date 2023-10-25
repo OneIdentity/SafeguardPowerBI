@@ -172,7 +172,17 @@ TestErrorIsContainedInAdvancedSearchResponse = () =>
                 actualResponse{1}
             )
         },
-        errorFacts = TestErrorIsRaised(try actualResponse{2}, expectedReason, expectedMessage, expectedDetail)
+        errorResponse = () => actualResponse{2},
+        errorFacts = AssertError(
+            "Advanced search masks the error",
+            errorResponse,
+            {},
+            [
+                Reason = expectedReason,
+                Message = expectedMessage,
+                Detail = expectedDetail
+            ]
+        )
     in
         List.Combine({dataFacts, errorFacts});
 
@@ -204,16 +214,17 @@ TestGetSessionsCountRaisesError = () =>
             ErrorCode = 10002
         ]
     in
-        TestErrorIsRaised(
-            try
-                Search.GetSessionsCount(
-                    requestUrl, [], "dummy_session_id", [
-                        GetSessionsCountResponse = fakeCountResponse
-                    ]
-                ),
-            expectedReason,
-            expectedMessage,
-            expectedDetail
+        AssertError(
+            "An error is raised if fields are missing in the response received",
+            Search.GetSessionsCount,
+            {requestUrl, [], "dummy_session_id", [
+                GetSessionsCountResponse = fakeCountResponse
+            ]},
+            [
+                Reason = expectedReason,
+                Message = expectedMessage,
+                Detail = expectedDetail
+            ]
         );
 
 TestOpenSnapshotIsSuccessful = () =>
@@ -231,22 +242,23 @@ TestOpenSnapshotIsSuccessful = () =>
 
 TestOpenSnapshotRaisesError = () =>
     let
-        AsserErrorIsRaised = (
+        AssertErrorIsRaised = (
             fakeSnapshotResponse as binary, expectedReason as text, expectedMessage as text, expectedDetail as record
         ) =>
             let
                 requestUrl = "http://dummy_url/api/audit/sessions/_snapshot"
             in
-                TestErrorIsRaised(
-                    try
-                        Search.OpenSnapshot(
-                            requestUrl, "dummy_session_id", [
-                                OpenSnapshotResponse = fakeSnapshotResponse
-                            ]
-                        ),
-                    expectedReason,
-                    expectedMessage,
-                    expectedDetail & [RequestUrl = requestUrl]
+                AssertError(
+                    "An error is raised if fields are missing in the response received",
+                    Search.OpenSnapshot,
+                    {requestUrl, "dummy_session_id", [
+                        OpenSnapshotResponse = fakeSnapshotResponse
+                    ]},
+                    [
+                        Reason = expectedReason,
+                        Message = expectedMessage,
+                        Detail = expectedDetail & [RequestUrl = requestUrl]
+                    ]
                 ),
         cases = {
             {
@@ -273,7 +285,7 @@ TestOpenSnapshotRaisesError = () =>
                 ]
             }
         },
-        facts = ProvideDataForTest(cases, AsserErrorIsRaised)
+        facts = ProvideDataForTest(cases, AssertErrorIsRaised)
     in
         facts;
 
@@ -287,5 +299,5 @@ shared Testsearch.UnitTest = [
         TestOpenSnapshotIsSuccessful(),
         TestOpenSnapshotRaisesError()
     },
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];

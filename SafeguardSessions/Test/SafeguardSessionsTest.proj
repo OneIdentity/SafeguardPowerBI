@@ -24,6 +24,7 @@
   </PropertyGroup>
   <ItemGroup Label="UnitTestFramework">
     <MezContent Include="$(UnitTestFrameworkPath)UnitTestFramework.pq" />
+    <MezContent Include="$(UnitTestFrameworkPath)**\*.pqm" />
   </ItemGroup>
   <ItemGroup Label="SafeguardSessionsTest">
     <MezContent Include="$(SchemaPath)GetDataAsset.pqm" />

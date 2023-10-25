@@ -1,5 +1,7 @@
 section TestSafeguardSessions;
 
+Yes = Extension.ImportFunction("Yes", "Constants.pqm");
+No = Extension.ImportFunction("No", "Constants.pqm");
 FetchInfo = Extension.ImportFunction("FetchInfo", "Utils.pqm");
 
 CreateSchema = Extension.ImportFunction("CreateSchema", "SchemaUtils.pqm");
@@ -354,5 +356,5 @@ shared TestSafeguardSessions.IntegrationTest = [
         TestFetchSessionsWithOnlyOneFilterFieldInput(),
         TestFetchingSessionsWithFromSPSWithUnsupportedVersion()
     },
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];

@@ -616,5 +616,5 @@ shared TestSafeguardSessions.IntegrationTest = [
         TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringDataFetch(),
         TestGetDataHandlesSchemaApplyError()
     },
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];

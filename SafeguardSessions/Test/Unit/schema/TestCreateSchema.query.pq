@@ -22,5 +22,5 @@ TestSchemaCreation = () =>
 
 shared TestCreateSchema.UnitTest = [
     facts = {TestSchemaCreation()},
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];

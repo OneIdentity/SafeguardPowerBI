@@ -48,18 +48,22 @@ TestFlattenListsHandlesListWithNonTextValue = () =>
         t = #table({"session_id", "list_field"}, {{"id1", {"1", "2"}}, {"id2", {"3", 4}}}),
         fieldNames = {"list_field"},
         withFlattenedLists = SchemaUtils.FlattenLists(t, fieldNames),
-        cellValue = try withFlattenedLists{[session_id = "id2"]}[list_field],
+        cellValue = () => withFlattenedLists{[session_id = "id2"]}[list_field],
         withErrorsReplaced = Table.ReplaceErrorValues(withFlattenedLists, {"list_field", "error_replaced"}),
         facts = {
-            TestErrorIsRaised(
+            AssertError(
+                "Error is raised when a list with non-text value is present",
                 cellValue,
-                "List To Text Conversion Error",
-                "Error 10003: The list contains other types than text.",
+                {},
                 [
-                    Cause = "[""3"",4]",
-                    RequestUrl = null,
-                    ManuallyHandled = true,
-                    ErrorCode = 10003
+                    Reason = "List To Text Conversion Error",
+                    Message = "Error 10003: The list contains other types than text.",
+                    Detail = [
+                        Cause = "[""3"",4]",
+                        RequestUrl = null,
+                        ManuallyHandled = true,
+                        ErrorCode = 10003
+                    ]
                 ]
             ),
             Fact(
@@ -356,5 +360,5 @@ shared TestFlatten.UnitTest = [
         TestFlatteningRecords(),
         TestFlattening()
     },
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];

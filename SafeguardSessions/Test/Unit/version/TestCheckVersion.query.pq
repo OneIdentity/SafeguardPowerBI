@@ -67,5 +67,5 @@ TestLatestSPSVersionIsSupported = () =>
 
 shared TestCheckVersion.UnitTest = [
     facts = {TestCheckVersion(), TestLatestSPSVersionIsSupported()},
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];

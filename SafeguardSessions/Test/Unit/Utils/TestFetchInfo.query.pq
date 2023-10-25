@@ -16,5 +16,5 @@ TestFetchInfoContainsConnectorVersion = () =>
 
 shared TestUtils.UnitTest = [
     facts = {TestFetchInfoContainsConnectorVersion()},
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];
