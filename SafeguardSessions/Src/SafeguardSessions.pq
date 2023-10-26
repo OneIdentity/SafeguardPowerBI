@@ -1,24 +1,24 @@
-﻿[Version = "1.1.1"]
+﻿[Version = "2.0.0"]
 section SafeguardSessions;
 
 [DataSource.Kind = "SafeguardSessions", Publish = "SafeguardSessions.Publish"]
 shared SafeguardSessions.Contents = Value.ReplaceType(SafeguardSessions.ContentsImpl, SafeguardSessions.ContentsType);
 
 shared SafeguardSessions.ContentsImpl = (
-    sps_ip as text,
-    from as nullable datetimezone,
-    to as nullable datetimezone,
-    filterField1 as nullable text,
-    filterValue1 as nullable text,
-    filterField2 as nullable text,
-    filterValue2 as nullable text,
-    filterField3 as nullable text,
-    filterValue3 as nullable text,
-    skipVersionCheck as nullable logical
+    spsIP as text,
+    optional skipVersionCheck as text,
+    optional from as datetimezone,
+    optional to as datetimezone,
+    optional filterField1 as text,
+    optional filterValue1 as text,
+    optional filterField2 as text,
+    optional filterValue2 as text,
+    optional filterField3 as text,
+    optional filterValue3 as text
 ) as table =>
     let
         sessions = FetchSessions(
-            sps_ip,
+            spsIP,
             Extension.CurrentCredential(),
             from,
             to,
@@ -44,7 +44,7 @@ shared FetchSessions = (
     filterValue2 as nullable text,
     filterField3 as nullable text,
     filterValue3 as nullable text,
-    skipVersionCheck as nullable logical,
+    skipVersionCheck as nullable text,
     optional mocks as nullable record
 ) =>
     let
@@ -58,12 +58,16 @@ shared FetchSessions = (
             from = from,
             to = to
         ],
-        data = GetData(spsIp, credentials, query, skipVersionCheck ?? false, mocks)
+        data = GetData(spsIp, credentials, query, skipVersionCheck, mocks)
     in
         data;
 
 shared GetData = (
-    spsIp as text, credentials as record, query as record, skipVersionCheck as logical, optional mocks as nullable record
+    spsIp as text,
+    credentials as record,
+    query as record,
+    skipVersionCheck as nullable text,
+    optional mocks as nullable record
 ) =>
     let
         startTime = DateTimeZone.LocalNow(),
@@ -89,12 +93,12 @@ shared GetData = (
     in
         result;
 
-ValidateSPSVersion = (
-    spsUrl as text, sessionId as text, skipVersionCheck as logical, optional mocks as nullable record
+shared ValidateSPSVersion = (
+    spsUrl as text, sessionId as text, skipVersionCheck as nullable text, optional mocks as nullable record
 ) =>
     let
         sessionIdOrError =
-            if skipVersionCheck then
+            if skipVersionCheck = Yes then
                 sessionId
             else
                 let
@@ -165,7 +169,14 @@ shared HandleIfThereIsAnError = (input as record) =>
     else
         input;
 
+shared TestSpsConnection = (dataSourcePath) =>
+    let
+        json = Json.Document(dataSourcePath), spsIP = json[spsIP], skipVersionCheck = json[skipVersionCheck]
+    in
+        {"SafeguardSessions.Contents", spsIP, skipVersionCheck, null, null, null, null, null, null, null, null};
+
 SafeguardSessions = [
+    TestConnection = TestSpsConnection,
     Authentication = [
         UsernamePassword = []
     ],
@@ -248,6 +259,7 @@ UrlBuilder.GetDefaultQuery = UrlBuilder[GetDefaultQuery];
 
 Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "CommonLogger.pqm");
 
+Yes = Extension.ImportFunction("Yes", "Constants.pqm");
 AuthEndpoint = Extension.ImportFunction("AuthEndpoint", "Constants.pqm");
 
 TransformUnexpectedError = Extension.ImportFunction("TransformUnexpectedError", "UnexpectedErrorWrapper.pqm");

@@ -1,14 +1,24 @@
 let
+    Yes = Extension.ImportFunction("Yes", "Constants.pqm"),
+    No = Extension.ImportFunction("No", "Constants.pqm"),
     SafeguardSessions.ContentsType = type function (
-        url as (
+        spsIP as (
             type text meta [
                 Documentation.FieldCaption = "Source IP",
                 Documentation.FieldDescription = "The source IP address identifies the appliance from which you will fetch session data.",
                 Documentation.SampleValues = {"10.12.230.21"}
             ]
         ),
-        from as (
-            type nullable datetimezone meta [
+        optional skipVersionCheck as (
+            type text meta [
+                Documentation.FieldCaption = "Skip Version Check",
+                Documentation.FieldDescription = "This field allows you to skip the SPS version check.",
+                Documentation.AllowedValues = {No, Yes},
+                DataSource.Path = true
+            ]
+        ),
+        optional from as (
+            type datetimezone meta [
                 Documentation.FieldCaption = "From",
                 Documentation.FieldDescription = "This field allows you to specify the starting search date.",
                 Documentation.SampleValues = {
@@ -24,8 +34,8 @@ let
                 DataSource.Path = false
             ]
         ),
-        to as (
-            type nullable datetimezone meta [
+        optional to as (
+            type datetimezone meta [
                 Documentation.FieldCaption = "To",
                 Documentation.FieldDescription = "This field allows you to specify the closing search date.",
                 Documentation.SampleValues = {
@@ -41,59 +51,51 @@ let
                 DataSource.Path = false
             ]
         ),
-        filterField1 as (
-            type nullable text meta [
+        optional filterField1 as (
+            type text meta [
                 Documentation.FieldCaption = "Filter field 1",
                 Documentation.FieldDescription = "This field allows you to specify a search field for sessions. Specify its value in Filter value 1.",
                 Documentation.SampleValues = {"protocol"},
                 DataSource.Path = false
             ]
         ),
-        filterValue1 as (
-            type nullable text meta [
+        optional filterValue1 as (
+            type text meta [
                 Documentation.FieldCaption = "Filter value 1",
                 Documentation.FieldDescription = "This field allows you to specify a search value for sessions. Specifies the value of Filter field 1.",
                 Documentation.SampleValues = {"SSH"},
                 DataSource.Path = false
             ]
         ),
-        filterField2 as (
-            type nullable text meta [
+        optional filterField2 as (
+            type text meta [
                 Documentation.FieldCaption = "Filter field 2",
                 Documentation.FieldDescription = "This field allows you to specify a search field for sessions. Specify its value in Filter value 2.",
                 Documentation.SampleValues = {"verdict"},
                 DataSource.Path = false
             ]
         ),
-        filterValue2 as (
-            type nullable text meta [
+        optional filterValue2 as (
+            type text meta [
                 Documentation.FieldCaption = "Filter value 2",
                 Documentation.FieldDescription = "This field allows you to specify a search value for sessions. Specifies the value of Filter field 2.",
                 Documentation.SampleValues = {"ACCEPT"},
                 DataSource.Path = false
             ]
         ),
-        filterField3 as (
-            type nullable text meta [
+        optional filterField3 as (
+            type text meta [
                 Documentation.FieldCaption = "Filter field 3",
                 Documentation.FieldDescription = "This field allows you to specify a search field for sessions. Specify its value in Filter value 3.",
                 Documentation.SampleValues = {"active"},
                 DataSource.Path = false
             ]
         ),
-        filterValue3 as (
-            type nullable text meta [
+        optional filterValue3 as (
+            type text meta [
                 Documentation.FieldCaption = "Filter value 3",
                 Documentation.FieldDescription = "This field allows you to specify a search value for sessions. Specifies the value of Filter field 3.",
                 Documentation.SampleValues = {"false"},
-                DataSource.Path = false
-            ]
-        ),
-        skipVersionCheck as (
-            type nullable logical meta [
-                Documentation.FieldCaption = "Skip Version Check",
-                Documentation.FieldDescription = "This field allows you to skip the SPS version check.",
-                Documentation.AllowedValues = {false, true},
                 DataSource.Path = false
             ]
         )
