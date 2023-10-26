@@ -1,12 +1,12 @@
 ﻿[Version = "1.1.1"]
-section SafeguardSessionsPoC;
+section SafeguardSessionsPoC_2;
 
-[DataSource.Kind = "SafeguardSessionsPoC", Publish = "SafeguardSessionsPoC.Publish"]
-shared SafeguardSessionsPoC.Contents = Value.ReplaceType(
-    SafeguardSessionsPoC.ContentsImpl, SafeguardSessionsPoC.ContentsType
+[DataSource.Kind = "SafeguardSessionsPoC_2", Publish = "SafeguardSessionsPoC_2.Publish"]
+shared SafeguardSessionsPoC_2.Contents = Value.ReplaceType(
+    SafeguardSessionsPoC_2.ContentsImpl, SafeguardSessionsPoC_2.ContentsType
 );
 
-shared SafeguardSessionsPoC.ContentsImpl = (
+shared SafeguardSessionsPoC_2.ContentsImpl = (
     spsIP as text,
     optional from as datetimezone,
     optional to as datetimezone,
@@ -167,28 +167,50 @@ shared HandleIfThereIsAnError = (input as record) =>
     else
         input;
 
-SafeguardSessionsPoC = [
+SafeguardSessionsPoC_2 = [
     TestConnection = (dataSourcePath) =>
         let
-            json = Json.Document(dataSourcePath), spsIP = json[spsIP]
+            json = Json.Document(dataSourcePath),
+            spsIP = json[spsIP],
+            from = json[from]?,
+            to = json[to]?,
+            filterField1 = json[filterField1]?,
+            filterValue1 = json[filterValue1]?,
+            filterField2 = json[filterField2]?,
+            filterValue2 = json[filterValue2]?,
+            filterField3 = json[filterField3]?,
+            filterValue3 = json[filterValue3]?,
+            skipVersionCheck = json[skipVersionCheck]?
         in
-            {"SafeguardSessionsPoC.Contents", spsIP, null, null, null, null, null, null, null, null, true},
+            {
+                "SafeguardSessionsPoC_2.Contents",
+                spsIP,
+                from,
+                to,
+                filterField1,
+                filterValue1,
+                filterField2,
+                filterValue2,
+                filterField3,
+                filterValue3,
+                skipVersionCheck
+            },
     Authentication = [
         UsernamePassword = []
     ],
     Label = Extension.LoadString("DataSourceLabel")
 ];
 
-SafeguardSessionsPoC.Publish = [
+SafeguardSessionsPoC_2.Publish = [
     Beta = true,
     Category = "Other",
     ButtonText = {Extension.LoadString("ButtonTitle"), Extension.LoadString("ButtonHelp")},
     LearnMoreUrl = "https://powerbi.microsoft.com/",
-    SourceImage = SafeguardSessionsPoC.Icons,
-    SourceTypeImage = SafeguardSessionsPoC.Icons
+    SourceImage = SafeguardSessionsPoC_2.Icons,
+    SourceTypeImage = SafeguardSessionsPoC_2.Icons
 ];
 
-SafeguardSessionsPoC.Icons = [
+SafeguardSessionsPoC_2.Icons = [
     Icon16 = {
         Extension.Contents("OneIdentitySafeguardPowerBIConnector16.png"),
         Extension.Contents("OneIdentitySafeguardPowerBIConnector20.png"),
@@ -215,7 +237,7 @@ shared Extension.ImportModule = (name as text) =>
 shared Extension.ImportFunction = (function_name as text, module_name as text) =>
     Record.Field(Extension.ImportModule(module_name), function_name);
 
-SafeguardSessionsPoC.ContentsType = Extension.ImportFunction("ContentsType", "Types.pqm");
+SafeguardSessionsPoC_2.ContentsType = Extension.ImportFunction("ContentsType", "Types.pqm");
 
 IsMocked = Extension.ImportFunction("IsMocked", "CommonUtils.pqm");
 
