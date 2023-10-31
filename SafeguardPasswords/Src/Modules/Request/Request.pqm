@@ -1,35 +1,31 @@
 let  
+    ValidateByStatusCode = Extension.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
+    InfoLog = Extension.ImportFunction("InfoLog", "CommonLogger.pqm"),
+    ErrorCodes = Extension.ImportFunction("ErrorCodes", "RequestErrors.pqm"),
+
     //Executes query against SPP API with specified host target, headers, path, and body (content). 
     //
     //Returns JSON response.
     Request.GetSppResponse = (host as text, headers as record, optional relativePath as text, optional content as binary, optional query as record) =>
         let
-            headers = [
+            options = [
                 Headers = headers,
                 RelativePath = relativePath,
                 Content = content,
                 Query = query
             ],
 
-            response = Json.Document(Web.Contents(host, headers))
-        in
-            response,
+            loggedParameters = Record.RemoveFields(options,"Headers"),
 
-        //Returns CSV response.
-        Request.GetCsvSppResponse = (host as text, headers as record, optional relativePath as text, optional content as binary, optional query as record) =>
-        let
-            headers = [
-                Headers = headers,
-                RelativePath = relativePath,
-                Content = content,
-                Query = query
-            ],
+            log = InfoLog("Request sent to SPP", [Url = host, Parameters = loggedParameters]),
 
-            response = Csv.Document(Web.Contents(host, headers))
+            response = Web.Contents(log[Url], options & [ManualStatusHandling = {400}]),
+            json = InfoLog("Response from SPP: ", Json.Document(response)),
+            extendedMeta = Value.Metadata(response) & [RequestUrl = host] & [RelativePath = relativePath],
+            responseWithMeta = Value.ReplaceMetadata(json, extendedMeta)
         in
-            response
+            ValidateByStatusCode(responseWithMeta)
 in
     [
-        GetSppResponse = Request.GetSppResponse,
-        GetCsvSppResponse = Request.GetCsvSppResponse
+        GetSppResponse = Request.GetSppResponse
     ]

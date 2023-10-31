@@ -328,7 +328,7 @@ GetLoginToken = (host) =>
             scope=providerScope,
             username=user[Username],
             password=creds[Password]
-        ])),
+            ])),
 
         loginToken = Function.InvokeAfter(() => GetLoginResponse(host, rstsResponse), #duration(0,0,0,Number.RandomBetween(1,5)))
     in
