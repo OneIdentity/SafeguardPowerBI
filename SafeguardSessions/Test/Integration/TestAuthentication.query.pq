@@ -7,32 +7,6 @@ TestSafeguardSessions.AuthenticationCredentials = [
     Password = "pwd"
 ];
 
-TestAuthenticateRaisesErrorForStatusCode = (statusCode as number, expectedReason as text, expectedMessage as text) =>
-    let
-        fakeAuthResponse = FakeRawResponse([#"error" = "reason"], [
-            Response.Status = statusCode
-        ]),
-        facts = AssertErrorIsRaised(
-            Text.Format("Error is raised for status code [#StatusCode]", [StatusCode = statusCode]),
-            try
-                Authenticate(
-                    TestSafeguardSessions.URL,
-                    TestSafeguardSessions.AuthenticationCredentials,
-                    [
-                        AuthResponse = fakeAuthResponse
-                    ]
-                ),
-            expectedReason,
-            expectedMessage,
-            [
-                ManuallyHandled = true,
-                Cause = [#"error" = "reason"],
-                RequestUrl = "http://dummy_url/api/authentication"
-            ]
-        )
-    in
-        facts;
-
 TestAuthenticateIsSuccessful = () =>
     let
         fakeAuthResponse = FakeRawResponse(
@@ -119,6 +93,9 @@ TestAuthenticateRaisesError = () =>
         facts;
 
 shared TestSafeguardSessions.IntegrationTest = [
-    facts = {TestAuthenticateIsSuccessful(), TestAuthenticateRaisesError()},
+    facts = {
+        TestAuthenticateIsSuccessful(),
+        TestAuthenticateRaisesError()
+    },
     report = Summarize(facts)
 ][report];
