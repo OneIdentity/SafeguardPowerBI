@@ -1,0 +1,34 @@
+let
+    IsMocked = Extension.ImportFunction("IsMocked", "CommonUtils.pqm"),
+    SessionsCountEndpoint = Extension.ImportFunction("SessionsCountEndpoint", "Constants.pqm"),
+    Request.Generate = Extension.ImportFunction("Generate", "Request.pqm"),
+    Request.GetDefaultParameters = Extension.ImportFunction("GetDefaultParameters", "Request.pqm"),
+    ResponseHandler.GetDataFromResponse = Extension.ImportFunction(
+        "GetDataFromResponse", "CommonResponseHandler.pqm"
+    ),
+    ResponseHandler.ValidateByStatusCode = Extension.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
+    UrlBuilder.GenerateUrl = Extension.ImportFunction("GenerateUrl", "UrlBuilder.pqm"),
+    GetSessionsCount.GetSessionsCount = (
+        spsUrl as text, queryParams as record, sessionId as text, optional mocks as nullable record
+    ) as number =>
+        let
+            sessionsCountUrl = UrlBuilder.GenerateUrl(spsUrl, SessionsCountEndpoint, queryParams),
+            countResponse = ResponseHandler.ValidateByStatusCode(
+                if IsMocked(mocks, "GetSessionsCountResponse") then
+                    Request.Generate(
+                        sessionsCountUrl,
+                        Request.GetDefaultParameters(sessionId),
+                        [
+                            Response = mocks[GetSessionsCountResponse]
+                        ]
+                    )
+                else
+                    Request.Generate(sessionsCountUrl, Request.GetDefaultParameters(sessionId))
+            ),
+            count = ResponseHandler.GetDataFromResponse(countResponse, "count")
+        in
+            count
+in
+    [
+        GetSessionsCount = GetSessionsCount.GetSessionsCount
+    ]

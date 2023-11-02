@@ -1,0 +1,32 @@
+let
+    IsMocked = Extension.ImportFunction("IsMocked", "CommonUtils.pqm"),
+    SessionsSnapshotEndpoint = Extension.ImportFunction("SessionsSnapshotEndpoint", "Constants.pqm"),
+    Request.Generate = Extension.ImportFunction("Generate", "Request.pqm"),
+    Request.GetDefaultParameters = Extension.ImportFunction("GetDefaultParameters", "Request.pqm"),
+    ResponseHandler.GetDataFromResponse = Extension.ImportFunction(
+        "GetDataFromResponse", "CommonResponseHandler.pqm"
+    ),
+    ResponseHandler.ValidateByStatusCode = Extension.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
+    UrlBuilder.GenerateUrl = Extension.ImportFunction("GenerateUrl", "UrlBuilder.pqm"),
+    OpenSnapshot.OpenSnapshot = (spsUrl as text, sessionId as text, optional mocks as nullable record) as text =>
+        let
+            openSnapshotUrl = UrlBuilder.GenerateUrl(spsUrl, SessionsSnapshotEndpoint),
+            openSnapshotResponse = ResponseHandler.ValidateByStatusCode(
+                if IsMocked(mocks, "OpenSnapshotResponse") then
+                    Request.Generate(
+                        openSnapshotUrl,
+                        Request.GetDefaultParameters(sessionId),
+                        [
+                            Response = mocks[OpenSnapshotResponse]
+                        ]
+                    )
+                else
+                    Request.Generate(openSnapshotUrl, Request.GetDefaultParameters(sessionId))
+            ),
+            snapshot = ResponseHandler.GetDataFromResponse(openSnapshotResponse, "body.snapshot")
+        in
+            snapshot
+in
+    [
+        OpenSnapshot = OpenSnapshot.OpenSnapshot
+    ]

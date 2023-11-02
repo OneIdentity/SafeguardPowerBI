@@ -16,6 +16,7 @@
     <ErrorPath>$(ModulesPath)Error\</ErrorPath>
     <RequestPath>$(ModulesPath)Request\</RequestPath>
     <SchemaPath>$(ModulesPath)Schema\</SchemaPath>
+    <SearchPath>$(ModulesPath)Search\</SearchPath>
     <DefinitionsPath>$(Schemapath)Definitions\</DefinitionsPath>
     <VersionPath>$(ModulesPath)Version\</VersionPath>
     <ResourcePath>$(SrcPath)\Res\</ResourcePath>
@@ -45,8 +46,10 @@
     <MezContent Include="$(SrcPath)SafeguardSessions.pq" />
     <MezContent Include="$(ModulesPath)Constants.pqm" />
     <MezContent Include="$(ModulesPath)Types.pqm" />
-    <MezContent Include="$(ModulesPath)Search.pqm" />
     <MezContent Include="$(ModulesPath)Utils.pqm" />
+    <MezContent Include="$(SearchPath)AdvancedSearch.pqm" />
+    <MezContent Include="$(SearchPath)OpenSnapshot.pqm" />
+    <MezContent Include="$(SearchPath)GetSessionsCount.pqm" />
     <MezContent Include="$(ErrorPath)ErrorCodes.pqm" />
     <MezContent Include="$(ErrorPath)QueryTransformErrors.pqm" />
     <MezContent Include="$(ErrorPath)RequestErrors.pqm" />
