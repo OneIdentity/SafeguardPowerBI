@@ -6,6 +6,7 @@ When you import or refresh data with the Power BI Connector, you will likely fac
 
 - The data import finishes without any immediate signs of error.
 - A pop-up appears indicating an error.
+- An error occurs when connecting via the Power BI Service.
 
 You can read about these scenarios below.
 
@@ -17,9 +18,18 @@ To see if there were any error during the data import, you can check the **Info*
 
 If the error is handled by the Power BI Connector, the pop-up will contain the error code and error message what you can find in [Errors raised by the Power BI Connector] section to learn more about the error.
 
+#### An error occurs when connecting via the Power BI Service.
+
+If an error occurs when a new connection is created, Power BI Service (Service) will show the exact error message.
+
+If an error oocurs when an existing dataset is refreshed through an existing connection, the _Refresh history_ of that dataset will contain the error details.
+
 ### Creating a technical case
 
-If you cannot resolve the error, reproduce it with trace logging enabled, collect the Power BI mashup trace logs, as described in the [Collecting Power BI mashup trace logs] documentation, and create a [One Identity Technical Case]. Attach the collected trace logs for debugging purposes. Make sure you include the version of your Power BI desktop application, the Power BI Connector and SPS appliance. Attaching an SPS debug bundle may also help us troubleshooting the issue if it is rather related to SPS.
+If you cannot resolve the error, reproduce it with trace logging enabled, collect the Power BI mashup trace logs, as described in the [Collecting Power BI mashup trace logs] documentation. If the error occurs in the Service, collect the Power BI Gateway logs, as described in the [Collecting Power BI Gateway logs] documentation.
+Finally, create a [One Identity Technical Case]. Attach the collected trace logs for debugging purposes.
+
+Make sure you include the version of your Power BI Desktop application, the version of the Power BI Connector and the version of the SPS appliance. If you are using the Service with a Gateway, also include the version of the Gateway. Attaching an SPS debug bundle may also help us troubleshooting the issue if it is rather related to SPS.
 
 In the next sections you can read about errors that you might run into when using the Power BI Connector.
 
@@ -106,5 +116,6 @@ This error wraps unexpected errors raised by the Power BI Connector. Create a te
 [One Identity Technical Case]: https://support.oneidentity.com/create-service-request
 
 [Collecting Power BI mashup trace logs]: https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-diagnostics#collecting-mashup-traces
+[Collecting Power BI Gateway logs]: https://learn.microsoft.com/en-us/data-integration/gateway/service-gateway-tshoot#collect-logs-from-the-on-premises-data-gateway-app
 
 <!-- Links END -->
