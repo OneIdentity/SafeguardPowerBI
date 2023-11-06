@@ -98,7 +98,7 @@ shared GetData = (
             if IsMocked(mocks, "FetchData") then
                 mocks[FetchData][Value]
             else
-                FetchData(spsUrl, UrlBuilder.GetDefaultQuery() & query, sessionId, mocks),
+                FetchData(spsUrl, UrlBuilder.DefaultQuery & query, sessionId, mocks),
         data = HandleIfThereIsAnError(try (response)),
         result = BuildSPSResult(data, startTime)
     in
@@ -272,7 +272,7 @@ UrlBuilder = Extension.ImportModule("UrlBuilder.pqm");
 
 UrlBuilder.GenerateBaseUrl = UrlBuilder[GenerateBaseUrl];
 UrlBuilder.GenerateUrl = UrlBuilder[GenerateUrl];
-UrlBuilder.GetDefaultQuery = UrlBuilder[GetDefaultQuery];
+UrlBuilder.DefaultQuery = UrlBuilder[DefaultQuery];
 
 Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "CommonLogger.pqm");
 
