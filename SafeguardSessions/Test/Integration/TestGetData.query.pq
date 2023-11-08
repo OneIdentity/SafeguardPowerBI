@@ -6,7 +6,12 @@ CreateSchema = Extension.ImportFunction("CreateSchema", "SchemaUtils.pqm");
 
 SupportedVersions.LatestVersion = Extension.ImportFunction("LatestVersion", "SupportedVersions.pqm");
 
-TestResultsContentWithoutStartTime =  UnitTestFramework.ImportFunction("TestResultsContentWithoutStartTime", "Asserts.pqm");
+TestResultsContentWithoutStartTime = UnitTestFramework.ImportFunction(
+    "TestResultsContentWithoutStartTime", "Asserts.pqm"
+);
+
+Yes = Extension.ImportFunction("Yes", "Constants.pqm");
+No = Extension.ImportFunction("No", "Constants.pqm");
 
 TestSafeguardSessions.URL = "dummy_url";
 
@@ -122,7 +127,7 @@ TestEmptyResponseIsHandled = () =>
             TestSafeguardSessions.URL,
             TestSafeguardSessions.AuthenticationCredentials,
             [],
-            false,
+            No,
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
                 InfoResponse = TestSafeguardSessions.InfoResponse,
@@ -164,7 +169,7 @@ TestGetDataWithoutError = () =>
             TestSafeguardSessions.URL,
             TestSafeguardSessions.AuthenticationCredentials,
             [],
-            false,
+            No,
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
                 InfoResponse = TestSafeguardSessions.InfoResponse,
@@ -207,7 +212,7 @@ TestFirmwareCheckCanBeBypassed = () =>
             TestSafeguardSessions.URL,
             TestSafeguardSessions.AuthenticationCredentials,
             [],
-            true,
+            Yes,
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
                 InfoResponse = infoResponse,
@@ -253,7 +258,7 @@ TestGetDataWithQueryInputs = () =>
                 end = "2023.1.31",
                 q = "protocol:SSh AND user.name:balabit"
             ],
-            false,
+            No,
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
                 InfoResponse = TestSafeguardSessions.InfoResponse,
@@ -295,7 +300,7 @@ TestGetDataHandlesAuthenticationError = () =>
             TestSafeguardSessions.URL,
             TestSafeguardSessions.AuthenticationCredentials,
             [],
-            false,
+            No,
             [
                 AuthResponse = fakeAuthResponse
             ]
@@ -322,7 +327,7 @@ TestGetDataWithActualData = () =>
             TestSafeguardSessions.URL,
             TestSafeguardSessions.AuthenticationCredentials,
             [],
-            false,
+            No,
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
                 InfoResponse = TestSafeguardSessions.InfoResponse,
@@ -369,7 +374,7 @@ TestGetDataHandlesBadRequest = () =>
             TestSafeguardSessions.URL,
             TestSafeguardSessions.AuthenticationCredentials,
             [],
-            false,
+            No,
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
                 InfoResponse = TestSafeguardSessions.InfoResponse,
@@ -399,7 +404,7 @@ TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringAuth = () =>
             TestSafeguardSessions.URL,
             TestSafeguardSessions.AuthenticationCredentials,
             [],
-            false,
+            No,
             [
                 Authenticate = errorMock
             ]
@@ -425,7 +430,7 @@ TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringDataFetch = () =>
             TestSafeguardSessions.URL,
             TestSafeguardSessions.AuthenticationCredentials,
             [],
-            false,
+            No,
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
                 InfoResponse = TestSafeguardSessions.InfoResponse,
@@ -461,7 +466,7 @@ TestGetDataReturnsWithErrorInCaseOfUnsupportedSPSVersion = () =>
                     TestSafeguardSessions.URL,
                     TestSafeguardSessions.AuthenticationCredentials,
                     [],
-                    false,
+                    No,
                     [
                         AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
                         InfoResponse = infoResponse
@@ -499,7 +504,7 @@ TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringAut
                         TestSafeguardSessions.URL,
                         TestSafeguardSessions.AuthenticationCredentials,
                         [],
-                        false,
+                        No,
                         [
                             Authenticate = errorMock
                         ]
@@ -537,7 +542,7 @@ TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringDat
                         TestSafeguardSessions.URL,
                         TestSafeguardSessions.AuthenticationCredentials,
                         [],
-                        false,
+                        No,
                         [
                             AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
                             InfoResponse = TestSafeguardSessions.InfoResponse,
@@ -582,7 +587,7 @@ TestGetDataHandlesSchemaApplyError = () =>
             TestSafeguardSessions.URL,
             TestSafeguardSessions.AuthenticationCredentials,
             [],
-            false,
+            No,
             [
                 AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
                 InfoResponse = TestSafeguardSessions.InfoResponse,

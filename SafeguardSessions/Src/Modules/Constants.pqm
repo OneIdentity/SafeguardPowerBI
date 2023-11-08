@@ -1,4 +1,7 @@
 let
+    // Version check
+    Constants.Yes = "Yes",
+    Constants.No = "No",
     // Statuses
     Constants.SuccessStatus = "Success",
     Constants.ErrorStatus = "Error",
@@ -12,6 +15,8 @@ let
     Constants.SessionsSnapshotEndpoint = Text.Combine({Constants.SessionsEndpoint, "/_snapshot"})
 in
     [
+        Yes = Constants.Yes,
+        No = Constants.No,
         SuccessStatus = Constants.SuccessStatus,
         ErrorStatus = Constants.ErrorStatus,
         NotAvailableStatus = Constants.NotAvailableStatus,
