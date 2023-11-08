@@ -26,7 +26,7 @@ TestHandleIfThereIsAnError = () =>
                     Reason = "Wrong variable",
                     Message = "Error 99999: Variable type mismatch error",
                     Detail = [
-                        originalDetails = "The variable badVariable is of the type text, but it should be of the type number",
+                        OriginalDetails = "The variable badVariable is of the type text, but it should be of the type number",
                         ManuallyHandled = false,
                         ErrorCode = 99999
                     ],

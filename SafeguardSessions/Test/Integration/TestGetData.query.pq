@@ -489,7 +489,7 @@ TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringAut
                 Reason = "Wrong variable",
                 Message = "Error 99999: Variable type mismatch error",
                 Detail = [
-                    originalDetails = "The variable badVariable is of the type text, but it should be of the type number",
+                    OriginalDetails = "The variable badVariable is of the type text, but it should be of the type number",
                     ErrorCode = 99999,
                     ManuallyHandled = false
                 ],
@@ -527,7 +527,7 @@ TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringDat
                 Reason = "Wrong variable",
                 Message = "Error 99999: Variable type mismatch error",
                 Detail = [
-                    originalDetails = "The variable badVariable is of the type text, but it should be of the type number",
+                    OriginalDetails = "The variable badVariable is of the type text, but it should be of the type number",
                     ErrorCode = 99999,
                     ManuallyHandled = false
                 ],
