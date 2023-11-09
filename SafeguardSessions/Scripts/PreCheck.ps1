@@ -7,4 +7,4 @@ if ($null -eq $config) {
     & Bootstrap.ps1
 }
 
-Import-Alias -Path $config.aliasesPath -Force
+Import-Alias -Path $config.AliasesPath -Force

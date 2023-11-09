@@ -46,11 +46,11 @@ function VerifyChecksum {
 
 if ($Verify -eq $true) {
     Write-Host "Verifying checksums"
-    VerifyChecksum -File $config.connectorMezPath
-    VerifyChecksum -File $config.reportTemplatePath
+    VerifyChecksum -File $config.ConnectorMezPath
+    VerifyChecksum -File $config.ReportTemplatePath
 }
 else {
     Write-Host "Calculating checksums"
-    CalculateChecksum -File $config.connectorMezPath -Persist -Verbose
-    CalculateChecksum -File $config.reportTemplatePath -Persist -Verbose
+    CalculateChecksum -File $config.ConnectorMezPath -Persist -Verbose
+    CalculateChecksum -File $config.ReportTemplatePath -Persist -Verbose
 }

@@ -52,7 +52,7 @@ function LogFail {
 
 $Output = "short"
 if ($null -eq $TestFile){
-    $testInput = $config.unitTestsPath
+    $testInput = $config.UnitTestsPath
 } else {
     $testInput = $TestFile
 }
@@ -60,8 +60,8 @@ if ($null -eq $TestFile){
 Write-Host "Running unit tests in $testInput"
 
 $pqtestOutput =  pqtest run-test `
-    --extension $config.connectorMezPath `
-    --extension $config.testMezPath `
+    --extension $config.ConnectorMezPath `
+    --extension $config.TestMezPath `
     --environmentConfiguration output=$Output `
     --queryFile $testInput `
     --prettyPrint 

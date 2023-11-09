@@ -1,0 +1,8 @@
+{
+  "ConnectorProjPath": "SafeguardSessions.proj",
+  "TestProjPath": "Test\\SafeguardSessionsTest.proj",
+  "UnitTestsPath": "Test",
+  "ConnectorMezPath": "Deploy\\OneIdentitySafeguard\\Bin\\OneIdentitySafeguard.mez",
+  "TestMezPath": "Deploy\\UnitTestFramework\\Bin\\UnitTestFramework.mez",
+  "ReportTemplatePath": "ReportTemplate\\OneIdentitySafeguard.pbit"
+}
