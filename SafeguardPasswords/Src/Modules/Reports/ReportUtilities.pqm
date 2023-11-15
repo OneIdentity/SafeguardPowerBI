@@ -1,0 +1,92 @@
+let
+    SafeguardPasswords.GetDataTable = Extension.ImportFunction("GetDataTable","Data.pqm"),
+    Constants = Extension.ImportModule("Constants.pqm")[SppConstants],
+    IsMocked = Extension.ImportFunction("IsMocked", "CommonUtils.pqm"),
+    InfoLog = Extension.ImportFunction("InfoLog", "CommonLogger.pqm"),
+
+
+    ReportUtilities.GetSingleAssetOwnershipDataTable = (applianceName as text, Id as number) =>
+        let
+            owners = SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Assets]&"/"&Number.ToText(Id)&"/EffectiveManagedBy", null, Constants[Fields][AssetOwnershipReport], null, "JSON")
+        in
+            owners,
+
+    ReportUtilities.GetSingleAccountOwnershipDataTable = (applianceName as text, Id as number) =>
+        let
+            owners = SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AssetAccounts]&"/"&Number.ToText(Id)&"/EffectiveManagedBy", null, null,/*Constants[Fields][AssetAccountOwnershipReport],*/ null, "JSON")
+        in
+            owners,
+
+    ReportUtilities.GetSinglePartitionOwnershipDataTable = (applianceName as text, Id as number) =>
+        let
+            owners = SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AssetPartitions]&"/"&Number.ToText(Id)&"/ManagedBy", null, Constants[Fields][AssetPartitionOwnershipReport], null, "JSON")
+        in
+            owners,
+
+    ReportUtilities.GetCombinedAssetAccountOwners = (applianceName as text, id as number, assetId as number, partitionId as number, optional mocks as record) =>
+        let
+            accountOwners = if IsMocked(mocks,"AccountOwners")
+                then  mocks[AccountOwners]
+                else ReportUtilities.GetSingleAccountOwnershipDataTable(applianceName,id),
+
+            assetAndPartitionOwners = ReportUtilities.GetCombinedAssetOwners(applianceName,assetId,partitionId,mocks),
+
+            owners = Table.Combine({accountOwners, assetAndPartitionOwners})
+        in
+            owners,
+
+    ReportUtilities.GetCombinedAssetOwners = (applianceName as text, id as number, partitionId as number, optional mocks as record) =>
+        let
+            assetOwners = if IsMocked(mocks,"AssetOwners")
+                then mocks[AssetOwners]
+                else ReportUtilities.GetSingleAssetOwnershipDataTable(applianceName,id),
+            
+            partitionOwners = if IsMocked(mocks,"PartitionOwners")
+                then mocks[PartitionOwners]
+                else ReportUtilities.GetSinglePartitionOwnershipDataTable(applianceName,partitionId),
+
+            owners = Table.Combine({assetOwners, partitionOwners})
+        in
+            owners,
+
+    // Retrieves table of asset IDs, then for each ID queries the Assets/ID/EffectiveManagedBy endpoint to retrieve owners
+    ReportUtilities.GetAssetOwnershipDataTable = (applianceName as text) as table => 
+        let
+            assetIds = SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Assets], null, "Id,Name, AssetPartitionId", null, "JSON"),
+
+            owners = Table.AddColumn(assetIds, "Owners", each ReportUtilities.GetCombinedAssetOwners(applianceName, [Id], [AssetPartitionId])),
+            expandedOwners = Table.ExpandTableColumn(owners,"Owners", {"Name", "EmailAddress","PrincipalKind","IdentityProviderName","Direct"}, {"Owners.Name", "Owners.EmailAddress", "Owners.PrincipalKind", "Owners.IdentityProviderName", "Owners.Direct"})
+        in
+            expandedOwners,
+
+    // Retrieves table of assetaccount IDs, then for each ID queries the AssetAccounts/ID/EffectiveManagedBy endpoint to retrieve owners
+    ReportUtilities.GetAssetAccountOwnershipDataTable = (applianceName as text, optional mocks as record) as table => 
+        let
+            assetAccounts = if IsMocked(mocks, "Response")
+                then mocks[Response][Accounts]
+                else SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AssetAccounts], null, "Id,Name,Asset.Id,Asset.AssetPartitionId", null, "JSON"),
+       
+            expandedAccounts = Table.ExpandRecordColumn(assetAccounts,"Asset",{"Id","AssetPartitionId"},{"Asset.Id","AssetPartitionId"}),
+       
+            owners = if IsMocked(mocks, "Response")
+                then Table.AddColumn(expandedAccounts, "Owners", each ReportUtilities.GetCombinedAssetAccountOwners(applianceName,[Id],[Asset.Id],[AssetPartitionId],mocks[Response][Owners]))
+                else Table.AddColumn(expandedAccounts, "Owners", each ReportUtilities.GetCombinedAssetAccountOwners(applianceName,[Id],[Asset.Id],[AssetPartitionId])),
+            expandedOwners = Table.ExpandTableColumn(owners,"Owners", {"Name", "EmailAddress","PrincipalKind","IdentityProviderName","Direct"}, {"Owners.Name", "Owners.EmailAddress", "Owners.PrincipalKind", "Owners.IdentityProviderName", "Owners.Direct"})
+        in
+            expandedOwners,
+
+    // Retrieves table of assetpartition IDs, then for each ID queries the AssetPartitions/ID/ManagedBy endpoint to retrieve owners
+    ReportUtilities.GetAssetPartitionOwnershipDataTable = (applianceName as text) as table => 
+        let
+            assetPartitionIds = SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AssetPartitions], null, "Id,Name", null, "JSON"),
+            owners = Table.AddColumn(assetPartitionIds, "Owners", each SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AssetPartitions]&"/"&Number.ToText([Id])&"/ManagedBy", null, Constants[Fields][AssetPartitionOwnershipReport], null, "JSON")),
+            expandedOwners = Table.ExpandTableColumn(owners,"Owners", {"Name", "EmailAddress","PrincipalKind","IdentityProviderName","Direct"}, {"Owners.Name", "Owners.EmailAddress", "Owners.PrincipalKind", "Owners.IdentityProviderName", "Owners.Direct"})
+        in
+            expandedOwners
+in
+    [
+        GetAssetOwnershipDataTable = ReportUtilities.GetAssetOwnershipDataTable,
+        GetAssetAccountOwnershipDataTable = ReportUtilities.GetAssetAccountOwnershipDataTable,
+        GetAssetPartitionOwnershipDataTable = ReportUtilities.GetAssetPartitionOwnershipDataTable
+    ]
+    

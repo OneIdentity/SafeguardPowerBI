@@ -1,0 +1,10 @@
+let
+    ErrorBase = Extension.ImportModule("CommonErrorBase.pqm"),
+    CommonRequestErrors.ErrorMap = Extension.ImportFunction("ErrorMap", "CommonRequestErrors.pqm"),
+    RequestErrors.ErrorMap = CommonRequestErrors.ErrorMap
+
+in
+    [
+        ErrorCodes = List.Transform(Record.FieldNames(RequestErrors.ErrorMap), each Number.FromText(_)),
+        ErrorMap = RequestErrors.ErrorMap
+    ]

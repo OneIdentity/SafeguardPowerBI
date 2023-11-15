@@ -1,0 +1,144 @@
+let  
+    ValidateByStatusCode = Extension.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
+    InfoLog = Extension.ImportFunction("InfoLog", "CommonLogger.pqm"),
+    ErrorCodes = Extension.ImportFunction("ErrorCodes", "RequestErrors.pqm"),
+    GetHost = Extension.ImportFunction("GetSppHost","UrlBuilder.pqm"),
+    Constants = Extension.ImportModule("Constants.pqm")[SppConstants],
+    IsMocked = Extension.ImportFunction("IsMocked", "CommonUtils.pqm"),
+
+
+    Request.GetSppResponseBase = (host as text, options as record, optional logResponse as logical, optional mocks as record) =>
+        let
+            response = if IsMocked(mocks, "Response")
+                        then mocks[Response]
+                        else Web.Contents(host, options & [ManualStatusHandling = {400,406}]),
+
+            json = if logResponse = true 
+                    then InfoLog("Response from SPP: ", Json.Document(response))
+                    else Json.Document(response),
+
+            extendedMeta = Value.Metadata(response) & [RequestUrl = host] & [RelativePath = options[RelativePath]],// & [Query = options[Query]],
+
+            responseWithMeta = Value.ReplaceMetadata(json, extendedMeta)
+        in
+            ValidateByStatusCode(responseWithMeta),
+
+    Request.ConvertQueryToRecord = (query as text) =>
+        let
+            apiParameters = Text.Split(query,"&"),              
+
+            ExtractParamsFunc = (param as text) =>
+                let
+                    splitParams = Text.Split(param,"="),
+                    name = splitParams{0},
+                    value = splitParams{1},
+
+                    rcd = [],
+                    rcd1 = Record.AddField(rcd,name,value)
+                in
+                    rcd1,
+
+            ListOfQueryParamRecords = List.Transform(apiParameters, each ExtractParamsFunc(_)),
+
+            QueryRecord = Record.Combine(ListOfQueryParamRecords)
+        in
+            QueryRecord,
+
+    //Executes query against SPP API with specified host target, headers, path, and body (content). 
+    //
+    //Returns JSON response.
+    Request.GetSppResponse = (applianceName as text, loginToken as text, optional relativePath as text, optional content as binary, optional query as text, optional mocks as record) =>
+        let
+            host = GetHost("https://" & applianceName),
+            
+            options = if query = null or query = ""
+                then [
+                        Headers = [#"Content-Type"="application/json", Authorization="Bearer " & loginToken],
+                        RelativePath = relativePath,
+                        Content = content
+                     ]
+                else [
+                        Headers = [#"Content-Type"="application/json", Authorization="Bearer " & loginToken],
+                        RelativePath = relativePath,
+                        Content = content,
+                        Query = Request.ConvertQueryToRecord(query)
+                    ],
+
+            loggedParameters = Record.RemoveFields(options,"Headers"),
+
+            log = InfoLog("Request sent to SPP", [Url = host, Parameters = loggedParameters]),
+            
+            response = if IsMocked(mocks, "Response") 
+                        then Request.GetSppResponseBase(log[Url], options, true, mocks)
+                        else Request.GetSppResponseBase(log[Url], options, true)
+        in
+            response,
+
+    Request.GetUnauthenticatedSppResponse = (applianceName as text, optional relativePath as text, optional content as binary, optional query as text) =>
+        let
+            host = GetHost("https://" & applianceName),
+            
+            options = [
+                Headers = [#"Content-Type"="application/json"],
+                RelativePath = relativePath,
+                Content = content,
+                Query = query
+            ],
+
+            loggedParameters = options,
+
+            log = InfoLog("Request sent to SPP", [Url = host, Parameters = loggedParameters]),
+            response = Request.GetSppResponseBase(log[Url], options, true)
+
+        in
+            response,
+
+    Request.GetRstsResponse = (applianceName as text, providerScope as text, user as text, pass as text, optional mocks as record) =>
+        let
+            host = GetHost("https://" & applianceName),
+
+            options = [
+                Headers = [#"Content-Type"="application/json"],
+                RelativePath = Constants[RstsRelativePath],
+                Content = Json.FromValue([
+                    grant_type="password",
+                    scope=providerScope,
+                    username=user,
+                    password=pass
+                    ])
+                ],
+
+            loggedParameters = Record.RemoveFields(options,"Content"),
+
+            log = InfoLog("RSTS Request sent to SPP", [Url = host, Parameters = loggedParameters]),
+            response = if IsMocked(mocks, "Response") 
+                            then Request.GetSppResponseBase(log[Url], options, false, mocks)
+                            else Request.GetSppResponseBase(log[Url], options, false)
+        in
+            response,
+
+        Request.GetLoginResponse = (applianceName as text, rstsResponse as any, optional mocks as record) =>
+            let
+                host = GetHost("https://" & applianceName),
+                options = [
+                    Headers = [#"Content-Type"="application/json"],
+                    RelativePath = Constants[Endpoints][LoginResponse],
+                    Content = Json.FromValue([StsAccessToken=rstsResponse[#"access_token"]])
+                ],
+
+                loginResponse = if IsMocked(mocks, "Response")
+                                    then Request.GetSppResponseBase(host, options, false, mocks)
+                                    else Request.GetSppResponseBase(host, options, false),
+
+                loginToken = loginResponse[UserToken]
+            in
+                loginToken
+in
+    [
+        GetSppResponse = Request.GetSppResponse,
+        GetRstsResponse = Request.GetRstsResponse,
+        GetSppResponseBase = Request.GetSppResponseBase,
+        GetLoginResponse = Request.GetLoginResponse,
+        GetUnauthenticatedSppResponse = Request.GetUnauthenticatedSppResponse,
+        ConvertQueryToRecord = Request.ConvertQueryToRecord
+    ]

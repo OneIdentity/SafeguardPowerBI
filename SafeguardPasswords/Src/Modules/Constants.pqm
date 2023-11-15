@@ -1,0 +1,111 @@
+﻿let
+    // Statuses
+    Constants.SuccessStatus = "Success",
+    Constants.ErrorStatus = "Error",
+    Constants.NotAvailableStatus = "N/A",
+
+    // SPP Base Endpoints
+    Constants.SppCoreEndpoint = "/service/core/v4",
+    Constants.SppApplianceEndpoint = "/service/appliance/v4",
+    Constants.SppNotificationEndpoint = "/service/notification/v4",
+    Constants.SppAssetPartitionsEndpoint = Text.Combine({Constants.SppCoreEndpoint,"/AssetPartitions"}),
+    Constants.SppAuditLogEndpoint = Text.Combine({Constants.SppCoreEndpoint,"/AuditLog"}),
+    Constants.SppReportsEndpoint = Text.Combine({Constants.SppCoreEndpoint,"/Reports"}),
+    Constants.SppClusterEndpoint = Text.Combine({Constants.SppCoreEndpoint,"/Cluster"}),
+    Constants.SppAuditLogAccessRequestsEndpoint = Text.Combine({Constants.SppAuditLogEndpoint,"/AccessRequests"})
+
+in
+    [
+        // Statuses
+        SuccessStatus = Constants.SuccessStatus,
+        ErrorStatus = Constants.ErrorStatus,
+        NotAvailableStatus = Constants.NotAvailableStatus,
+
+        // SPP Constants
+        SppConstants = [
+            DataConnectorName = "One Identity SPP Power BI Connector",
+            RstsRelativePath = "RSTS/oauth2/token",
+            Endpoints = [
+                Assets = Text.Combine({Constants.SppCoreEndpoint,"/Assets"}),
+                AssetAccounts = Text.Combine({Constants.SppCoreEndpoint,"/AssetAccounts"}),
+                AssetPartitions = Constants.SppAssetPartitionsEndpoint,
+                DiscoveredAccounts = Text.Combine({Constants.SppAssetPartitionsEndpoint,"/DiscoveredAccounts"}),
+                DiscoveredService = Text.Combine({Constants.SppAssetPartitionsEndpoint,"/DiscoveredServices"}),
+                DiscoveredSshKeys = Text.Combine({Constants.SppAssetPartitionsEndpoint,"/DiscoveredSshKeys"}),
+                Users = Text.Combine({Constants.SppCoreEndpoint,"/Users"}),
+                UserGroups = Text.Combine({Constants.SppCoreEndpoint,"/UserGroups"}),
+                IdentityProviders = Text.Combine({Constants.SppCoreEndpoint,"/IdentityProviders"}),
+                Roles = Text.Combine({Constants.SppCoreEndpoint,"/Roles"}),
+                AccessPolicies = Text.Combine({Constants.SppCoreEndpoint,"/AccessPolicies"}),
+                AssetGroups = Text.Combine({Constants.SppCoreEndpoint,"/AssetGroups"}),
+                AccountGroups = Text.Combine({Constants.SppCoreEndpoint,"/AccountGroups"}),
+                NotificationStatus = Text.Combine({Constants.SppNotificationEndpoint,"/Status"}),
+                Me = Text.Combine({Constants.SppCoreEndpoint,"/Me"}),
+                AuthenticationProviders = Text.Combine({Constants.SppCoreEndpoint,"/AuthenticationProviders"}),
+                LoginResponse = Text.Combine({Constants.SppCoreEndpoint,"/Token/LoginResponse"}),
+                Appliance = [
+                    Health = Text.Combine({Constants.SppApplianceEndpoint,"/Health"}),
+                    Backups = Text.Combine({Constants.SppApplianceEndpoint,"/Backups"}),
+                    CpuStatuses = Text.Combine({Constants.SppApplianceEndpoint,"/CpuStatuses"}),
+                    DiskStatus = Text.Combine({Constants.SppApplianceEndpoint,"/DiskStatus"}),
+                    HardwareStatus = Text.Combine({Constants.SppApplianceEndpoint,"/HardwareStatus"}),
+                    NtpClientStatus = Text.Combine({Constants.SppApplianceEndpoint,"/NtpClientStatus"}),
+                    MemoryStatus = Text.Combine({Constants.SppApplianceEndpoint,"/MemoryStatus"})
+                ],
+                AuditLog = [
+                    AccessRequests = Text.Combine({Constants.SppAuditLogAccessRequestsEndpoint,"/Requests"}),
+                    Activities = Text.Combine({Constants.SppAuditLogAccessRequestsEndpoint,"/Activities"}),
+                    Sessions = Text.Combine({Constants.SppAuditLogAccessRequestsEndpoint,"/Sessions"}),
+                    Appliances = Text.Combine({Constants.SppAuditLogEndpoint,"/Appliances"}),
+                    Archives = Text.Combine({Constants.SppAuditLogEndpoint,"/Archives"}),
+                    DirectorySync = Text.Combine({Constants.SppAuditLogEndpoint,"/DirectorySync"}),
+                    DiscoveredAccounts = Text.Combine({Constants.SppAuditLogEndpoint,"/Discovery/Accounts"}),
+                    DiscoveredAssets = Text.Combine({Constants.SppAuditLogEndpoint,"/Discovery/Assets"}),
+                    DiscoveredServices = Text.Combine({Constants.SppAuditLogEndpoint,"/Discovery/Services"}),
+                    DiscoveredSshKeys = Text.Combine({Constants.SppAuditLogEndpoint,"/Discovery/SshKeys"}),
+                    Logins = Text.Combine({Constants.SppAuditLogEndpoint,"/Logins"}),
+                    ObjectChanges = Text.Combine({Constants.SppAuditLogEndpoint,"/ObjectChanges"}),
+                    Passwords = Text.Combine({Constants.SppAuditLogEndpoint,"/Passwords"})
+                ],
+                Reports = [
+                    AccountEntitlements = Text.Combine({Constants.SppReportsEndpoint,"/Entitlements/AccountEntitlements"}),
+                    AssetEntitlements = Text.Combine({Constants.SppReportsEndpoint,"/Entitlements/AssetEntitlements"}),
+                    UserEntitlements = Text.Combine({Constants.SppReportsEndpoint,"/Entitlements/UserEntitlements"}),
+                    AccountOwnership = Text.Combine({Constants.SppReportsEndpoint,"/Ownership/Account"}),
+                    AssetOwnership = Text.Combine({Constants.SppReportsEndpoint,"/Ownership/Asset"}),
+                    PartitionOwnership = Text.Combine({Constants.SppReportsEndpoint,"/Ownership/Partition"}),
+                    TagOwnership = Text.Combine({Constants.SppReportsEndpoint,"/Ownership/Tag"}),
+                    UserOwnership = Text.Combine({Constants.SppReportsEndpoint,"/Ownership/User"}),
+                    AccountTaskSummary = Text.Combine({Constants.SppReportsEndpoint,"/Tasks/AccountTaskSummary"}),
+                    FailedChangePassword = Text.Combine({Constants.SppReportsEndpoint,"/Tasks/FailedAccountTasks/ChangePassword"}),
+                    FailedCheckPassword = Text.Combine({Constants.SppReportsEndpoint,"/Tasks/FailedAccountTasks/CheckPassword"}),
+                    FailedChangeSshKey = Text.Combine({Constants.SppReportsEndpoint,"/Tasks/FailedAccountTasks/ChangeSshKey"}),
+                    FailedCheckSshKey = Text.Combine({Constants.SppReportsEndpoint,"/Tasks/FailedAccountTasks/CheckSshKey"}),
+                    FailedDiscoverAccounts = Text.Combine({Constants.SppReportsEndpoint,"/Tasks/FailedAssetTasks/DiscoverAccounts"}),
+                    FailedDiscoverServices = Text.Combine({Constants.SppReportsEndpoint,"/Tasks/FailedAssetTasks/DiscoverServices"})
+                ],
+                Cluster = [
+                    ManagedNetworks = Text.Combine({Constants.SppClusterEndpoint,"/ManagedNetworks"}),
+                    Members = Text.Combine({Constants.SppClusterEndpoint,"/Members"}),
+                    Status = Text.Combine({Constants.SppClusterEndpoint,"/Status"}),
+                    PlatformTaskLoadStatus = Text.Combine({Constants.SppClusterEndpoint,"/PlatformTaskLoadStatus"})
+                ]
+            ],
+            Fields = [
+                Assets = "PlatformDisplayName,CreatedDate,Name,NetworkAddress,AssetPartitionName,TaskProperties.HasAssetTaskFailure,TaskProperties.FailedAccountDiscoveryAttempts,"
+                    & "TaskProperties.FailedServiceDiscoveryAttempts,TaskProperties.FailedTestConnectionAttempts,TaskProperties.FailedDependentServiceUpdateAttempts,"
+                    & "SessionAccessProperties.AllowSessionRequests,Tags,AssetDiscoveryJobName,AccountDiscoveryScheduleName,ConnectionProperties.ServiceAccountName,"
+                    & "ConnectionProperties.ServiceAccountCredentialType",
+                AssetAccounts = "Name,IsServiceAccount,IsApplicationAccount,Tags,Asset.Name,Asset.NetworkAddress,PasswordProfile.EffectiveName,"
+                    & "RequestProperties.AllowPasswordRequest,RequestProperties.AllowSessionRequest,RequestProperties.AllowSshKeyRequest,RequestProperties.AllowApiKeyRequest,"
+                    & "HasPassword,HasSshKey,HasTotpAuthenticator,HasApiKeys,TaskProperties.HasAccountTaskFailure,TaskProperties.FailedPasswordCheckAttempts,"
+                    & "TaskProperties.FailedPasswordChangeAttempts,TaskProperties.FailedSshKeyCheckAttempts,TaskProperties.FailedSshKeyChangeAttempts,"
+                    & "TaskProperties.FailedSshKeyDiscoveryAttempts,TaskProperties.FailedSshKeyRevokeAttempts,TaskProperties.FailedSuspendAccountAttempts,"
+                    & "TaskProperties.FailedRestoreAccountAttempts,TaskProperties.FailedApiKeyCheckAttempts,TaskProperties.FailedApiKeyChangeAttempts",
+                AssetPartitions = "Name,DefaultProfileName,DefaultSshKeyProfileName,ManagedBy",
+                AssetOwnershipReport = "Name,EmailAddress,PrincipalKind,IdentityProviderName,Direct,ViaTags",
+                AssetAccountOwnershipReport = "Name,EmailAddress,PrincipalKind,IdentityProviderName,Direct,ViaTags",
+                AssetPartitionOwnershipReport = "Name,EmailAddress,PrincipalKind,IdentityProviderName"
+            ]
+        ]
+    ]

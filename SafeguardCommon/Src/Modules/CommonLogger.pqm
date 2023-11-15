@@ -198,16 +198,31 @@ let
         in
             if isTesting = null or isTesting = false then
                 Diagnostics.Trace(
-                    logLevel, prefix & ": " & (try _valueToText(value) otherwise "<error getting value>"), value,
+                    logLevel, "[SafeguardPowerBI]" & prefix & ": " & (try _valueToText(value) otherwise "<error getting value>"), value,
                     delayed
                 )
             else
                 [
                     LogLevel = logLevel,
-                    Output = prefix & ": " & (try _valueToText(value) otherwise "<error getting value>"),
+                    Output = "[SafeguardPowerBI]" & prefix & ": " & (try _valueToText(value) otherwise "<error getting value>"),
                     Value = value,
                     Delayed = delayed
                 ],
+    // Logger.InfoLog and Logger.ErrorLog Details
+    //      prefix: text to write to PowerBI Log
+    //      value: method or value to return. 
+    //      delayed: when true, delay logging until after evaluation of value
+    //      isTesting: when true don't actually write to logs; instead return table of log info
+    // 
+    //      Usage: This boils down to a PowerBI Diagnostics.Trace() call. 
+    //          It logs the text specified in prefix, evaluates the method provided in value,
+    //          and returns the result of value to the caller. 
+    //          
+    //      Example:
+    //          res = Logger.InfoLog("text to be logged", () => text.trim("sample text   ", " "))
+    //      
+    //          After evaluation, "text to be logged" is written to the PowerBI log
+    //          and res contains "sample text".                
     Logger.InfoLog = (
         prefix as text, value as any, optional delayed as nullable logical, optional isTesting as nullable logical
     ) =>
