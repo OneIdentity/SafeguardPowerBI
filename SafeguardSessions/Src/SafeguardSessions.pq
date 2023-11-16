@@ -58,7 +58,18 @@ shared FetchSessions = (
             from = from,
             to = to
         ],
-        data = GetData(spsIp, credentials, query, skipVersionCheck, mocks)
+        parsedSkipVersionCheck = skipVersionCheck ?? false,
+        data =
+            if IsMocked(mocks, "ReturnParams") then
+                [
+                    spsIp = spsIp,
+                    credentials = credentials,
+                    query = query,
+                    parsedSkipVersionCheck = parsedSkipVersionCheck,
+                    mocks = mocks
+                ]
+            else
+                GetData(spsIp, credentials, query, parsedSkipVersionCheck, mocks)
     in
         data;
 
