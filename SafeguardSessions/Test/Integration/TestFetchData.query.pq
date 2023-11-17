@@ -251,10 +251,20 @@ TestFetchDataWithInvalidTypeForField = () =>
 
 TestFetchDataRaisesErrorWhenAdvancedSearchInitialResponseFails = () =>
     let
-        AssertErrorIsRaised = (
+        AssertFetchingFailure = (
             statusCode as number, expectedReason as text, expectedMessage as text, expectedErrorCode as number
         ) =>
             let
+                params = {
+                    TestSafeguardSessions.URL,
+                    [],
+                    TestSafeguardSessions.SessionId,
+                    [
+                        GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(0),
+                        OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
+                        GetPageResponseMap = fakeResponses
+                    ]
+                },
                 fakeResponses = [
                     #"http://dummy_url/api/audit/sessions?snapshot=dummy_snapshot_id" = FakeRawResponse(
                         [#"error" = "reason"], [
@@ -262,29 +272,19 @@ TestFetchDataRaisesErrorWhenAdvancedSearchInitialResponseFails = () =>
                         ]
                     )
                 ],
-                facts = TestErrorIsRaised(
-                    try
-                        FetchData(
-                            TestSafeguardSessions.URL,
-                            [],
-                            TestSafeguardSessions.SessionId,
-                            [
-                                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(0),
-                                OpenSnapshotResponse = TestSafeguardSession.SuccessfulOpenSnapshotResponse,
-                                GetPageResponseMap = fakeResponses
-                            ]
-                        ),
-                    expectedReason,
-                    expectedMessage,
-                    [
+                expectedErrorRecord = [
+                    Reason = expectedReason,
+                    Message = expectedMessage,
+                    Detail = [
                         ManuallyHandled = true,
                         Cause = [#"error" = "reason"],
                         RequestUrl = "http://dummy_url/api/audit/sessions?snapshot=dummy_snapshot_id",
                         ErrorCode = expectedErrorCode
                     ]
-                )
+                ],
+                caseName = Text.Format("Error is raised for status code [#StatusCode]", [StatusCode = statusCode])
             in
-                facts,
+                AssertError(caseName, FetchData, params, expectedErrorRecord),
         cases = {
             {
                 400,
@@ -308,7 +308,7 @@ TestFetchDataRaisesErrorWhenAdvancedSearchInitialResponseFails = () =>
             {429, "Snapshot Quota Error", "Error 4290: Snapshot quota exceeded.", 4290},
             {500, "Server Error", "Error 5000: The source IP responded with a server error.", 5000}
         },
-        facts = ProvideDataForTest(cases, AssertErrorIsRaised)
+        facts = ProvideDataForTest(cases, AssertFetchingFailure)
     in
         facts;
 
@@ -340,19 +340,30 @@ TestErrorIsContainedWhenAdvancedSearchSuccessiveResponseFails = () =>
                 dataFacts = {
                     Fact(
                         "First row contains valid data",
-                        [ session_id = "id1", subtable.field1 = 1, subtable.field2 = "value1", flatvalue1 = 1, flatvalue2 = true ],
+                        [
+                            session_id = "id1",
+                            subtable.field1 = 1,
+                            subtable.field2 = "value1",
+                            flatvalue1 = 1,
+                            flatvalue2 = true
+                        ],
                         actualResponse{0}
                     )
                 },
-                errorFacts = TestErrorIsRaised(
-                    try actualResponse{1},
-                    expectedReason,
-                    expectedMessage,
+                errorResponse = () => actualResponse{1},
+                errorFacts = AssertError(
+                    "Advanced search masks the error",
+                    errorResponse,
+                    {},
                     [
-                        ManuallyHandled = true,
-                        Cause = [#"error" = "reason"],
-                        RequestUrl = "http://dummy_url/dummy_url_next",
-                        ErrorCode = expectedErrorCode
+                        Reason = expectedReason,
+                        Message = expectedMessage,
+                        Detail = [
+                            ManuallyHandled = true,
+                            Cause = [#"error" = "reason"],
+                            RequestUrl = "http://dummy_url/dummy_url_next",
+                            ErrorCode = expectedErrorCode
+                        ]
                     ]
                 )
             in
@@ -386,34 +397,34 @@ TestErrorIsContainedWhenAdvancedSearchSuccessiveResponseFails = () =>
 
 TestFetchDataRaisesErrorWhenCountRequestFails = () =>
     let
-        AssertErrorIsRaised = (
+        AssertFetchingFailure = (
             statusCode as number, expectedReason as text, expectedMessage as text, expectedErrorCode as number
         ) =>
             let
                 fakeCountResponse = FakeRawResponse([#"error" = "reason"], [
                     Response.Status = statusCode
                 ]),
-                facts = TestErrorIsRaised(
-                    try
-                        FetchData(
-                            TestSafeguardSessions.URL,
-                            [],
-                            TestSafeguardSessions.SessionId,
-                            [
-                                GetSessionsCountResponse = fakeCountResponse
-                            ]
-                        ),
-                    expectedReason,
-                    expectedMessage,
-                    [
+                expectedErrorRecord = [
+                    Reason = expectedReason,
+                    Message = expectedMessage,
+                    Detail = [
                         ManuallyHandled = true,
                         Cause = [#"error" = "reason"],
                         RequestUrl = "http://dummy_url/api/audit/sessions/_count",
                         ErrorCode = expectedErrorCode
                     ]
-                )
+                ],
+                params = {
+                    TestSafeguardSessions.URL,
+                    [],
+                    TestSafeguardSessions.SessionId,
+                    [
+                        GetSessionsCountResponse = fakeCountResponse
+                    ]
+                },
+                caseName = Text.Format("Error is raised for status code [#StatusCode]", [StatusCode = statusCode])
             in
-                facts,
+                AssertError(caseName, FetchData, params, expectedErrorRecord),
         cases = {
             {
                 400,
@@ -437,41 +448,41 @@ TestFetchDataRaisesErrorWhenCountRequestFails = () =>
             {429, "Snapshot Quota Error", "Error 4290: Snapshot quota exceeded.", 4290},
             {500, "Server Error", "Error 5000: The source IP responded with a server error.", 5000}
         },
-        facts = ProvideDataForTest(cases, AssertErrorIsRaised)
+        facts = ProvideDataForTest(cases, AssertFetchingFailure)
     in
         facts;
 
 TestFetchDataRaisesErrorWhenSnapshotRequestFails = () =>
     let
-        AssertErrorIsRaised = (
+        AssertFetchingFailure = (
             statusCode as number, expectedReason as text, expectedMessage as text, expectedErrorCode as number
         ) =>
             let
                 fakeSnapshotResponse = FakeRawResponse([#"error" = "reason"], [
                     Response.Status = statusCode
                 ]),
-                facts = TestErrorIsRaised(
-                    try
-                        FetchData(
-                            TestSafeguardSessions.URL,
-                            [],
-                            TestSafeguardSessions.SessionId,
-                            [
-                                GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
-                                OpenSnapshotResponse = fakeSnapshotResponse
-                            ]
-                        ),
-                    expectedReason,
-                    expectedMessage,
-                    [
+                expectedErrorRecord = [
+                    Reason = expectedReason,
+                    Message = expectedMessage,
+                    Detail = [
                         ManuallyHandled = true,
                         Cause = [#"error" = "reason"],
                         RequestUrl = "http://dummy_url/api/audit/sessions/_snapshot",
                         ErrorCode = expectedErrorCode
                     ]
-                )
+                ],
+                params = {
+                    TestSafeguardSessions.URL,
+                    [],
+                    TestSafeguardSessions.SessionId,
+                    [
+                        GetSessionsCountResponse = TestSafeguardSession.GetExpectedCountResponse(2),
+                        OpenSnapshotResponse = fakeSnapshotResponse
+                    ]
+                },
+                caseName = Text.Format("Error is raised for status code [#StatusCode]", [StatusCode = statusCode])
             in
-                facts,
+                AssertError(caseName, FetchData, params, expectedErrorRecord),
         cases = {
             {
                 400,
@@ -495,7 +506,7 @@ TestFetchDataRaisesErrorWhenSnapshotRequestFails = () =>
             {429, "Snapshot Quota Error", "Error 4290: Snapshot quota exceeded.", 4290},
             {500, "Server Error", "Error 5000: The source IP responded with a server error.", 5000}
         },
-        facts = ProvideDataForTest(cases, AssertErrorIsRaised)
+        facts = ProvideDataForTest(cases, AssertFetchingFailure)
     in
         facts;
 
@@ -508,5 +519,5 @@ shared TestSafeguardSessions.IntegrationTest = [
         TestFetchDataRaisesErrorWhenCountRequestFails(),
         TestFetchDataRaisesErrorWhenSnapshotRequestFails()
     },
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];

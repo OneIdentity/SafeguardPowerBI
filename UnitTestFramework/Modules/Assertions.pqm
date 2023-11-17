@@ -1,0 +1,31 @@
+let
+    Assertions.AssertLogContent = (caseName as text, logValues as record, expectedLogValues as record) as list =>
+        let
+            facts = {
+                Fact(CaseWrapper(caseName, "Log level is correct"), logValues[LogLevel], expectedLogValues[LogLevel]),
+                Fact(CaseWrapper(caseName, "Output is correct"), logValues[Output], expectedLogValues[Output]),
+                Fact(CaseWrapper(caseName, "Value is correct"), logValues[Value], expectedLogValues[Value]),
+                Fact(
+                    CaseWrapper(caseName, "The value of delayed is correct"),
+                    logValues[Delayed],
+                    expectedLogValues[Delayed]
+                )
+            }
+        in
+            facts,
+    Assertions.AssertError = (caseName as text, testedFunction as function, params as list, expectedErrorRecord as record) =>
+        let
+            err = try Function.Invoke(testedFunction, params),
+            facts = {
+                Fact(CaseWrapper(caseName, "Error is raised"), true, err[HasError]),
+                Fact(CaseWrapper(caseName, "Reason is correct"), expectedErrorRecord[Reason], err[Error][Reason]),
+                Fact(CaseWrapper(caseName, "Message is correct"), expectedErrorRecord[Message], err[Error][Message]),
+                Fact(CaseWrapper(caseName, "Detail is correct"), expectedErrorRecord[Detail], err[Error][Detail])
+            }
+        in
+            facts
+in
+    [
+        AssertLogContent = Assertions.AssertLogContent,
+        AssertError = Assertions.AssertError
+    ]

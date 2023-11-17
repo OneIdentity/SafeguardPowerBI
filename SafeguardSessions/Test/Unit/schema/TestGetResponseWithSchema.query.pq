@@ -41,5 +41,5 @@ TestGetResponseWithSchema = () =>
 
 shared TestGetResponseWithSchema.UnitTest = [
     facts = {TestGetResponseWithSchema()},
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];

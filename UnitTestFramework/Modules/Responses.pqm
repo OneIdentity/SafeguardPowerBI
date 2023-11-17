@@ -1,0 +1,26 @@
+let
+    Responses.ResponseFactory = (body as record, f as function, optional metaData as record) =>
+        let
+            asText = Text.FromBinary(Json.FromValue(body)),
+            response = f(asText),
+            withMeta = Value.ReplaceMetadata(
+                response,
+                if metaData <> null then
+                    metaData
+                else
+                    [
+                        Content.Type = "application/json",
+                        Response.Status = 200
+                    ]
+            )
+        in
+            withMeta,
+    Responses.FakeResponse = (body as record, optional metaData as record) as record =>
+        Responses.ResponseFactory(body, Json.Document, metaData),
+    Responses.FakeRawResponse = (body as record, optional metaData as record) as binary =>
+        Responses.ResponseFactory(body, Text.ToBinary, metaData)
+in
+    [
+        FakeRawResponse = Responses.FakeRawResponse,
+        FakeResponse = Responses.FakeResponse
+    ]

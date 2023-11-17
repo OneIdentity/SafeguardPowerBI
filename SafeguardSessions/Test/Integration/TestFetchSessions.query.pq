@@ -1,358 +1,88 @@
 section TestSafeguardSessions;
 
-FetchInfo = Extension.ImportFunction("FetchInfo", "Utils.pqm");
+Yes = Extension.ImportFunction("Yes", "Constants.pqm");
+No = Extension.ImportFunction("No", "Constants.pqm");
 
-CreateSchema = Extension.ImportFunction("CreateSchema", "SchemaUtils.pqm");
-
-SupportedVersions.LatestVersion = Extension.ImportFunction("LatestVersion", "SupportedVersions.pqm");
-
-TestResultsContentWithoutStartTime =  UnitTestFramework.ImportFunction("TestResultsContentWithoutStartTime", "Asserts.pqm");
-
-TestSafeguardSessions.URL = "dummy_url";
+TestSafeguardSessions.SpsIp = "0.0.0.0";
 
 TestSafeguardSessions.AuthenticationCredentials = [
     Username = "dummy",
     Password = "pwd"
 ];
 
-TestSafeguardSessions.SuccessfulAuthenticationResponse = FakeRawResponse(
-    [],
-    [
-        Response.Status = 200,
-        Headers = [
-            #"Set-Cookie" = "session_id=e8e5f0a0d3367043150187f81df3484e91e365d5; expires=Sat, 03 Dec 2022 02:27:48 GMT; HttpOnly; Max-Age=43200; Path=/; Secure"
-        ]
-    ]
-);
+TestSafeguardSessions.LocalNow = DateTimeZone.LocalNow();
+TestSafeguardSessions.LocalNowPlusOneHour = DateTimeZone.LocalNow() + #duration(0,1,0,0);
 
-TestSafeguardSessions.InfoResponse = FakeRawResponse([
-    body = [firmware_version = SupportedVersions.LatestVersion]
-]);
-
-TestSafeguardSessions.GetExpectedCountResponse = (optional expectedCount as number) =>
-    FakeRawResponse([count = expectedCount ?? 0]);
-
-TestSafeguardSessions.SuccessfulOpenSnapshotResponse = FakeRawResponse([
-    body = [snapshot = "dummy_snapshot_id"]
-]);
-
-TestSafeguardSessions.Response.SingleHit = FakeRawResponse(
-    [
-        items = {TestSafeguardSessions.FirstItem},
-        #"meta" = [next = "/dummy_next"]
-    ]
-);
-
-TestSafeguardSessions.Response.DoubleHit = FakeRawResponse(
-    [
-        items = {TestSafeguardSessions.FirstItem, TestSafeguardSessions.SecondItem},
-        #"meta" = [next = "/dummy_next"]
-    ]
-);
-
-TestSafeguardSessions.Response.LastHit = FakeRawResponse(
-    [
-        items = {},
-        #"meta" = [next = null]
-    ]
-);
-
-TestSafeguardSessions.FirstItem = [
-    body = [
-        start = #datetimezone(2022, 12, 31, 23, 59, 30, 0, 0),
-        end = #datetimezone(2023, 1, 1, 7, 34, 11, 0, 0),
-        protocol = "SSH",
-        user = [name = "balabit"]
-    ],
-    key = "id1",
-    #"meta" = []
-];
-
-TestSafeguardSessions.SecondItem = [
-    body = [
-        start = #datetimezone(2023, 1, 14, 22, 11, 33, 0, 0),
-        end = #datetimezone(2023, 1, 16, 2, 3, 12, 0, 0),
-        protocol = "RDP",
-        user = [name = "other_username"]
-    ],
-    key = "id2",
-    #"meta" = []
-];
-
-TestSafeguardSessions.Schema = [
-    Sessions = CreateSchema(
-        {
-            {"session_id", type text},
-            {"start", type datetimezone},
-            {"end", type datetimezone},
-            {"protocol", type text},
-            {"user.name", type text}
+TestQueryBuildWithPossibleNullValues = () =>
+    let
+        expectedQuery = [
+            qInput = {{null, null} , {null, null} , {null, null} } ,
+            from = null,
+            to = null
+        ],
+        expectedSkipVersionCheck = false,
+        params = FetchSessions(
+            TestSafeguardSessions.SpsIp,
+            TestSafeguardSessions.AuthenticationCredentials,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            [
+                ReturnParams = true
+            ]
+        ),
+        facts = {
+            Fact("The spsIp is correct", TestSafeguardSessions.SpsIp , params[spsIp]),
+            Fact("The credentials is correct", TestSafeguardSessions.AuthenticationCredentials, params[credentials]),
+            Fact("The query data is correct", expectedQuery, params[query]),
+            Fact("The skipVersionCheck value is correct", expectedSkipVersionCheck, params[parsedSkipVersionCheck])
         }
-    )
-];
-
-TestSafeguardSessions.Mocks = [
-    AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-    InfoResponse = TestSafeguardSessions.InfoResponse,
-    OpenSnapshotResponse = TestSafeguardSessions.SuccessfulOpenSnapshotResponse,
-    Schema = TestSafeguardSessions.Schema
-];
-
-TestFetchSessionsWithOnlyOneFilterFieldInput = () =>
-    let
-        expectedResult = [
-            HasError = true,
-            Error = [
-                Reason = "Filter Field Without Value",
-                Message = "Error 10000: There is a field value missing from one or more of your filter fields.",
-                Detail = [ManuallyHandled = false, Cause = "protocol", RequestUrl = null, ErrorCode = 10000],
-                Message.Format = null,
-                Message.Parameters = null
-            ]
-        ],
-        response =
-            try
-                (
-                    FetchSessions(
-                        TestSafeguardSessions.URL,
-                        TestSafeguardSessions.AuthenticationCredentials,
-                        null,
-                        null,
-                        "protocol",
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        [
-                            AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                            InfoResponse = TestSafeguardSessions.InfoResponse
-                        ]
-                    )
-                )
     in
-        Fact("Check error is raised", expectedResult, response);
+        facts;
 
-TestFetchingSessionsWithFromSPSWithUnsupportedVersion = () =>
+TestQueryBuildWithValues = () =>
     let
-        infoResponse = FakeRawResponse([
-            body = [firmware_version = "unsupported_version"]
-        ]),
-        expectedResult = [
-            HasError = true,
-            Error = [
-                Reason = "Not Supported Version",
-                Message = "Error 10001: Your version of the connector (v1.1.1+sps7.4.0) is not compatible with your SPS version (unsupported_version). For a connector version that is compatible with your SPS version, visit the official release page of the connector: https://github.com/OneIdentity/SafeguardPowerBI/releases",
-                Detail = [
-                    Version = "unsupported_version",
-                    SupportedVersions = "7.3, 7.4",
-                    ManuallyHandled = false,
-                    ErrorCode = 10001
-                ],
-                Message.Format = null,
-                Message.Parameters = null
-            ]
+        expectedQuery = [
+            qInput = {{"mockField", "mockValue"} , {"mockField2", "mockValue2"} , {"mockField3", "mockValue3"} } ,
+            from = TestSafeguardSessions.LocalNow ,
+            to = TestSafeguardSessions.LocalNowPlusOneHour
         ],
-        response =
-            try
-                (
-                    FetchSessions(
-                        TestSafeguardSessions.URL,
-                        TestSafeguardSessions.AuthenticationCredentials,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        [
-                            AuthResponse = TestSafeguardSessions.SuccessfulAuthenticationResponse,
-                            InfoResponse = infoResponse
-                        ]
-                    )
-                )
-    in
-        Fact("Check error is raised", expectedResult, response);
-
-TestFetchingSessions = () =>
-    let
-        AssertFetching = (description as text, args as list, mocks as record, expectedData, expectedInfo) as list =>
-            let
-                response = Function.Invoke(
-                    FetchSessions,
-                    List.Combine(
-                        {{TestSafeguardSessions.URL, TestSafeguardSessions.AuthenticationCredentials}, args, {mocks}}
-                    )
-                )
-            in
-                TestResultsContentWithoutStartTime(response, expectedData, expectedInfo),
-        cases = {
-            {
-                "Fetching sessions with date inputs",
-                {
-                    #datetimezone(2023, 1, 1, 0, 0, 0, 0, 0),
-                    #datetimezone(2023, 1, 15, 0, 0, 0, 0, 0),
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                },
-                [
-                    GetSessionsCountResponse = TestSafeguardSessions.GetExpectedCountResponse(2),
-                    GetPageResponseMap = [
-                        #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&start=2023-01-01T00%3A00%3A00.0000000%2B00%3A00&end=2023-01-15T00%3A00%3A00.0000000%2B00%3A00&snapshot=dummy_snapshot_id" = TestSafeguardSessions.Response.DoubleHit,
-                        #"https://dummy_url/dummy_next" = TestSafeguardSessions.Response.LastHit
-                    ]
-                ]
-                    & TestSafeguardSessions.Mocks,
-                #table(
-                    type table [
-                        session_id = text, start = datetimezone, end = datetimezone, protocol = text, user.name = text
-                    ],
-                    {
-                        {
-                            "id1",
-                            #datetimezone(2022, 12, 31, 23, 59, 30, 0, 0),
-                            #datetimezone(2023, 1, 1, 7, 34, 11, 0, 0),
-                            "SSH",
-                            "balabit"
-                        },
-                        {
-                            "id2",
-                            #datetimezone(2023, 1, 14, 22, 11, 33, 0, 0),
-                            #datetimezone(2023, 1, 16, 2, 3, 12, 0, 0),
-                            "RDP",
-                            "other_username"
-                        }
-                    }
-                ),
-                FetchInfo(
-                    "Success",
-                    "Data fetch succeeded.",
-                    null,
-                    2,
-                    false,
-                    "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&start=2023-01-01T00%3A00%3A00.0000000%2B00%3A00&end=2023-01-15T00%3A00%3A00.0000000%2B00%3A00&snapshot=dummy_snapshot_id"
-                )
-            },
-            {
-                "Fetching sessions with field-value pairs",
-                {null, null, "protocol", "SSH", "user.name", "balabit", null, null, null},
-                [
-                    GetSessionsCountResponse = TestSafeguardSessions.GetExpectedCountResponse(1),
-                    GetPageResponseMap = [
-                        #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&q=protocol%3ASSH%20AND%20user.name%3Abalabit&snapshot=dummy_snapshot_id" = TestSafeguardSessions.Response.SingleHit,
-                        #"https://dummy_url/dummy_next" = TestSafeguardSessions.Response.LastHit
-                    ]
-                ]
-                    & TestSafeguardSessions.Mocks,
-                #table(
-                    type table [
-                        session_id = text, start = datetimezone, end = datetimezone, protocol = text, user.name = text
-                    ],
-                    {
-                        {
-                            "id1",
-                            #datetimezone(2022, 12, 31, 23, 59, 30, 0, 0),
-                            #datetimezone(2023, 1, 1, 7, 34, 11, 0, 0),
-                            "SSH",
-                            "balabit"
-                        }
-                    }
-                ),
-                FetchInfo(
-                    "Success",
-                    "Data fetch succeeded.",
-                    null,
-                    1,
-                    false,
-                    "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&q=protocol%3ASSH%20AND%20user.name%3Abalabit&snapshot=dummy_snapshot_id"
-                )
-            },
-            {
-                "Fetching sessions with only filter value",
-                {null, null, null, "SSH", null, null, null, null, null},
-                [
-                    GetSessionsCountResponse = TestSafeguardSessions.GetExpectedCountResponse(1),
-                    GetPageResponseMap = [
-                        #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id" = TestSafeguardSessions.Response.SingleHit,
-                        #"https://dummy_url/dummy_next" = TestSafeguardSessions.Response.LastHit
-                    ]
-                ]
-                    & TestSafeguardSessions.Mocks,
-                #table(
-                    type table [
-                        session_id = text, start = datetimezone, end = datetimezone, protocol = text, user.name = text
-                    ],
-                    {
-                        {
-                            "id1",
-                            #datetimezone(2022, 12, 31, 23, 59, 30, 0, 0),
-                            #datetimezone(2023, 1, 1, 7, 34, 11, 0, 0),
-                            "SSH",
-                            "balabit"
-                        }
-                    }
-                ),
-                FetchInfo(
-                    "Success",
-                    "Data fetch succeeded.",
-                    null,
-                    1,
-                    false,
-                    "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id"
-                )
-            },
-            {
-                "Fetching sessions with invalid field-value pair",
-                {null, null, "apple", "peach", null, null, null, null, null},
-                [
-                    GetSessionsCountResponse = TestSafeguardSessions.GetExpectedCountResponse(),
-                    GetPageResponseMap = [
-                        #"https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&q=apple%3Apeach&snapshot=dummy_snapshot_id" = FakeRawResponse(
-                            [#"error" = "value"], [Response.Status = 400]
-                        )
-                    ]
-                ]
-                    & TestSafeguardSessions.Mocks,
-                [
-                    Reason = "Bad Request",
-                    Message = "Error 4000: The source IP interpreted a malformed request. Your filter parameter(s) might be invalid.",
-                    Detail = [
-                        ManuallyHandled = true,
-                        Cause = [#"error" = "value"],
-                        RequestUrl = "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&q=apple%3Apeach&snapshot=dummy_snapshot_id",
-                        ErrorCode = 4000
-                    ],
-                    Message.Format = null,
-                    Message.Parameters = null
-                ],
-                FetchInfo(
-                    "Error",
-                    "Error 4000: The source IP interpreted a malformed request. Your filter parameter(s) might be invalid.",
-                    null,
-                    0,
-                    true,
-                    "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&q=apple%3Apeach&snapshot=dummy_snapshot_id"
-                )
-            }
-        },
-        facts = ProvideDataForTest(cases, AssertFetching)
+        expectedSkipVersionCheck = Yes,
+        params = FetchSessions(
+            TestSafeguardSessions.SpsIp,
+            TestSafeguardSessions.AuthenticationCredentials,
+            TestSafeguardSessions.LocalNow ,
+            TestSafeguardSessions.LocalNowPlusOneHour,
+            "mockField",
+            "mockValue",
+            "mockField2",
+            "mockValue2",
+            "mockField3",
+            "mockValue3",
+            Yes,
+            [
+                ReturnParams = true
+            ]
+        ),
+        facts = {
+            Fact("The spsIp is correct", TestSafeguardSessions.SpsIp , params[spsIp]),
+            Fact("The credentials is correct", TestSafeguardSessions.AuthenticationCredentials, params[credentials]),
+            Fact("The query data is correct", expectedQuery, params[query]),
+            Fact("The skipVersionCheck value is correct", expectedSkipVersionCheck, params[parsedSkipVersionCheck])
+        }
     in
         facts;
 
 shared TestSafeguardSessions.IntegrationTest = [
     facts = {
-        TestFetchingSessions(),
-        TestFetchSessionsWithOnlyOneFilterFieldInput(),
-        TestFetchingSessionsWithFromSPSWithUnsupportedVersion()
+        TestQueryBuildWithPossibleNullValues(),
+        TestQueryBuildWithValues()
     },
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];

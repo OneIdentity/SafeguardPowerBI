@@ -26,22 +26,26 @@ TestGetVersionRaisesError = () =>
         expectedMessage = "Error 10002: The source IP returned a response with missing fields.",
         expectedDetail = [
             ManuallyHandled = true,
-            ErrorCode =  10002,
+            ErrorCode = 10002,
             Cause = [invalid = "response"],
             MissingField = "body.firmware_version",
             RequestUrl = requestUrl
         ]
     in
-        TestErrorIsRaised(
-            try Version.GetVersion(requestUrl, "dummy_session_id", [
+        AssertError(
+            "An error is raised if fields are missing in the response received",
+            Version.GetVersion,
+            {requestUrl, "dummy_session_id", [
                 InfoResponse = fakeInfoResponse
-            ]),
-            expectedReason,
-            expectedMessage,
-            expectedDetail
+            ]},
+            [
+                Reason = expectedReason,
+                Message = expectedMessage,
+                Detail = expectedDetail
+            ]
         );
 
 shared TestGetVersion.UnitTest = [
     facts = {TestGetVersionIsSuccesful(), TestGetVersionRaisesError()},
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];

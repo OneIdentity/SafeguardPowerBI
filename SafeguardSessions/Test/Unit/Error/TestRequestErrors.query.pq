@@ -11,5 +11,5 @@ TestErrorCodeListIsCorrect = () =>
 
 shared TestRequestErrors.UnitTest = [
     facts = {TestErrorCodeListIsCorrect()},
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];

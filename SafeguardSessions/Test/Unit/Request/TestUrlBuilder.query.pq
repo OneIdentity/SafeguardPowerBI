@@ -4,7 +4,6 @@ GenerateBaseUrl = Extension.ImportFunction("GenerateBaseUrl", "UrlBuilder.pqm");
 GenerateUrl = Extension.ImportFunction("GenerateUrl", "UrlBuilder.pqm");
 GetBaseUrlFromUrl = Extension.ImportFunction("GetBaseUrlFromUrl", "UrlBuilder.pqm");
 GetQueryFromUrl = Extension.ImportFunction("GetQueryFromUrl", "UrlBuilder.pqm");
-GetDefaultQuery = Extension.ImportFunction("GetDefaultQuery", "UrlBuilder.pqm");
 
 TestGenerateBaseUrl = () =>
     let
@@ -142,13 +141,7 @@ TestGetQueryFromUrl = () =>
     in
         facts;
 
-TestGetDefaultQuery = () =>
-    let
-        cases = {{"Check default query", [fields = "*"], GetDefaultQuery()}}, facts = ProvideDataForTest(cases, Fact)
-    in
-        facts;
-
 shared TestUrlBuilder.UnitTest = [
     facts = {TestGenerateBaseUrl(), TestGenerateUrl(), TestGetBaseUrlFromUrl(), TestGetQueryFromUrl()},
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];

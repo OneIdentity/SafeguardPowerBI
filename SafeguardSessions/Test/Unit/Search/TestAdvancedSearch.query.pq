@@ -1,10 +1,8 @@
-section TestSearch;
+section TestAdvancedSearch;
 
-Search = Extension.ImportModule("Search.pqm");
+AdvancedSearch = Extension.ImportModule("AdvancedSearch.pqm");
 
-Search.AdvancedSearch = Search[AdvancedSearch];
-Search.GetSessionsCount = Search[GetSessionsCount];
-Search.OpenSnapshot = Search[OpenSnapshot];
+AdvancedSearch.AdvancedSearch = AdvancedSearch[AdvancedSearch];
 
 CreateSchema = Extension.ImportFunction("CreateSchema", "SchemaUtils.pqm");
 
@@ -76,7 +74,7 @@ TestAdvancedSearchIsSuccessful = () =>
             ],
             {{"id1", 1, "value1", 1, true}, {"id2", 2, "value2", 2, false}}
         ),
-        result = Search.AdvancedSearch(
+        result = AdvancedSearch.AdvancedSearch(
             "dummy_url",
             [],
             "dummy_snapshot",
@@ -105,7 +103,7 @@ TestAdvancedSearchWithZeroItem = () =>
             ],
             {}
         ),
-        result = Search.AdvancedSearch(
+        result = AdvancedSearch.AdvancedSearch(
             "dummy_url",
             [],
             "dummy_snapshot",
@@ -130,7 +128,7 @@ TestErrorIsContainedInAdvancedSearchResponse = () =>
                 ]
             )
         ],
-        actualResponse = Search.AdvancedSearch(
+        actualResponse = AdvancedSearch.AdvancedSearch(
             "dummy_url",
             [],
             "dummy_snapshot",
@@ -172,120 +170,25 @@ TestErrorIsContainedInAdvancedSearchResponse = () =>
                 actualResponse{1}
             )
         },
-        errorFacts = TestErrorIsRaised(try actualResponse{2}, expectedReason, expectedMessage, expectedDetail)
+        errorResponse = () => actualResponse{2},
+        errorFacts = AssertError(
+            "Advanced search masks the error",
+            errorResponse,
+            {},
+            [
+                Reason = expectedReason,
+                Message = expectedMessage,
+                Detail = expectedDetail
+            ]
+        )
     in
         List.Combine({dataFacts, errorFacts});
 
-TestGetSessionsCountIsSuccesful = () =>
-    let
-        fakeCountResponse = FakeRawResponse([count = 2]),
-        count = Search.GetSessionsCount(
-            "dummy_url", [], "dummy_session_id", [
-                GetSessionsCountResponse = fakeCountResponse
-            ]
-        )
-    in
-        Fact("Count is returned correctly", 2, count);
-
-TestGetSessionsCountRaisesError = () =>
-    let
-        requestUrl = "http://dummy_url/api/audit/sessions/_count",
-        fakeCountResponse = FakeRawResponse([invalid = "response"], [
-            Response.Status = 200,
-            RequestUrl = requestUrl
-        ]),
-        expectedReason = "Not Parsable Response",
-        expectedMessage = "Error 10002: The source IP returned a response with missing fields.",
-        expectedDetail = [
-            Cause = [invalid = "response"],
-            MissingField = "count",
-            RequestUrl = requestUrl,
-            ManuallyHandled = true,
-            ErrorCode = 10002
-        ]
-    in
-        TestErrorIsRaised(
-            try
-                Search.GetSessionsCount(
-                    requestUrl, [], "dummy_session_id", [
-                        GetSessionsCountResponse = fakeCountResponse
-                    ]
-                ),
-            expectedReason,
-            expectedMessage,
-            expectedDetail
-        );
-
-TestOpenSnapshotIsSuccessful = () =>
-    let
-        fakeSnapshotResponse = FakeRawResponse([
-            body = [snapshot = "dummy_snapshot_id"]
-        ]),
-        snapshot = Search.OpenSnapshot(
-            "dummy_url", "dummy_session_id", [
-                OpenSnapshotResponse = fakeSnapshotResponse
-            ]
-        )
-    in
-        Fact("Snapshot is returned correctly", "dummy_snapshot_id", snapshot);
-
-TestOpenSnapshotRaisesError = () =>
-    let
-        AsserErrorIsRaised = (
-            fakeSnapshotResponse as binary, expectedReason as text, expectedMessage as text, expectedDetail as record
-        ) =>
-            let
-                requestUrl = "http://dummy_url/api/audit/sessions/_snapshot"
-            in
-                TestErrorIsRaised(
-                    try
-                        Search.OpenSnapshot(
-                            requestUrl, "dummy_session_id", [
-                                OpenSnapshotResponse = fakeSnapshotResponse
-                            ]
-                        ),
-                    expectedReason,
-                    expectedMessage,
-                    expectedDetail & [RequestUrl = requestUrl]
-                ),
-        cases = {
-            {
-                FakeRawResponse([invalid = "response"]),
-                "Not Parsable Response",
-                "Error 10002: The source IP returned a response with missing fields.",
-                [
-                    Cause = [invalid = "response"],
-                    MissingField = "body.snapshot",
-                    ManuallyHandled = true,
-                    ErrorCode = 10002
-                ]
-            },
-            {
-                FakeRawResponse([#"error" = "reason"], [
-                    Response.Status = 429
-                ]),
-                "Snapshot Quota Error",
-                "Error 4290: Snapshot quota exceeded.",
-                [
-                    Cause = [#"error" = "reason"],
-                    ManuallyHandled = true,
-                    ErrorCode = 4290
-                ]
-            }
-        },
-        facts = ProvideDataForTest(cases, AsserErrorIsRaised)
-    in
-        facts;
-
-shared Testsearch.UnitTest = [
+shared TestAdvancedSearch.UnitTest = [
     facts = {
         TestAdvancedSearchIsSuccessful(),
         TestAdvancedSearchWithZeroItem(),
-        TestErrorIsContainedInAdvancedSearchResponse(),
-        TestGetSessionsCountIsSuccesful(),
-        TestGetSessionsCountRaisesError(),
-        TestOpenSnapshotIsSuccessful(),
-        TestOpenSnapshotRaisesError()
+        TestErrorIsContainedInAdvancedSearchResponse()
     },
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];

@@ -1,5 +1,5 @@
 let
-    QueryParameterTransformerMap = Extension.ImportFunction("Map","QueryParameterTransformer.pqm"),
+    QueryParameterTransformerMap = Extension.ImportFunction("Map", "QueryParameterTransformer.pqm"),
     UrlBuilder.GenerateBaseUrl = (scheme as text, bareUrl as text) => Text.Combine({scheme & ":", bareUrl}, "//"),
     UrlBuilder.GenerateUrl = (baseUrl as text, path as nullable text, optional query as nullable record) as text =>
         let
@@ -14,7 +14,7 @@ let
         in
             UrlBuilder.GenerateBaseUrl(urlParts[Scheme], urlParts[Host]),
     UrlBuilder.GetQueryFromUrl = (url as text) as record => Uri.Parts(url)[Query],
-    UrlBuilder.GetDefaultQuery = () => [fields = "*", sort = "-start_time"],
+    UrlBuilder.DefaultQuery = [fields = "*", sort = "-start_time"],
     UrlBuilder._generateNewUrl = (newUrlWithoutQuery as text, query as record) =>
         let
             transformedQueryRecordList = List.Accumulate(
@@ -58,5 +58,5 @@ in
         GenerateUrl = UrlBuilder.GenerateUrl,
         GetBaseUrlFromUrl = UrlBuilder.GetBaseUrlFromUrl,
         GetQueryFromUrl = UrlBuilder.GetQueryFromUrl,
-        GetDefaultQuery = UrlBuilder.GetDefaultQuery
+        DefaultQuery = UrlBuilder.DefaultQuery
     ]

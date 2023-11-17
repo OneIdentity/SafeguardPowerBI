@@ -58,7 +58,18 @@ shared FetchSessions = (
             from = from,
             to = to
         ],
-        data = GetData(spsIp, credentials, query, skipVersionCheck, mocks)
+        parsedSkipVersionCheck = skipVersionCheck ?? false,
+        data =
+            if IsMocked(mocks, "ReturnParams") then
+                [
+                    spsIp = spsIp,
+                    credentials = credentials,
+                    query = query,
+                    parsedSkipVersionCheck = parsedSkipVersionCheck,
+                    mocks = mocks
+                ]
+            else
+                GetData(spsIp, credentials, query, parsedSkipVersionCheck, mocks)
     in
         data;
 
@@ -87,7 +98,7 @@ shared GetData = (
             if IsMocked(mocks, "FetchData") then
                 mocks[FetchData][Value]
             else
-                FetchData(spsUrl, UrlBuilder.GetDefaultQuery() & query, sessionId, mocks),
+                FetchData(spsUrl, UrlBuilder.DefaultQuery & query, sessionId, mocks),
         data = HandleIfThereIsAnError(try (response)),
         result = BuildSPSResult(data, startTime)
     in
@@ -140,9 +151,9 @@ shared Authenticate = (spsUrl as text, credentials as record, optional mocks as 
 
 shared FetchData = (spsUrl as text, queryParams as record, sessionId as text, optional mocks as nullable record) as table =>
     let
-        snapshot = Search.OpenSnapshot(spsUrl, sessionId, mocks),
-        sessions = Search.AdvancedSearch(spsUrl, queryParams, snapshot, sessionId, mocks),
-        expectedSessionsCount = try Search.GetSessionsCount(spsUrl, queryParams, sessionId, mocks),
+        snapshot = OpenSnapshot.OpenSnapshot(spsUrl, sessionId, mocks),
+        sessions = AdvancedSearch.AdvancedSearch(spsUrl, queryParams, snapshot, sessionId, mocks),
+        expectedSessionsCount = try GetSessionsCount.GetSessionsCount(spsUrl, queryParams, sessionId, mocks),
         sessionsWithCountMetadata =
             if expectedSessionsCount[HasError] = true then
                 error expectedSessionsCount[Error]
@@ -245,17 +256,23 @@ SupportedVersions.Versions = SupportedVersions[Versions];
 
 VersionErrors.NotSupportedVersion = Extension.ImportFunction("NotSupportedVersion", "VersionErrors.pqm");
 
-Search = Extension.ImportModule("Search.pqm");
+GetSessionsCount = Extension.ImportModule("GetSessionsCount.pqm");
 
-Search.AdvancedSearch = Search[AdvancedSearch];
-Search.GetSessionsCount = Search[GetSessionsCount];
-Search.OpenSnapshot = Search[OpenSnapshot];
+GetSessionsCount.GetSessionsCount = GetSessionsCount[GetSessionsCount];
+
+OpenSnapshot = Extension.ImportModule("OpenSnapshot.pqm");
+
+OpenSnapshot.OpenSnapshot = OpenSnapshot[OpenSnapshot];
+
+AdvancedSearch = Extension.ImportModule("AdvancedSearch.pqm");
+
+AdvancedSearch.AdvancedSearch = AdvancedSearch[AdvancedSearch];
 
 UrlBuilder = Extension.ImportModule("UrlBuilder.pqm");
 
 UrlBuilder.GenerateBaseUrl = UrlBuilder[GenerateBaseUrl];
 UrlBuilder.GenerateUrl = UrlBuilder[GenerateUrl];
-UrlBuilder.GetDefaultQuery = UrlBuilder[GetDefaultQuery];
+UrlBuilder.DefaultQuery = UrlBuilder[DefaultQuery];
 
 Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "CommonLogger.pqm");
 

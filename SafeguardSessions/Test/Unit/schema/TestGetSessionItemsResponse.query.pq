@@ -77,5 +77,5 @@ TestItemsResponseIsReturnedCorrectly = () =>
 
 shared TestGetSessionItemsResponse.UnitTest = [
     facts = {TestItemsResponseIsReturnedCorrectly()},
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];

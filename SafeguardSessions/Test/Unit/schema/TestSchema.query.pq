@@ -6,5 +6,5 @@ ExpectedSessionsSchema = UnitTestFramework.ImportFunction("Schema", "SessionsSch
 
 shared TestRequest.UnitTest = [
     facts = {Fact("Sessions schema matches", ExpectedSessionsSchema, GetSchema("Sessions"))},
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];

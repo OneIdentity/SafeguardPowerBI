@@ -9,15 +9,19 @@ TestValidateByStatusCodeRaisesError = () =>
             Response.Status = 401,
             RequestUrl = url
         ]),
-        facts = TestErrorIsRaised(
-            try ValidateByStatusCode(fakeAuthResponse),
-            "Authentication Error",
-            "Error 4010: The username or password you have specified is invalid.",
+        facts = AssertError(
+            "Error is raised if error response is received",
+            ValidateByStatusCode,
+            {fakeAuthResponse},
             [
-                ManuallyHandled = true,
-                Cause = fakeAuthResponse,
-                RequestUrl = url,
-                ErrorCode = 4010
+                Reason = "Authentication Error",
+                Message = "Error 4010: The username or password you have specified is invalid.",
+                Detail = [
+                    ManuallyHandled = true,
+                    Cause = fakeAuthResponse,
+                    RequestUrl = url,
+                    ErrorCode = 4010
+                ]
             ]
         )
     in
@@ -43,9 +47,6 @@ TestValidateByStatusCodeFallbackIsWorking = () =>
         facts;
 
 shared TestResponseHandler.UnitTest = [
-    facts = {
-        TestValidateByStatusCodeRaisesError(),
-        TestValidateByStatusCodeFallbackIsWorking()
-    },
-    report = Facts.Summarize(facts)
+    facts = {TestValidateByStatusCodeRaisesError(), TestValidateByStatusCodeFallbackIsWorking()},
+    report = Summarize(facts)
 ][report];

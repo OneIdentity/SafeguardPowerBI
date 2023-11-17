@@ -79,5 +79,5 @@ TestTestSpsConnectionSignature = () =>
 
 shared TestSafeguardSessions.IntegrationTest = [
     facts = {TestSafeguardSessionsContentsSignature(), TestTestSpsConnectionSignature()},
-    report = Facts.Summarize(facts)
+    report = Summarize(facts)
 ][report];
