@@ -8,13 +8,13 @@
 
 ### Breaking changes
 
-* Power BI Service support has been implemented and the order and type of the input parameters have changed. Before the upgrade, we recommend to check what input parameters were used when connecting to your SPS so that after replacing the old version of the connector with the new version, you know how to fix the order and type of the input parameters. After the upgrade, the input parameters of previously saved .pbix files must be modified according to your observations to work with the new versions of One Identity Safeguard Power BI Connector and One Identity Safeguard Power BI Report Template.
+* Power BI Service support has been implemented and the order and type of the input parameters have changed. Before the upgrade, we recommend that you check what input parameters were used when connecting to your SPS, so that after replacing the old version of the connector with the new version, you know how to fix the order and type of the input parameters. To ensure compatibility with the new versions of the One Identity Safeguard Power BI Connector and One Identity Safeguard Power BI Report Template, we recommend that after the upgrade, you modify the input parameters of previously saved .pbix files according to your observations.
 
 *Checking the parameters*: In Power BI Desktop, you can check the input parameters of the Source query on the [Query Settings] pane of [Power Query Editor].
 
 *Modifying the parameters*: In Power BI Desktop, you can modify the parameter list of *SafeguardSessions.Contents* (Source query) in the [Data] pane of [Power Query Editor].
 
-The following tables shows the order, names, types and allowed values of the parameters before and after the breaking change.
+The following tables list the order, names, types and allowed values of the parameters before and after the breaking change.
 
 **Parameter changes**
 
