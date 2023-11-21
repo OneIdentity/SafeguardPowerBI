@@ -50,12 +50,34 @@ try {
 
     ConvertTo-Json $config -Depth 1 | Set-Content $VENV_DIR\config.json
 
-    Write-Output "Installing .NET SDK"
+    Write-Output "Installing .NET SDK as a background job"
     if (-Not (Test-Path($(Get-Alias -Name dotnet-install).Definition))) {
         Invoke-WebRequest -Uri https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.ps1 -OutFile $(Get-Alias -Name dotnet-install).Definition
     }
 
-    & dotnet-install -InstallDir $DOTNET -NoCdn -NoPath -Verbose -Version $packageVersions.DotnetVersion
+    $job = Start-Job -Name DotnetInstall -ScriptBlock {
+        switch ($input) {
+            { $true } {
+                & $_.DotnetInstall -InstallDir $_.InstallDir -NoCdn -NoPath -Verbose -Version $_.Version
+            }
+        }
+    } -InputObject @{
+        DotnetInstall = $(Get-Alias -Name dotnet-install).Definition
+        InstallDir    = $DOTNET
+        Version       = $packageVersions.DotnetVersion
+    }
+
+    $jobIDs = $(Get-Job -Name DotnetInstall -IncludeChildJob).Id
+
+    $timeOutInSeconds = 600
+    Wait-Job -Id $jobIDs -Timeout $timeOutInSeconds
+    Receive-Job -Id $jobIDs -ErrorAction Stop
+
+    if ($(Get-Job -Id $jobIDs).Where({ $_.State -eq "Running" }, "First").Count -gt 0) {
+        Write-Host "Timeout reached. Stopping the .NET SDK installer download job."
+        Stop-Job -Id $jobIDs
+        throw "Failed to download and install the .NET SDK within $($timeOutInSeconds) seconds."
+    }
 
     Write-Output "Downloading nuget executable"
     if (-Not (Test-Path($(Get-Alias -Name nuget).Definition))) {
