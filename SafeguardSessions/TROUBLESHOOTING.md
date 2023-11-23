@@ -2,25 +2,25 @@
 
 ### Collect information
 
-When you import or refresh data with the Power BI Connector, you will likely face one of the scenarios when error occurs:
+When you import or refresh data with the Power BI Connector, you will likely face one of the scenarios when an error occurs:
 
-- The data import finishes without any immediate signs of error.
+- The data import process finishes without any immediate signs of error.
 - A pop-up appears indicating an error.
-- An error occurs when connecting via the Power BI Service.
+- An error occurs when connecting to SPS via the Power BI Service.
 
 You can read about these scenarios below.
 
-#### The data import finishes without any warnings signs of error.
+#### The data import process finishes without any immediate signs of error.
 
-To see if there were any error during the data import, you can check the **Info** table. If it indicates error, you can read about the specific error by searching for the error code in the [Errors raised by the Power BI Connector] section of this document. When the **Info** table indicates error, the **Sessions** table will contain the exact error record that you can inspect if you go to **Home > Transform data** and select the **Sessions** table.
+To see if there were any errors during the data import, you can check the **Info** table. When it indicates an error, you can read about the specific error by searching for the error code in the [Errors raised by the Power BI Connector] section of this document. The **Sessions** table will contain the exact error record that you can inspect in the [Data] pane of [Power Query Editor].
 
 #### A pop-up appears indicating some type of error.
 
 If the error is handled by the Power BI Connector, the pop-up will contain the error code and error message what you can find in [Errors raised by the Power BI Connector] section to learn more about the error.
 
-#### An error occurs when connecting via the Power BI Service.
+#### An error occurs when connecting to SPS via the Power BI Service.
 
-If an error occurs when a new connection is created, Power BI Service (Service) will show the exact error message.
+If an error occurs when a new connection is created, Power BI Service (Service) will show the specific error message.
 
 If an error oocurs when an existing dataset is refreshed through an existing connection, the _Refresh history_ of that dataset will contain the error details.
 
@@ -29,9 +29,9 @@ If an error oocurs when an existing dataset is refreshed through an existing con
 If you cannot resolve the error, reproduce it with trace logging enabled, collect the Power BI mashup trace logs, as described in the [Collecting Power BI mashup trace logs] documentation. If the error occurs in the Service, collect the Power BI Gateway logs, as described in the [Collecting Power BI Gateway logs] documentation.
 Finally, create a [One Identity Technical Case]. Attach the collected trace logs for debugging purposes.
 
-Make sure you include the version of your Power BI Desktop application, the version of the Power BI Connector and the version of the SPS appliance. If you are using the Service with a Gateway, also include the version of the Gateway. Attaching an SPS debug bundle may also help us troubleshooting the issue if it is rather related to SPS.
+Make sure you include the version of your Power BI Desktop application, the version of the Power BI Connector and the version of the SPS appliance. If you are using the Service with a Gateway, also include the version of the Gateway. Attaching an SPS debug bundle may also help us troubleshooting the issue if it is related to SPS.
 
-In the next sections you can read about errors that you might run into when using the Power BI Connector.
+In the next sections, you can read about errors that you might run into when using the Power BI Connector.
 
 ## General errors
 
@@ -117,5 +117,9 @@ This error wraps unexpected errors raised by the Power BI Connector. Create a te
 
 [Collecting Power BI mashup trace logs]: https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-diagnostics#collecting-mashup-traces
 [Collecting Power BI Gateway logs]: https://learn.microsoft.com/en-us/data-integration/gateway/service-gateway-tshoot#collect-logs-from-the-on-premises-data-gateway-app
+
+[Power Query Editor]: https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-query-overview#power-query-editor
+[Data]: https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-query-overview#the-center-data-pane
+[Query Settings]: https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-query-overview#the-right-query-settings-pane
 
 <!-- Links END -->
