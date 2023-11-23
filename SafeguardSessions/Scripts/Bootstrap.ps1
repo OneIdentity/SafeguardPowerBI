@@ -76,5 +76,7 @@ catch {
 
     Write-Output "Cleanup initiated"
     & $SCRIPTS_DIR\Cleanup.ps1
+
+    exit 1
 }
 
