@@ -51,17 +51,21 @@ let
         let
             host = GetHost("https://" & applianceName),
             
+            // IsRetry causes Web.Contents to not use cached API response. 
+            // See https://learn.microsoft.com/en-us/powerquery-m/web-contents for details
             options = if query = null or query = ""
                 then [
                         Headers = [#"Content-Type"="application/json", Authorization="Bearer " & loginToken],
                         RelativePath = relativePath,
-                        Content = content
+                        Content = content,
+                        IsRetry = true
                      ]
                 else [
                         Headers = [#"Content-Type"="application/json", Authorization="Bearer " & loginToken],
                         RelativePath = relativePath,
                         Content = content,
-                        Query = Request.ConvertQueryToRecord(query)
+                        Query = Request.ConvertQueryToRecord(query),
+                        IsRetry = true
                     ],
 
             loggedParameters = Record.RemoveFields(options,"Headers"),

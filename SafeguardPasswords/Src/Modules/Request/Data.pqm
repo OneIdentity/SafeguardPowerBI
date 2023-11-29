@@ -3,8 +3,6 @@ let
     Logger.InfoLog = Extension.ImportFunction("InfoLog", "CommonLogger.pqm"),
     GetResponse = Extension.ImportFunction("GetSppResponse","Request.pqm"),
 
-    loginToken = "",
-
     ValidateInput = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text) => 
         // M Language does not support regex so validation is ugly. (◡︵◡)
         //
@@ -29,7 +27,7 @@ let
         let
             validated = ValidateInput(applianceName,resourcePath,filter,fields,queryOptions),
 
-            loginToken = if loginToken = null or Text.Length(loginToken) = 0 or loginToken = "" then GetLoginToken(applianceName) else loginToken,
+            loginToken = GetLoginToken(applianceName),
 
             hasFilter = if filter = null or Text.Length(filter) = 0 then false else true,
             hasFields = if fields = null or Text.Length(fields) = 0 or fields = "all" then false else true,
@@ -40,11 +38,11 @@ let
             query3 = if not hasQueryOptions then query2 else query2 & Text.Trim(queryOptions, "&"),
             query = Text.Trim(Text.Trim(Text.Trim(query3, "/"), "?"), "&"),
 
-            // we will never act on the else case - if validation fails we throw in the ValidateInput method.
+            // We will never act on the else case - if validation fails we throw in the ValidateInput method.
             // But ValidateInput() doesn't evalute until the var is referenced.
-        data =   if validated = true then 
-                            Logger.InfoLog("Executing JSON Query", GetResponse(applianceName, loginToken, resourcePath, null, query))
-                    else null,
+        data =  if validated = true 
+            then Logger.InfoLog("Executing JSON Query", GetResponse(applianceName, loginToken, resourcePath, null, query))
+            else null,
 
             // GetResponse returns either a list or value that needs to be parsed into a table.
             // GetCsvResponse returns a table where the first row is the column names. We need to parse out (promote) the headers in that case.

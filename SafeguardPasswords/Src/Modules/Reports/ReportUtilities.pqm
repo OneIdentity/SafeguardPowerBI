@@ -1,5 +1,5 @@
 let
-    SafeguardPasswords.GetDataTable = Extension.ImportFunction("GetDataTable","Data.pqm"),
+    Data.GetDataTable = Extension.ImportFunction("GetDataTable","Data.pqm"),
     Constants = Extension.ImportModule("Constants.pqm")[SppConstants],
     IsMocked = Extension.ImportFunction("IsMocked", "CommonUtils.pqm"),
     InfoLog = Extension.ImportFunction("InfoLog", "CommonLogger.pqm"),
@@ -7,19 +7,19 @@ let
 
     ReportUtilities.GetSingleAssetOwnershipDataTable = (applianceName as text, Id as number) =>
         let
-            owners = SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Assets]&"/"&Number.ToText(Id)&"/EffectiveManagedBy", null, Constants[Fields][AssetOwnershipReport], null, "JSON")
+            owners = Data.GetDataTable(applianceName, Constants[Endpoints][Assets]&"/"&Number.ToText(Id)&"/EffectiveManagedBy", null, Constants[Fields][AssetOwnershipReport], null, "JSON")
         in
             owners,
 
     ReportUtilities.GetSingleAccountOwnershipDataTable = (applianceName as text, Id as number) =>
         let
-            owners = SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AssetAccounts]&"/"&Number.ToText(Id)&"/EffectiveManagedBy", null, null,/*Constants[Fields][AssetAccountOwnershipReport],*/ null, "JSON")
+            owners = Data.GetDataTable(applianceName, Constants[Endpoints][AssetAccounts]&"/"&Number.ToText(Id)&"/EffectiveManagedBy", null, null,/*Constants[Fields][AssetAccountOwnershipReport],*/ null, "JSON")
         in
             owners,
 
     ReportUtilities.GetSinglePartitionOwnershipDataTable = (applianceName as text, Id as number) =>
         let
-            owners = SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AssetPartitions]&"/"&Number.ToText(Id)&"/ManagedBy", null, Constants[Fields][AssetPartitionOwnershipReport], null, "JSON")
+            owners = Data.GetDataTable(applianceName, Constants[Endpoints][AssetPartitions]&"/"&Number.ToText(Id)&"/ManagedBy", null, Constants[Fields][AssetPartitionOwnershipReport], null, "JSON")
         in
             owners,
 
@@ -52,7 +52,7 @@ let
     // Retrieves table of asset IDs, then for each ID queries the Assets/ID/EffectiveManagedBy endpoint to retrieve owners
     ReportUtilities.GetAssetOwnershipDataTable = (applianceName as text) as table => 
         let
-            assetIds = SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][Assets], null, "Id,Name, AssetPartitionId", null, "JSON"),
+            assetIds = Data.GetDataTable(applianceName, Constants[Endpoints][Assets], null, "Id,Name, AssetPartitionId", null, "JSON"),
 
             owners = Table.AddColumn(assetIds, "Owners", each ReportUtilities.GetCombinedAssetOwners(applianceName, [Id], [AssetPartitionId])),
             expandedOwners = Table.ExpandTableColumn(owners,"Owners", {"Name", "EmailAddress","PrincipalKind","IdentityProviderName","Direct"}, {"Owners.Name", "Owners.EmailAddress", "Owners.PrincipalKind", "Owners.IdentityProviderName", "Owners.Direct"})
@@ -64,7 +64,7 @@ let
         let
             assetAccounts = if IsMocked(mocks, "Response")
                 then mocks[Response][Accounts]
-                else SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AssetAccounts], null, "Id,Name,Asset.Id,Asset.AssetPartitionId", null, "JSON"),
+                else Data.GetDataTable(applianceName, Constants[Endpoints][AssetAccounts], null, "Id,Name,Asset.Id,Asset.AssetPartitionId", null, "JSON"),
        
             expandedAccounts = Table.ExpandRecordColumn(assetAccounts,"Asset",{"Id","AssetPartitionId"},{"Asset.Id","AssetPartitionId"}),
        
@@ -78,8 +78,8 @@ let
     // Retrieves table of assetpartition IDs, then for each ID queries the AssetPartitions/ID/ManagedBy endpoint to retrieve owners
     ReportUtilities.GetAssetPartitionOwnershipDataTable = (applianceName as text) as table => 
         let
-            assetPartitionIds = SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AssetPartitions], null, "Id,Name", null, "JSON"),
-            owners = Table.AddColumn(assetPartitionIds, "Owners", each SafeguardPasswords.GetDataTable(applianceName, Constants[Endpoints][AssetPartitions]&"/"&Number.ToText([Id])&"/ManagedBy", null, Constants[Fields][AssetPartitionOwnershipReport], null, "JSON")),
+            assetPartitionIds = Data.GetDataTable(applianceName, Constants[Endpoints][AssetPartitions], null, "Id,Name", null, "JSON"),
+            owners = Table.AddColumn(assetPartitionIds, "Owners", each Data.GetDataTable(applianceName, Constants[Endpoints][AssetPartitions]&"/"&Number.ToText([Id])&"/ManagedBy", null, Constants[Fields][AssetPartitionOwnershipReport], null, "JSON")),
             expandedOwners = Table.ExpandTableColumn(owners,"Owners", {"Name", "EmailAddress","PrincipalKind","IdentityProviderName","Direct"}, {"Owners.Name", "Owners.EmailAddress", "Owners.PrincipalKind", "Owners.IdentityProviderName", "Owners.Direct"})
         in
             expandedOwners
