@@ -11,7 +11,7 @@
 
 ## About the project
 
-The aim of One Identity Safeguard Power BI Connector (Power BI Connector) is to provide a solution for customers to visualize their data captured by [One Identity Safeguard for Privileged Passwords] in a highly configurable way compared to the on-box reporting system of SPP. 
+The aim of the One Identity Safeguard for Privileged Passwords Power BI Connector (Power BI Connector) is to provide a solution for customers to visualize their data captured by [One Identity Safeguard for Privileged Passwords] in a highly configurable way compared to the on-box reporting system of SPP. 
 
 The SPP Power BI Connector uses basic local authentication to connect to SPP. After connection users are prompted to enter API query options and may select data from a variety of SPP API endpoints. This data is returned in a table. 
 
@@ -22,7 +22,7 @@ Several SPP report templates are included:
 - **Account Ownership report**: equivalent to SPP UI built-in Account Ownership Report
 - **Metrics Report**: presents data about password management activity
 
-## SPP Installation and usage
+## Installation and usage
 
 First configure a trusted SSL Certificate on your SPP appliance. Refer to the Admin guide for additional details. 
 
@@ -62,7 +62,7 @@ Distributed under the One Identity - Open Source License. For more information, 
 <!-- Links -->
 
 [About the project]: #about-the-project
-[SPP Installation and usage]: #spp-installation-and-usage
+[Installation and usage]: #installation-and-usage
 [Troubleshooting errors]: #troubleshooting-errors
 [Contributing to the project]: #contributing-to-the-project
 [Licensing of the project]: #license-of-the-project
