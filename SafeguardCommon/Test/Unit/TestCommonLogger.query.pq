@@ -4,10 +4,12 @@ Logger = Extension.ImportModule("CommonLogger.pqm");
 
 Logger.InfoLog = Logger[InfoLog];
 
+LogLabel = "[SafeguardPowerBI]";
+
 TestInfoLogWithNumberInput = () =>
     let
         input = [Prefix = "iphone", Value = 12, Delayed = null, IsTesting = true],
-        expectedLogValues = [LogLevel = TraceLevel.Information, Output = "iphone: 12", Value = 12, Delayed = null],
+        expectedLogValues = [LogLevel = TraceLevel.Information, Output = LogLabel & "iphone: 12", Value = 12, Delayed = null],
         logValues = Logger.InfoLog(input[Prefix], input[Value], input[Delayed], input[IsTesting]),
         facts = TestLogging(logValues, expectedLogValues, "number")
     in
@@ -18,7 +20,7 @@ TestInfoLogWithTextInput = () =>
         input = [Prefix = "iphone", Value = "pro", Delayed = null, IsTesting = true],
         expectedLogValues = [
             LogLevel = TraceLevel.Information,
-            Output = "iphone: ""pro""",
+            Output = LogLabel & "iphone: ""pro""",
             Value = "pro",
             Delayed = null
         ],
@@ -32,7 +34,7 @@ TestInfoLogWithListInput = () =>
         input = [Prefix = "iphone", Value = {11, 12, 13}, Delayed = null, IsTesting = true],
         expectedLogValues = [
             LogLevel = TraceLevel.Information,
-            Output = "iphone: {11, 12, 13} ",
+            Output = LogLabel & "iphone: {11, 12, 13} ",
             Value = {11, 12, 13},
             Delayed = null
         ],
@@ -51,7 +53,7 @@ TestInfoLogWithRecordInput = () =>
         ],
         expectedLogValues = [
             LogLevel = TraceLevel.Information,
-            Output = "say: [ One = ""Apple tree"", Two = ""Ladybug"", Three = ""Little ducks"" ] ",
+            Output = LogLabel & "say: [ One = ""Apple tree"", Two = ""Ladybug"", Three = ""Little ducks"" ] ",
             Value = [One = "Apple tree", Two = "Ladybug", Three = "Little ducks"],
             Delayed = null
         ],
@@ -73,7 +75,7 @@ TestInfoLogWithTableInput = () =>
         ],
         expectedLogValues = [
             LogLevel = TraceLevel.Information,
-            Output = "say: #table( type table [Number = number, Value = text] , {{1, ""Apple Tree""} , {2, ""Ladybug""} , {3, ""Little ducks""} } ) ",
+            Output = LogLabel & "say: #table( type table [Number = number, Value = text] , {{1, ""Apple Tree""} , {2, ""Ladybug""} , {3, ""Little ducks""} } ) ",
             Value = #table({"Number", "Value"}, {{1, "Apple Tree"}, {2, "Ladybug"}, {3, "Little ducks"}}),
             Delayed = null
         ],
