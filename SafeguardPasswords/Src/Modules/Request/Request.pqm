@@ -9,9 +9,12 @@ let
 
     Request.GetSppResponseBase = (host as text, options as record, optional logResponse as logical, optional mocks as record) =>
         let
+
+            // IsRetry causes Web.Contents to not use cached API response. 
+            // See https://learn.microsoft.com/en-us/powerquery-m/web-contents for details
             response = if IsMocked(mocks, "Response")
                         then mocks[Response]
-                        else Web.Contents(host, options & [ManualStatusHandling = {400,406}]),
+                        else Web.Contents(host, options & [ManualStatusHandling = {400,406}, IsRetry = true]),
 
             json = if logResponse = true 
                     then InfoLog("Response from SPP: ", Json.Document(response))
@@ -51,21 +54,17 @@ let
         let
             host = GetHost("https://" & applianceName),
             
-            // IsRetry causes Web.Contents to not use cached API response. 
-            // See https://learn.microsoft.com/en-us/powerquery-m/web-contents for details
             options = if query = null or query = ""
                 then [
                         Headers = [#"Content-Type"="application/json", Authorization="Bearer " & loginToken],
                         RelativePath = relativePath,
-                        Content = content,
-                        IsRetry = true
+                        Content = content
                      ]
                 else [
                         Headers = [#"Content-Type"="application/json", Authorization="Bearer " & loginToken],
                         RelativePath = relativePath,
                         Content = content,
-                        Query = Request.ConvertQueryToRecord(query),
-                        IsRetry = true
+                        Query = Request.ConvertQueryToRecord(query)
                     ],
 
             loggedParameters = Record.RemoveFields(options,"Headers"),
