@@ -1,13 +1,9 @@
 ﻿let
-    // Statuses
-    Constants.SuccessStatus = "Success",
-    Constants.ErrorStatus = "Error",
-    Constants.NotAvailableStatus = "N/A",
-
     // SPP Base Endpoints
-    Constants.SppCoreEndpoint = "/service/core/v4",
-    Constants.SppApplianceEndpoint = "/service/appliance/v4",
-    Constants.SppNotificationEndpoint = "/service/notification/v4",
+    Constants.V4ApiPath = "v4",
+    Constants.SppCoreEndpoint = "/service/core/" & Constants.V4ApiPath,
+    Constants.SppApplianceEndpoint = "/service/appliance/" & Constants.V4ApiPath,
+    Constants.SppNotificationEndpoint = "/service/notification/" & Constants.V4ApiPath,
     Constants.SppAssetPartitionsEndpoint = Text.Combine({Constants.SppCoreEndpoint,"/AssetPartitions"}),
     Constants.SppAuditLogEndpoint = Text.Combine({Constants.SppCoreEndpoint,"/AuditLog"}),
     Constants.SppReportsEndpoint = Text.Combine({Constants.SppCoreEndpoint,"/Reports"}),
@@ -16,11 +12,6 @@
 
 in
     [
-        // Statuses
-        SuccessStatus = Constants.SuccessStatus,
-        ErrorStatus = Constants.ErrorStatus,
-        NotAvailableStatus = Constants.NotAvailableStatus,
-
         // SPP Constants
         SppConstants = [
             DataConnectorName = "One Identity SPP Power BI Connector",
