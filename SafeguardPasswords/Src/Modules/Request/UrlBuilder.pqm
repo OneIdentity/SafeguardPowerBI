@@ -1,0 +1,11 @@
+let
+    UrlBuilder.GetSppHost = (applianceName as text) =>
+        let
+            parts = Uri.Parts(applianceName),
+            port = if (parts[Scheme] = "https" and parts[Port] = 443) or (parts[Scheme] = "http" and parts[Port] = 80) then "" else ":" & Text.From(parts[Port])
+        in
+            parts[Scheme] & "://" & parts[Host] & port
+in
+    [
+        GetSppHost = UrlBuilder.GetSppHost
+    ]

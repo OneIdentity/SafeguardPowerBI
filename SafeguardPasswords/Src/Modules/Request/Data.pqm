@@ -1,0 +1,59 @@
+let
+    GetLoginToken = Extension.ImportFunction("GetLoginToken","Authentication.pqm"),
+    Logger.InfoLog = Extension.ImportFunction("InfoLog", "CommonLogger.pqm"),
+    GetResponse = Extension.ImportFunction("GetSppResponse","Request.pqm"),
+
+    ValidateInput = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text) => 
+        // M Language does not support regex so validation is ugly. (◡︵◡)
+        //
+        // Filter validation and field validation are handled by SPP API.
+        // So we really only need to ensure that no Resource Path is passed in
+        // as part of the applianceName / FQDN / IP, 
+        // and that the Resource Path doesn't contain a query. 
+
+        if( Text.Contains(applianceName,"&") or 
+            Text.Contains(applianceName,"?") or
+            
+            Text.Contains(resourcePath,"&") or 
+            Text.Contains(resourcePath,"?") or
+            Text.Contains(resourcePath, ".") or
+            not Text.Contains(resourcePath,"service",Comparer.OrdinalIgnoreCase)
+        ) then
+            error "Appliance FQDN or Resource Path failed Validation. Appliance FQDN: " & applianceName & "; Resource Path: " & resourcePath
+        else
+            true,
+
+    Data.GetDataTable = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text, optional responseFormat as text) as table => 
+        let
+            validated = ValidateInput(applianceName,resourcePath,filter,fields,queryOptions),
+
+            loginToken = GetLoginToken(applianceName),
+
+            hasFilter = if filter = null or Text.Length(filter) = 0 then false else true,
+            hasFields = if fields = null or Text.Length(fields) = 0 or fields = "all" then false else true,
+            hasQueryOptions = if queryOptions = null or Text.Length(queryOptions) = 0 then false else true,
+
+            query1 = if not hasFilter then "" else "filter=" & Text.Trim(filter,"&") & "&",
+            query2 = if not hasFields then query1 else query1 & "fields=" & Text.Trim(fields,"&") & "&",
+            query3 = if not hasQueryOptions then query2 else query2 & Text.Trim(queryOptions, "&"),
+            query = Text.Trim(Text.Trim(Text.Trim(query3, "/"), "?"), "&"),
+
+            // We will never act on the else case - if validation fails we throw in the ValidateInput method.
+            // But ValidateInput() doesn't evalute until the var is referenced.
+        data =  if validated = true 
+            then Logger.InfoLog("Executing JSON Query", GetResponse(applianceName, loginToken, resourcePath, null, query))
+            else null,
+
+            // GetResponse returns either a list or value that needs to be parsed into a table.
+            // GetCsvResponse returns a table where the first row is the column names. We need to parse out (promote) the headers in that case.
+            transformedData = if data is list 
+                    then Table.FromRecords(data) 
+                else if data is table
+                    then Table.PromoteHeaders(data)
+                else Table.FromValue(data)
+        in
+            transformedData
+in
+    [
+        GetDataTable = Data.GetDataTable
+    ]
