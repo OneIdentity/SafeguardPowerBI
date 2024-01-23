@@ -34,6 +34,10 @@ let
         ErrorBase(
             ErrorCodes.ExtendedHTTPCodes[NotFound], "Not Found", "The requested resource is not found.", detail
         ),
+        RequestErrors.NotAcceptable = (detail as record) =>
+        ErrorBase(
+            ErrorCodes.ExtendedHTTPCodes[NotAcceptable], "Not Acceptable", "This action is not acceptable.", detail
+        ),
     RequestErrors.ServerError = (detail as record) =>
         ErrorBase(
             ErrorCodes.ExtendedHTTPCodes[ServerError],
@@ -46,6 +50,7 @@ let
         401 = RequestErrors.AuthenticationError,
         403 = RequestErrors.AuthorizationError,
         404 = RequestErrors.NotFound,
+        406 = RequestErrors.NotAcceptable,
         500 = RequestErrors.ServerError
     ]
 in

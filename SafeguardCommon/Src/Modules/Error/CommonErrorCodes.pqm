@@ -4,6 +4,7 @@ let
         AuthenticationError = 4010,
         AuthorizationError = 4030,
         NotFound = 4040,
+        NotAcceptable = 4060,
         ServerError = 5000
     ],
     ErrorCodes.CustomCodes = [

@@ -1,0 +1,39 @@
+let
+    Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "CommonLogger.pqm"),
+    RequestErrors.ErrorMap = Extension.ImportFunction("ErrorMap", "RequestErrors.pqm"),
+    Constants = Extension.ImportModule("Constants.pqm"),
+
+    ResponseHandler.ValidateByStatusCode = (response as any) =>
+        let
+            responseMeta = Value.Metadata(response),
+            httpStatus = Text.From(responseMeta[Response.Status]),
+            log = Logger.ErrorLog(
+                "SPP returned with an error response",
+                [
+                    Response = response,
+                    Response.Status = responseMeta[Response.Status],
+                    RequestUrl = responseMeta[RequestUrl],
+                    RelativePath = responseMeta[RelativePath]
+                ]
+            ),
+            details = [
+                Cause = response,
+                RequestUrl = log[RequestUrl],
+                RelativePath = log[RelativePath]
+            ]
+
+        in
+            if Record.HasFields(RequestErrors.ErrorMap, httpStatus) then
+                //BUG 437648 - SPP RSTS returns 400 in the case of invalid credentials.
+                //In order to generate a sensible error response using this framework
+                //we replace the httpStatus code (400) with 401 unauthorized.
+                if( log[RelativePath] = Constants[RstsRelativePath] and httpStatus = "400" )  then
+                    Record.Field(RequestErrors.ErrorMap, "401")(details)
+                else
+                    Record.Field(RequestErrors.ErrorMap, httpStatus)(details)
+            else
+                response
+in
+    [
+        ValidateByStatusCode = ResponseHandler.ValidateByStatusCode
+    ]

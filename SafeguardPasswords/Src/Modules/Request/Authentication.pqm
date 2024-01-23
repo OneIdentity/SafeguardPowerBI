@@ -1,0 +1,41 @@
+let
+    GetRstsResponse = Extension.ImportFunction("GetRstsResponse","Request.pqm"),
+    GetLoginResponse = Extension.ImportFunction("GetLoginResponse","Request.pqm"),
+    GetUnauthenticatedResponse = Extension.ImportFunction("GetUnauthenticatedSppResponse","Request.pqm"),
+    Constants = Extension.ImportModule("Constants.pqm"),
+
+    Authentication.GetLoginToken = (host) =>
+        let
+            creds = Extension.CurrentCredential(),
+            user = User.GetDomain(creds[Username]),
+            providerScope = User.GetProvider(host, user[Domain]),
+
+            rstsResponse = GetRstsResponse(host, providerScope, user[Username], creds[Password]),
+
+            loginToken = Function.InvokeAfter(() => GetLoginResponse(host, rstsResponse), #duration(0,0,0,Number.RandomBetween(1,5)))
+        in
+            loginToken,
+
+    User.GetDomain = (fullUserName) =>
+        let
+            upnList = Text.Split(fullUserName, "@"),
+            netbiosList = Text.Split(fullUserName, "\"),
+
+            userName = if List.Count(upnList) = 2 then upnList{0} else if List.Count(netbiosList) = 2 then netbiosList{1} else fullUserName,
+            domain = if List.Count(upnList) = 2 then upnList{1} else if List.Count(netbiosList) = 2 then netbiosList{0} else ""
+        in
+            [ Username = userName, Domain = domain ],
+            
+    User.GetProvider = (host, domainName) =>
+        let
+            localOrDomainName = if domainName = "" then "local" else domainName,
+
+            providers = GetUnauthenticatedResponse(host, Constants[Endpoints][AuthenticationProviders], null, "filter = Name ieq '" & localOrDomainName & "'"),
+            
+            scope = if List.Count(providers) = 1 then providers{0}[RstsProviderScope] else "rsts:sts:primaryproviderid:local"
+        in
+            scope
+in
+    [
+        GetLoginToken = Authentication.GetLoginToken
+    ]
