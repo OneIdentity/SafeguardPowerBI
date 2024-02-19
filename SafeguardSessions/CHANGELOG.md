@@ -1,10 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [v2.0.0pre+sps7.5.0] - 2024-02-19
 
 ### Compatible SPS Versions
 
-* 7.3.0, 7.4.0
+* 7.3.0, 7.4.0, 7.5.0
 
 ### Breaking changes
 

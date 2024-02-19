@@ -85,10 +85,10 @@ TestValidateSPSVersionRaisesError = () =>
                     body = [firmware_version = "unsupported_version"]
                 ]),
                 "Not Supported Version",
-                "Error 10001: Your version of the connector (v1.1.1+sps7.4.0) is not compatible with your SPS version (unsupported_version). For a connector version that is compatible with your SPS version, visit the official release page of the connector: https://github.com/OneIdentity/SafeguardPowerBI/releases",
+                "Error 10001: Your version of the connector (v2.0.0pre+sps7.5.0) is not compatible with your SPS version (unsupported_version). For a connector version that is compatible with your SPS version, visit the official release page of the connector: https://github.com/OneIdentity/SafeguardPowerBI/releases",
                 [
                     Version = "unsupported_version",
-                    SupportedVersions = "7.3, 7.4",
+                    SupportedVersions = "7.3, 7.4, 7.5",
                     ManuallyHandled = false,
                     ErrorCode = 10001
                 ]
