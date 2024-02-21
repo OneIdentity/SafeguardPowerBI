@@ -27,6 +27,13 @@ TestValidateSPSVersionReturnsSessionId = () =>
             ),
         cases = {
             {
+                "Version check is performed by default",
+                FakeRawResponse([
+                    body = [firmware_version = "7.4.0"]
+                ]),
+                null
+            },
+            {
                 "Version is supported and version check is performed",
                 FakeRawResponse([
                     body = [firmware_version = "7.4.0"]

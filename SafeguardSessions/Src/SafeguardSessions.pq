@@ -58,18 +58,17 @@ shared FetchSessions = (
             from = from,
             to = to
         ],
-        parsedSkipVersionCheck = skipVersionCheck ?? false,
         data =
             if IsMocked(mocks, "ReturnParams") then
                 [
-                    spsIp = spsIp,
-                    credentials = credentials,
-                    query = query,
-                    parsedSkipVersionCheck = parsedSkipVersionCheck,
-                    mocks = mocks
+                    SpsIp = spsIp,
+                    Credentials = credentials,
+                    Query = query,
+                    SkipVersionCheck = skipVersionCheck,
+                    Mocks = mocks
                 ]
             else
-                GetData(spsIp, credentials, query, parsedSkipVersionCheck, mocks)
+                GetData(spsIp, credentials, query, skipVersionCheck, mocks)
     in
         data;
 
@@ -277,6 +276,7 @@ UrlBuilder.DefaultQuery = UrlBuilder[DefaultQuery];
 Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "CommonLogger.pqm");
 
 Yes = Extension.ImportFunction("Yes", "Constants.pqm");
+
 AuthEndpoint = Extension.ImportFunction("AuthEndpoint", "Constants.pqm");
 
 TransformUnexpectedError = Extension.ImportFunction("TransformUnexpectedError", "UnexpectedErrorWrapper.pqm");
