@@ -20,7 +20,6 @@ TestQueryBuildWithPossibleNullValues = () =>
             from = null,
             to = null
         ],
-        expectedSkipVersionCheck = false,
         params = FetchSessions(
             TestSafeguardSessions.SpsIp,
             TestSafeguardSessions.AuthenticationCredentials,
@@ -38,10 +37,10 @@ TestQueryBuildWithPossibleNullValues = () =>
             ]
         ),
         facts = {
-            Fact("The spsIp is correct", TestSafeguardSessions.SpsIp , params[spsIp]),
-            Fact("The credentials is correct", TestSafeguardSessions.AuthenticationCredentials, params[credentials]),
-            Fact("The query data is correct", expectedQuery, params[query]),
-            Fact("The skipVersionCheck value is correct", expectedSkipVersionCheck, params[parsedSkipVersionCheck])
+            Fact("The spsIp is correct", TestSafeguardSessions.SpsIp , params[SpsIp]),
+            Fact("The credentials is correct", TestSafeguardSessions.AuthenticationCredentials, params[Credentials]),
+            Fact("The query data is correct", expectedQuery, params[Query]),
+            Fact("The skipVersionCheck value is correct", null, params[SkipVersionCheck])
         }
     in
         facts;
@@ -53,7 +52,6 @@ TestQueryBuildWithValues = () =>
             from = TestSafeguardSessions.LocalNow ,
             to = TestSafeguardSessions.LocalNowPlusOneHour
         ],
-        expectedSkipVersionCheck = Yes,
         params = FetchSessions(
             TestSafeguardSessions.SpsIp,
             TestSafeguardSessions.AuthenticationCredentials,
@@ -71,10 +69,10 @@ TestQueryBuildWithValues = () =>
             ]
         ),
         facts = {
-            Fact("The spsIp is correct", TestSafeguardSessions.SpsIp , params[spsIp]),
-            Fact("The credentials is correct", TestSafeguardSessions.AuthenticationCredentials, params[credentials]),
-            Fact("The query data is correct", expectedQuery, params[query]),
-            Fact("The skipVersionCheck value is correct", expectedSkipVersionCheck, params[parsedSkipVersionCheck])
+            Fact("The spsIp is correct", TestSafeguardSessions.SpsIp , params[SpsIp]),
+            Fact("The credentials is correct", TestSafeguardSessions.AuthenticationCredentials, params[Credentials]),
+            Fact("The query data is correct", expectedQuery, params[Query]),
+            Fact("The skipVersionCheck value is correct", Yes, params[SkipVersionCheck])
         }
     in
         facts;

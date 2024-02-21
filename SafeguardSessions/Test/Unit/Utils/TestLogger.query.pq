@@ -21,7 +21,7 @@ TestErrorLogWithSPSResultInput = () =>
         ],
         expectedLogValues = [
             LogLevel = TraceLevel.Error,
-            Output = "error: #table( type table [Name = any, Data = any, ItemKind = any, ItemName = any, IsLeaf = any] , {{""Sessions"", ""error"", ""Table"", ""Table"", true} , {""Info"", #table( type table [Start = any, Url = any, ConnectorVersion = any, Status = any, ExpectedCount = any, Message = any, Failed = any] , {{#datetimezone(2023, 1, 18, 9, 47, 55, 2, 0), ""query"", ""v2.0.0pre+sps7.5.0"", ""status"", 42, ""message"", true} } ) , ""Table"", ""Table"", true} } ) ",
+            Output = "error: #table( type table [Name = any, Data = any, ItemKind = any, ItemName = any, IsLeaf = any] , {{""Sessions"", ""error"", ""Table"", ""Table"", true} , {""Info"", #table( type table [Start = any, Url = any, ConnectorVersion = any, Status = any, ExpectedCount = any, Message = any, Failed = any] , {{#datetimezone(2023, 1, 18, 9, 47, 55, 2, 0), ""query"", ""v2.0.0pre2+sps7.5.0"", ""status"", 42, ""message"", true} } ) , ""Table"", ""Table"", true} } ) ",
             Value = #table(
                 type table [Name = any, Data = any, ItemKind = any, ItemName = any, IsLeaf = any],
                 {
@@ -42,7 +42,7 @@ TestErrorLogWithSPSResultInput = () =>
                                 {
                                     #datetimezone(2023, 1, 18, 9, 47, 55, 2, 0),
                                     "query",
-                                    "v2.0.0pre+sps7.5.0",
+                                    "v2.0.0pre2+sps7.5.0",
                                     "status",
                                     42,
                                     "message",
