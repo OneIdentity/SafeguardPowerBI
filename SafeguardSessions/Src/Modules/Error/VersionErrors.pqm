@@ -1,7 +1,7 @@
 let
-    ErrorBase = Extension.ImportModule("CommonErrorBase.pqm"),
-    SupportedVersions.Versions = Extension.ImportFunction("Versions", "SupportedVersions.pqm"),
-    ErrorCodes.CustomCodes = Extension.ImportFunction("CustomCodes", "ErrorCodes.pqm"),
+    ErrorBase = SafeguardSessions.ImportModule("CommonErrorBase.pqm"),
+    SupportedVersions.Versions = SafeguardSessions.ImportFunction("Versions", "SupportedVersions.pqm"),
+    ErrorCodes.CustomCodes = SafeguardSessions.ImportFunction("CustomCodes", "ErrorCodes.pqm"),
     VersionErrors.NotSupportedVersion = (version as text) =>
         ErrorBase(
             ErrorCodes.CustomCodes[NotSupportedVersion],

@@ -1,6 +1,6 @@
 section TestCreateSchema;
 
-SchemaUtils = Extension.ImportModule("SchemaUtils.pqm");
+SchemaUtils = SafeguardSessions.ImportModule("SchemaUtils.pqm");
 CreateSchema = SchemaUtils[CreateSchema];
 
 TestCreateSchema = (case as text, rules as list, expectedSchema as table) as record =>

@@ -1,6 +1,6 @@
 section TestUtils;
 
-Utils.FetchInfo = Extension.ImportFunction("FetchInfo", "Utils.pqm");
+Utils.FetchInfo = SafeguardSessions.ImportFunction("FetchInfo", "Utils.pqm");
 
 TestFetchInfoContentWithoutStartTime =  UnitTestFramework.ImportFunction("TestFetchInfoContentWithoutStartTime", "Asserts.pqm");
 

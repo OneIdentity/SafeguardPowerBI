@@ -1,5 +1,5 @@
 let
-    QueryParameterTransformerMap = Extension.ImportFunction("Map", "QueryParameterTransformer.pqm"),
+    QueryParameterTransformerMap = SafeguardSessions.ImportFunction("Map", "QueryParameterTransformer.pqm"),
     UrlBuilder.GenerateBaseUrl = (scheme as text, bareUrl as text) => Text.Combine({scheme & ":", bareUrl}, "//"),
     UrlBuilder.GenerateUrl = (baseUrl as text, path as nullable text, optional query as nullable record) as text =>
         let

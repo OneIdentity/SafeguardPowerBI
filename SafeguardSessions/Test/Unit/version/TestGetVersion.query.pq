@@ -1,6 +1,6 @@
 section TestGetVersion;
 
-Version = Extension.ImportModule("Version.pqm");
+Version = SafeguardSessions.ImportModule("Version.pqm");
 
 Version.GetVersion = Version[GetVersion];
 

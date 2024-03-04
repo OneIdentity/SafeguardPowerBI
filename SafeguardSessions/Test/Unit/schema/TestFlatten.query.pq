@@ -1,6 +1,6 @@
 section TestFlatten;
 
-SchemaUtils = Extension.ImportModule("SchemaUtils.pqm");
+SchemaUtils = SafeguardSessions.ImportModule("SchemaUtils.pqm");
 
 SchemaUtils.FieldNamesOfType = SchemaUtils[FieldNamesOfType];
 SchemaUtils.IsFlat = SchemaUtils[IsFlat];
