@@ -1,7 +1,7 @@
 section TestSafeguardPasswords.Authentication;
 
-GetRstsResponse = Extension.ImportFunction("GetRstsResponse","Request.pqm");
-GetLoginResponse = Extension.ImportFunction("GetLoginResponse","Request.pqm");
+GetRstsResponse = SafeguardPasswords.ImportFunction("GetRstsResponse","Request.pqm");
+GetLoginResponse = SafeguardPasswords.ImportFunction("GetLoginResponse","Request.pqm");
 
 TestSafeguardPasswords.URL = "dummy_url";
 
