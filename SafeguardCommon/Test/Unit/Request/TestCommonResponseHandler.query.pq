@@ -1,6 +1,6 @@
 section TestCommonResponseHandler;
 
-GetDataFromResponse = Extension.ImportFunction("GetDataFromResponse", "CommonResponseHandler.pqm");
+GetDataFromResponse = SafeguardCommon.ImportFunction("GetDataFromResponse", "CommonResponseHandler.pqm");
 
 fakeResponse = FakeResponse(
     [

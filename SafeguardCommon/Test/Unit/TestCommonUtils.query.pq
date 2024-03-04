@@ -1,6 +1,6 @@
 section TestCommonUtils;
 
-PaddedTable.FromRecords = Extension.ImportFunction("PaddedTable.FromRecords", "CommonUtils.pqm");
+PaddedTable.FromRecords = SafeguardCommon.ImportFunction("PaddedTable.FromRecords", "CommonUtils.pqm");
 
 PaddedTable.FromRecords.Name = "PaddedTable.FromRecords";
 

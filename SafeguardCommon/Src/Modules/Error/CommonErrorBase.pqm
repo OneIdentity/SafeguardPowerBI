@@ -1,5 +1,5 @@
 let
-    ErrorBase.Type = Extension.ImportFunction("ErrorBaseType", "CommonTypes.pqm"),
+    ErrorBase.Type = SafeguardCommon.ImportFunction("ErrorBaseType", "CommonTypes.pqm"),
     ErrorBase.Implementation = (
         errorCode as number, reason as text, message as text, detail as record, optional manuallyHandled as logical
     ) =>
