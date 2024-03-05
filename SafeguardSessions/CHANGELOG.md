@@ -1,6 +1,6 @@
 # Changelog
 
-## [v2.0.0pre2+sps7.5.0] - 2024-02-21
+## [v2.0.0+sps7.5.0] - 2024-03-05
 
 ### Compatible SPS Versions
 
