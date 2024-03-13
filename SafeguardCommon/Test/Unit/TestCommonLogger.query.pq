@@ -1,6 +1,6 @@
 section TestCommonLogger;
 
-Logger = Extension.ImportModule("CommonLogger.pqm");
+Logger = SafeguardCommon.ImportModule("CommonLogger.pqm");
 
 Logger.InfoLog = Logger[InfoLog];
 

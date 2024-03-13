@@ -1,11 +1,11 @@
 section TestSafeguardSessions.ValidateSPSVersion;
 
-Version = Extension.ImportModule("Version.pqm");
+Version = SafeguardSessions.ImportModule("Version.pqm");
 
 Version.GetVersion = Version[GetVersion];
 
-Yes = Extension.ImportFunction("Yes", "Constants.pqm");
-No = Extension.ImportFunction("No", "Constants.pqm");
+Yes = SafeguardSessions.ImportFunction("Yes", "Constants.pqm");
+No = SafeguardSessions.ImportFunction("No", "Constants.pqm");
 
 TestValidateSPSVersion.SpsURL = "dummy_url";
 TestValidateSPSVersion.SessionId = "dummy_session_id";

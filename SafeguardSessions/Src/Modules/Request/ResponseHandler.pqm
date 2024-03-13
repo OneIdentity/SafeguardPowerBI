@@ -1,6 +1,6 @@
 let
-    Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "CommonLogger.pqm"),
-    RequestErrors.ErrorMap = Extension.ImportFunction("ErrorMap", "RequestErrors.pqm"),
+    Logger.ErrorLog = SafeguardSessions.ImportFunction("ErrorLog", "CommonLogger.pqm"),
+    RequestErrors.ErrorMap = SafeguardSessions.ImportFunction("ErrorMap", "RequestErrors.pqm"),
     ResponseHandler.ValidateByStatusCode = (response as record) =>
         let
             responseMeta = Value.Metadata(response),

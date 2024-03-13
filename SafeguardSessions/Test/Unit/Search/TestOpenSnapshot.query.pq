@@ -1,6 +1,6 @@
 section TestOpenSnapshot;
 
-OpenSnapshot = Extension.ImportModule("OpenSnapshot.pqm")[OpenSnapshot];
+OpenSnapshot = SafeguardSessions.ImportModule("OpenSnapshot.pqm")[OpenSnapshot];
 
 TestOpenSnapshotIsSuccessful = () =>
     let

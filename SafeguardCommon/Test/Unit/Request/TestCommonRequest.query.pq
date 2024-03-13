@@ -1,6 +1,6 @@
 section TestCommonRequest;
 
-Request = Extension.ImportModule("CommonRequest.pqm");
+Request = SafeguardCommon.ImportModule("CommonRequest.pqm");
 
 Request.GetHeader = Request[GetHeader];
 

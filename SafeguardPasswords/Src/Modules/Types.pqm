@@ -1,5 +1,5 @@
 let
-    Types.Constants = Extension.ImportModule("Constants.pqm"),
+    Types.Constants = SafeguardPasswords.ImportModule("Constants.pqm"),
     SafeguardPasswords.ContentsType = type function (
         applianceName as (
             type text meta [

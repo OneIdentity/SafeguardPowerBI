@@ -1,5 +1,5 @@
 let
-    SchemaUtils.CreateSchema = Extension.ImportFunction("CreateSchema", "SchemaUtils.pqm"),
+    SchemaUtils.CreateSchema = SafeguardSessions.ImportFunction("CreateSchema", "SchemaUtils.pqm"),
     Sessions.Schema = SchemaUtils.CreateSchema(
         {
             {"active", type logical},

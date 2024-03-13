@@ -1,17 +1,17 @@
 section TestSafeguardSessions.GetData;
 
-FetchInfo = Extension.ImportFunction("FetchInfo", "Utils.pqm");
+FetchInfo = SafeguardSessions.ImportFunction("FetchInfo", "Utils.pqm");
 
-CreateSchema = Extension.ImportFunction("CreateSchema", "SchemaUtils.pqm");
+CreateSchema = SafeguardSessions.ImportFunction("CreateSchema", "SchemaUtils.pqm");
 
-SupportedVersions.LatestVersion = Extension.ImportFunction("LatestVersion", "SupportedVersions.pqm");
+SupportedVersions.LatestVersion = SafeguardSessions.ImportFunction("LatestVersion", "SupportedVersions.pqm");
 
 TestResultsContentWithoutStartTime = UnitTestFramework.ImportFunction(
     "TestResultsContentWithoutStartTime", "Asserts.pqm"
 );
 
-Yes = Extension.ImportFunction("Yes", "Constants.pqm");
-No = Extension.ImportFunction("No", "Constants.pqm");
+Yes = SafeguardSessions.ImportFunction("Yes", "Constants.pqm");
+No = SafeguardSessions.ImportFunction("No", "Constants.pqm");
 
 TestSafeguardSessions.URL = "dummy_url";
 

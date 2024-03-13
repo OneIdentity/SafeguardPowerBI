@@ -1,6 +1,6 @@
 section TestGetSessionItemsResponse;
 
-SchemaUtils.GetSessionItemsResponse = Extension.ImportFunction("GetSessionItemsResponse", "SchemaUtils.pqm");
+SchemaUtils.GetSessionItemsResponse = SafeguardSessions.ImportFunction("GetSessionItemsResponse", "SchemaUtils.pqm");
 
 TestItemsResponseIsReturnedCorrectly = () =>
     let

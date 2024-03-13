@@ -1,6 +1,6 @@
 section CommonTestRequestErrors;
 
-ErrorCodes = Extension.ImportFunction("ErrorCodes", "CommonRequestErrors.pqm");
+ErrorCodes = SafeguardCommon.ImportFunction("ErrorCodes", "CommonRequestErrors.pqm");
 
 TestErrorCodeListIsCorrect = () =>
     let

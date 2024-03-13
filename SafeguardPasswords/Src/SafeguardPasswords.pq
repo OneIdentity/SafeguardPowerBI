@@ -1,19 +1,19 @@
 ﻿[Version = "1.0.0"]
 section SafeguardPasswords;
 
-ReportUtilities.GetAssetOwnershipDataTable = Extension.ImportFunction("GetAssetOwnershipDataTable","ReportUtilities.pqm");
-ReportUtilities.GetAssetAccountOwnershipDataTable = Extension.ImportFunction("GetAssetAccountOwnershipDataTable","ReportUtilities.pqm");
-ReportUtilities.GetAssetPartitionOwnershipDataTable = Extension.ImportFunction("GetAssetPartitionOwnershipDataTable","ReportUtilities.pqm");
-Types.ContentsType = Extension.ImportFunction("ContentsType","Types.pqm");
-Data.GetDataTable = Extension.ImportFunction("GetDataTable","Data.pqm");
-Constants = Extension.ImportModule("Constants.pqm");
-GetHost = Extension.ImportFunction("GetSppHost","UrlBuilder.pqm");
-GetResponse = Extension.ImportFunction("GetSppResponse","Request.pqm");
-GetUnauthenticatedResponse = Extension.ImportFunction("GetUnauthenticatedSppResponse","Request.pqm");
-GetRstsResponse = Extension.ImportFunction("GetRstsResponse","Request.pqm");
-GetLoginResponse = Extension.ImportFunction("GetLoginResponse","Request.pqm");
-Logger.ErrorLog = Extension.ImportFunction("ErrorLog","CommonLogger.pqm");
-Logger.InfoLog = Extension.ImportFunction("InfoLog", "CommonLogger.pqm");
+ReportUtilities.GetAssetOwnershipDataTable = SafeguardPasswords.ImportFunction("GetAssetOwnershipDataTable","ReportUtilities.pqm");
+ReportUtilities.GetAssetAccountOwnershipDataTable = SafeguardPasswords.ImportFunction("GetAssetAccountOwnershipDataTable","ReportUtilities.pqm");
+ReportUtilities.GetAssetPartitionOwnershipDataTable = SafeguardPasswords.ImportFunction("GetAssetPartitionOwnershipDataTable","ReportUtilities.pqm");
+Types.ContentsType = SafeguardPasswords.ImportFunction("ContentsType","Types.pqm");
+Data.GetDataTable = SafeguardPasswords.ImportFunction("GetDataTable","Data.pqm");
+Constants = SafeguardPasswords.ImportModule("Constants.pqm");
+GetHost = SafeguardPasswords.ImportFunction("GetSppHost","UrlBuilder.pqm");
+GetResponse = SafeguardPasswords.ImportFunction("GetSppResponse","Request.pqm");
+GetUnauthenticatedResponse = SafeguardPasswords.ImportFunction("GetUnauthenticatedSppResponse","Request.pqm");
+GetRstsResponse = SafeguardPasswords.ImportFunction("GetRstsResponse","Request.pqm");
+GetLoginResponse = SafeguardPasswords.ImportFunction("GetLoginResponse","Request.pqm");
+Logger.ErrorLog = SafeguardPasswords.ImportFunction("ErrorLog","CommonLogger.pqm");
+Logger.InfoLog = SafeguardPasswords.ImportFunction("InfoLog", "CommonLogger.pqm");
 
 [DataSource.Kind="SafeguardPasswords", Publish="SafeguardPasswords.Publish"]
 shared SafeguardPasswords.Contents = Value.ReplaceType(SafeguardPasswords.SafeguardNavTable, Types.ContentsType);
@@ -266,14 +266,14 @@ SafeguardPasswords.Icons = [
 //
 // Load common library functions
 //
-shared Extension.ImportModule = (name as text) =>
+shared SafeguardPasswords.ImportModule = (name as text) =>
     let
         binary = Extension.Contents(name), asText = Text.FromBinary(binary)
     in
         Expression.Evaluate(asText, #shared);
 
-shared Extension.ImportFunction = (function_name as text, module_name as text) =>
-    Record.Field(Extension.ImportModule(module_name), function_name);
+shared SafeguardPasswords.ImportFunction = (function_name as text, module_name as text) =>
+    Record.Field(SafeguardPasswords.ImportModule(module_name), function_name);
 
 Table.ToNavigationTable = (
     table as table,

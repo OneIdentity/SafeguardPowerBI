@@ -1,6 +1,6 @@
 section TestGetResponseWithSchema;
 
-SchemaUtils = Extension.ImportModule("SchemaUtils.pqm");
+SchemaUtils = SafeguardSessions.ImportModule("SchemaUtils.pqm");
 CreateSchema = SchemaUtils[CreateSchema];
 GetResponseWithSchema = SchemaUtils[GetResponseWithSchema];
 

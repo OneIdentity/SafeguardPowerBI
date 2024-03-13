@@ -1,6 +1,6 @@
 ﻿section TestBasicAuthentication;
 
-BaseAuthentication = Extension.ImportModule("BaseAuthentication.pqm");
+BaseAuthentication = SafeguardSessions.ImportModule("BaseAuthentication.pqm");
 
 BaseAuthentication.EncodeCredentials = BaseAuthentication[EncodeCredentials];
 BaseAuthentication.MineSessionIdFromCookie = BaseAuthentication[MineSessionIdFromCookie];

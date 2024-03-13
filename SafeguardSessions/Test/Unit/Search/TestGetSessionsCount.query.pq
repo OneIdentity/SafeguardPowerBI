@@ -1,10 +1,10 @@
 section TestGetSessionsCount;
 
-GetSessionsCount = Extension.ImportModule("GetSessionsCount.pqm");
+GetSessionsCount = SafeguardSessions.ImportModule("GetSessionsCount.pqm");
 
 GetSessionsCount.GetSessionsCount = GetSessionsCount[GetSessionsCount];
 
-CreateSchema = Extension.ImportFunction("CreateSchema", "SchemaUtils.pqm");
+CreateSchema = SafeguardSessions.ImportFunction("CreateSchema", "SchemaUtils.pqm");
 
 TestGetSessionsCountIsSuccessful = () =>
     let

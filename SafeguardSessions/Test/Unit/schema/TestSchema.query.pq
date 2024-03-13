@@ -1,6 +1,6 @@
 section TestSchema;
 
-GetSchema = Extension.ImportFunction("GetSchema", "Schema.pqm");
+GetSchema = SafeguardSessions.ImportFunction("GetSchema", "Schema.pqm");
 
 ExpectedSessionsSchema = UnitTestFramework.ImportFunction("Schema", "SessionsSchemaAsset.pqm");
 

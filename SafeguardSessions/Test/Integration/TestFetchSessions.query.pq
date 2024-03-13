@@ -1,7 +1,7 @@
 section TestSafeguardSessions;
 
-Yes = Extension.ImportFunction("Yes", "Constants.pqm");
-No = Extension.ImportFunction("No", "Constants.pqm");
+Yes = SafeguardSessions.ImportFunction("Yes", "Constants.pqm");
+No = SafeguardSessions.ImportFunction("No", "Constants.pqm");
 
 TestSafeguardSessions.SpsIp = "0.0.0.0";
 

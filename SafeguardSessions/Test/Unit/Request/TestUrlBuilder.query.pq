@@ -1,9 +1,9 @@
 section TestUrlBuilder;
 
-GenerateBaseUrl = Extension.ImportFunction("GenerateBaseUrl", "UrlBuilder.pqm");
-GenerateUrl = Extension.ImportFunction("GenerateUrl", "UrlBuilder.pqm");
-GetBaseUrlFromUrl = Extension.ImportFunction("GetBaseUrlFromUrl", "UrlBuilder.pqm");
-GetQueryFromUrl = Extension.ImportFunction("GetQueryFromUrl", "UrlBuilder.pqm");
+GenerateBaseUrl = SafeguardSessions.ImportFunction("GenerateBaseUrl", "UrlBuilder.pqm");
+GenerateUrl = SafeguardSessions.ImportFunction("GenerateUrl", "UrlBuilder.pqm");
+GetBaseUrlFromUrl = SafeguardSessions.ImportFunction("GetBaseUrlFromUrl", "UrlBuilder.pqm");
+GetQueryFromUrl = SafeguardSessions.ImportFunction("GetQueryFromUrl", "UrlBuilder.pqm");
 
 TestGenerateBaseUrl = () =>
     let

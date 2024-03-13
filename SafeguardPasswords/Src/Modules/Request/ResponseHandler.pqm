@@ -1,7 +1,7 @@
 let
-    Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "CommonLogger.pqm"),
-    RequestErrors.ErrorMap = Extension.ImportFunction("ErrorMap", "RequestErrors.pqm"),
-    Constants = Extension.ImportModule("Constants.pqm"),
+    Logger.ErrorLog = SafeguardPasswords.ImportFunction("ErrorLog", "CommonLogger.pqm"),
+    RequestErrors.ErrorMap = SafeguardPasswords.ImportFunction("ErrorMap", "RequestErrors.pqm"),
+    Constants = SafeguardPasswords.ImportModule("Constants.pqm"),
 
     ResponseHandler.ValidateByStatusCode = (response as any) =>
         let

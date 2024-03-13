@@ -1,7 +1,7 @@
 let
-    ErrorBase = Extension.ImportModule("CommonErrorBase.pqm"),
-    ErrorCodes.ExtendedHTTPCodes = Extension.ImportFunction("ExtendedHTTPCodes", "CommonErrorCodes.pqm"),
-    ErrorCodes.CustomCodes = Extension.ImportFunction("CustomCodes", "CommonErrorCodes.pqm"),
+    ErrorBase = SafeguardCommon.ImportModule("CommonErrorBase.pqm"),
+    ErrorCodes.ExtendedHTTPCodes = SafeguardCommon.ImportFunction("ExtendedHTTPCodes", "CommonErrorCodes.pqm"),
+    ErrorCodes.CustomCodes = SafeguardCommon.ImportFunction("CustomCodes", "CommonErrorCodes.pqm"),
     RequestErrors.NotParsableResponse = (detail as anynonnull) =>
         ErrorBase(
             ErrorCodes.CustomCodes[NotParsableResponse],

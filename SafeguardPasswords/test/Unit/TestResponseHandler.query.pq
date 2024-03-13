@@ -1,6 +1,6 @@
 section TestResponseHandler;
 
-ValidateByStatusCode = Extension.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm");
+ValidateByStatusCode = SafeguardPasswords.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm");
 
 TestValidateByStatusCodeRaisesError = () =>
     let

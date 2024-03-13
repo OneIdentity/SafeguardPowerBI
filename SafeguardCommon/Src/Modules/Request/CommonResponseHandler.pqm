@@ -1,5 +1,5 @@
 let
-    RequestErrors.NotParsableResponse = Extension.ImportFunction("NotParsableResponse", "CommonRequestErrors.pqm"),
+    RequestErrors.NotParsableResponse = SafeguardCommon.ImportFunction("NotParsableResponse", "CommonRequestErrors.pqm"),
     ResponseHandler.GetDataFromResponse = (response as record, path as text, optional separator as text) =>
         let
             GetRecordSafe = (content as record, pathAsList as list) =>

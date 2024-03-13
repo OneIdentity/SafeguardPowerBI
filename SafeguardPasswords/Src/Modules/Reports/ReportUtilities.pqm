@@ -1,8 +1,8 @@
 let
-    Data.GetDataTable = Extension.ImportFunction("GetDataTable","Data.pqm"),
-    Constants = Extension.ImportModule("Constants.pqm"),
-    IsMocked = Extension.ImportFunction("IsMocked", "CommonUtils.pqm"),
-    InfoLog = Extension.ImportFunction("InfoLog", "CommonLogger.pqm"),
+    Data.GetDataTable = SafeguardPasswords.ImportFunction("GetDataTable","Data.pqm"),
+    Constants = SafeguardPasswords.ImportModule("Constants.pqm"),
+    IsMocked = SafeguardPasswords.ImportFunction("IsMocked", "CommonUtils.pqm"),
+    InfoLog = SafeguardPasswords.ImportFunction("InfoLog", "CommonLogger.pqm"),
 
 
     ReportUtilities.GetSingleAssetOwnershipDataTable = (applianceName as text, Id as number) =>

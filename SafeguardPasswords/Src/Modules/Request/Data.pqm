@@ -1,7 +1,7 @@
 let
-    GetLoginToken = Extension.ImportFunction("GetLoginToken","Authentication.pqm"),
-    Logger.InfoLog = Extension.ImportFunction("InfoLog", "CommonLogger.pqm"),
-    GetResponse = Extension.ImportFunction("GetSppResponse","Request.pqm"),
+    GetLoginToken = SafeguardPasswords.ImportFunction("GetLoginToken","Authentication.pqm"),
+    Logger.InfoLog = SafeguardPasswords.ImportFunction("InfoLog", "CommonLogger.pqm"),
+    GetResponse = SafeguardPasswords.ImportFunction("GetSppResponse","Request.pqm"),
 
     ValidateInput = (applianceName as text, optional resourcePath as text, optional filter as text, optional fields as text, optional queryOptions as text) => 
         // M Language does not support regex so validation is ugly. (◡︵◡)

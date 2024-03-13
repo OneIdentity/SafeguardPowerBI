@@ -1,6 +1,6 @@
 let
-    ErrorBase = Extension.ImportModule("CommonErrorBase.pqm"),
-    ErrorCodes.CustomCodes = Extension.ImportFunction("CustomCodes", "ErrorCodes.pqm"),
+    ErrorBase = SafeguardSessions.ImportModule("CommonErrorBase.pqm"),
+    ErrorCodes.CustomCodes = SafeguardSessions.ImportFunction("CustomCodes", "ErrorCodes.pqm"),
     UnexpectedErrorWarper.TransformUnexpectedError = (handledError as record) =>
         let
             transformedError = ErrorBase(

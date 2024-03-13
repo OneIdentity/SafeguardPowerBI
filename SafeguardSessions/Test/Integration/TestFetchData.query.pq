@@ -1,6 +1,6 @@
 section TestSafeguardSessions.FetchData;
 
-CreateSchema = Extension.ImportFunction("CreateSchema", "SchemaUtils.pqm");
+CreateSchema = SafeguardSessions.ImportFunction("CreateSchema", "SchemaUtils.pqm");
 
 TestSafeguardSessions.URL = "dummy_url";
 TestSafeguardSessions.SessionId = "e8e5f0a0d3367043150187f81df3484e91e365d5";

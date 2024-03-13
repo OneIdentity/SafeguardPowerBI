@@ -1,10 +1,10 @@
 let  
-    ValidateByStatusCode = Extension.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
-    InfoLog = Extension.ImportFunction("InfoLog", "CommonLogger.pqm"),
-    ErrorCodes = Extension.ImportFunction("ErrorCodes", "RequestErrors.pqm"),
-    GetHost = Extension.ImportFunction("GetSppHost","UrlBuilder.pqm"),
-    Constants = Extension.ImportModule("Constants.pqm"),
-    IsMocked = Extension.ImportFunction("IsMocked", "CommonUtils.pqm"),
+    ValidateByStatusCode = SafeguardPasswords.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
+    InfoLog = SafeguardPasswords.ImportFunction("InfoLog", "CommonLogger.pqm"),
+    ErrorCodes = SafeguardPasswords.ImportFunction("ErrorCodes", "RequestErrors.pqm"),
+    GetHost = SafeguardPasswords.ImportFunction("GetSppHost","UrlBuilder.pqm"),
+    Constants = SafeguardPasswords.ImportModule("Constants.pqm"),
+    IsMocked = SafeguardPasswords.ImportFunction("IsMocked", "CommonUtils.pqm"),
 
 
     Request.GetSppResponseBase = (host as text, options as record, optional logResponse as logical, optional mocks as record) =>

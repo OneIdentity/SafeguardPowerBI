@@ -1,13 +1,13 @@
 let
-    IsMocked = Extension.ImportFunction("IsMocked", "CommonUtils.pqm"),
-    SessionsSnapshotEndpoint = Extension.ImportFunction("SessionsSnapshotEndpoint", "Constants.pqm"),
-    Request.Generate = Extension.ImportFunction("Generate", "Request.pqm"),
-    Request.GetDefaultParameters = Extension.ImportFunction("GetDefaultParameters", "Request.pqm"),
-    ResponseHandler.GetDataFromResponse = Extension.ImportFunction(
+    IsMocked = SafeguardSessions.ImportFunction("IsMocked", "CommonUtils.pqm"),
+    SessionsSnapshotEndpoint = SafeguardSessions.ImportFunction("SessionsSnapshotEndpoint", "Constants.pqm"),
+    Request.Generate = SafeguardSessions.ImportFunction("Generate", "Request.pqm"),
+    Request.GetDefaultParameters = SafeguardSessions.ImportFunction("GetDefaultParameters", "Request.pqm"),
+    ResponseHandler.GetDataFromResponse = SafeguardSessions.ImportFunction(
         "GetDataFromResponse", "CommonResponseHandler.pqm"
     ),
-    ResponseHandler.ValidateByStatusCode = Extension.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
-    UrlBuilder.GenerateUrl = Extension.ImportFunction("GenerateUrl", "UrlBuilder.pqm"),
+    ResponseHandler.ValidateByStatusCode = SafeguardSessions.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
+    UrlBuilder.GenerateUrl = SafeguardSessions.ImportFunction("GenerateUrl", "UrlBuilder.pqm"),
     OpenSnapshot.OpenSnapshot = (spsUrl as text, sessionId as text, optional mocks as nullable record) as text =>
         let
             openSnapshotUrl = UrlBuilder.GenerateUrl(spsUrl, SessionsSnapshotEndpoint),
