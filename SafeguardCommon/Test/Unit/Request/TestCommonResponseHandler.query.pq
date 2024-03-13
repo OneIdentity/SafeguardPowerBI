@@ -70,14 +70,16 @@ TestGetDataFromResponseRaisesError = () =>
                 description,
                 GetDataFromResponse,
                 {fakeResponse, path},
-                "Not Parsable Response",
-                "Error 10002: The source IP returned a response with missing fields.",
                 [
-                    ManuallyHandled = true,
-                    Cause = fakeResponse,
-                    MissingField = path,
-                    RequestUrl = "dummy_url",
-                    ErrorCode = 10002
+                    Reason = "Not Parsable Response",
+                    Message = "Error 10002: The source IP returned a response with missing fields.",
+                    Detail = [
+                        ManuallyHandled = true,
+                        Cause = fakeResponse,
+                        MissingField = path,
+                        RequestUrl = "dummy_url",
+                        ErrorCode = 10002
+                    ]
                 ]
             ),
         cases = {

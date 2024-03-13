@@ -37,7 +37,7 @@ TestPaddedTableFromRecords = () =>
 
 TestPaddedTableFromRecordsRaisesError = () =>
     let
-        records = {"not_a_record"},
+        records = {{"not_a_record"}},
         facts = AssertError(
             Text.Format(
                 "#[MethodName] raises error if the data provided is not a record",
