@@ -1,8 +1,8 @@
 let
-    IsMocked = Extension.ImportFunction("IsMocked", "CommonUtils.pqm"),
-    InfoLog = Extension.ImportFunction("InfoLog", "CommonLogger.pqm"),
-    ErrorCodes = Extension.ImportFunction("ErrorCodes", "RequestErrors.pqm"),
-    ValidateByStatusCode = Extension.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
+    IsMocked = SafeguardSessions.ImportFunction("IsMocked", "CommonUtils.pqm"),
+    InfoLog = SafeguardSessions.ImportFunction("InfoLog", "CommonLogger.pqm"),
+    ErrorCodes = SafeguardSessions.ImportFunction("ErrorCodes", "RequestErrors.pqm"),
+    ValidateByStatusCode = SafeguardSessions.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
     Request.GetAuthParameters = (encodedCredentails as text) as record =>
         let
             parameters = [

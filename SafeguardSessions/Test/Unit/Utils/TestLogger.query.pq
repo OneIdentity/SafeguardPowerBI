@@ -1,7 +1,7 @@
 section TestUtils;
 
-Logger = Extension.ImportModule("CommonLogger.pqm");
-Utils = Extension.ImportModule("Utils.pqm");
+Logger = SafeguardSessions.ImportModule("CommonLogger.pqm");
+Utils = SafeguardSessions.ImportModule("Utils.pqm");
 
 Logger.ErrorLog = Logger[ErrorLog];
 

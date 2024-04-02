@@ -1,6 +1,6 @@
 section TestRequest;
 
-Request = Extension.ImportModule("Request.pqm");
+Request = SafeguardSessions.ImportModule("Request.pqm");
 
 Request.GetAuthParameters = Request[GetAuthParameters];
 Request.GetDefaultParameters = Request[GetDefaultParameters];

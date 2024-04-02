@@ -1,8 +1,8 @@
 let
-    SuccessStatus = Extension.ImportFunction("SuccessStatus", "Constants.pqm"),
-    ErrorStatus = Extension.ImportFunction("ErrorStatus", "Constants.pqm"),
-    NotAvailableStatus = Extension.ImportFunction("NotAvailableStatus", "Constants.pqm"),
-    ErrorLog = Extension.ImportFunction("ErrorLog", "CommonLogger.pqm"),
+    SuccessStatus = SafeguardSessions.ImportFunction("SuccessStatus", "Constants.pqm"),
+    ErrorStatus = SafeguardSessions.ImportFunction("ErrorStatus", "Constants.pqm"),
+    NotAvailableStatus = SafeguardSessions.ImportFunction("NotAvailableStatus", "Constants.pqm"),
+    ErrorLog = SafeguardSessions.ImportFunction("ErrorLog", "CommonLogger.pqm"),
     Utils.FetchInfo = (
         status as text,
         message as text,

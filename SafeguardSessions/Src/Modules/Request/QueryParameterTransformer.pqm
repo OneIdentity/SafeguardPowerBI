@@ -1,5 +1,5 @@
 let
-    FilterFieldWithoutValueError = Extension.ImportFunction("FilterFieldWithoutValue", "QueryTransformErrors.pqm"),
+    FilterFieldWithoutValueError = SafeguardSessions.ImportFunction("FilterFieldWithoutValue", "QueryTransformErrors.pqm"),
     QueryParameterTransformer.Map = [
         qInput = QueryParameterTransformer.GenerateQParameter,
         from = QueryParameterTransformer.GenerateStartParameter,

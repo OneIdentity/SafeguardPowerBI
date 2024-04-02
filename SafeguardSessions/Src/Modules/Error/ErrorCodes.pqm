@@ -1,6 +1,6 @@
 let
-    CommonErrorCodes.ExtendedHTTPCodes = Extension.ImportFunction("ExtendedHTTPCodes", "CommonErrorCodes.pqm"),
-    CommonErrorCodes.CustomCodes = Extension.ImportFunction("CustomCodes", "CommonErrorCodes.pqm"),
+    CommonErrorCodes.ExtendedHTTPCodes = SafeguardSessions.ImportFunction("ExtendedHTTPCodes", "CommonErrorCodes.pqm"),
+    CommonErrorCodes.CustomCodes = SafeguardSessions.ImportFunction("CustomCodes", "CommonErrorCodes.pqm"),
     ErrorCodes.ExtendedHTTPCodes = CommonErrorCodes.ExtendedHTTPCodes & [
         SnapshotQuotaError = 4290
     ],

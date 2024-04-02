@@ -1,7 +1,7 @@
 section TestSafeguardSessions.TestSpsConnection;
 
-Yes = Extension.ImportFunction("Yes", "Constants.pqm");
-No = Extension.ImportFunction("No", "Constants.pqm");
+Yes = SafeguardSessions.ImportFunction("Yes", "Constants.pqm");
+No = SafeguardSessions.ImportFunction("No", "Constants.pqm");
 
 TestSafeguardSessions.SpsURL = "dummy_url";
 

@@ -1,10 +1,10 @@
 section TestCheckVersion;
 
-Version = Extension.ImportModule("Version.pqm");
+Version = SafeguardSessions.ImportModule("Version.pqm");
 
 Version.CheckVersion = Version[CheckVersion];
 
-SupportedVersions = Extension.ImportModule("SupportedVersions.pqm");
+SupportedVersions = SafeguardSessions.ImportModule("SupportedVersions.pqm");
 
 SupportedVersions.Versions = SupportedVersions[Versions];
 SupportedVersions.LatestVersion = SupportedVersions[LatestVersion];

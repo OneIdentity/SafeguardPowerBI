@@ -1,6 +1,6 @@
 section TestRequest;
 
-Request = Extension.ImportModule("Request.pqm");
+Request = SafeguardPasswords.ImportModule("Request.pqm");
 Request.GetAuthParameters = Request[GetAuthParameters];
 Request.GetDefaultParameters = Request[GetDefaultParameters];
 Request.GetSppResponse = Request[GetSppResponse];

@@ -1,8 +1,8 @@
 let
-    GetRstsResponse = Extension.ImportFunction("GetRstsResponse","Request.pqm"),
-    GetLoginResponse = Extension.ImportFunction("GetLoginResponse","Request.pqm"),
-    GetUnauthenticatedResponse = Extension.ImportFunction("GetUnauthenticatedSppResponse","Request.pqm"),
-    Constants = Extension.ImportModule("Constants.pqm"),
+    GetRstsResponse = SafeguardPasswords.ImportFunction("GetRstsResponse","Request.pqm"),
+    GetLoginResponse = SafeguardPasswords.ImportFunction("GetLoginResponse","Request.pqm"),
+    GetUnauthenticatedResponse = SafeguardPasswords.ImportFunction("GetUnauthenticatedSppResponse","Request.pqm"),
+    Constants = SafeguardPasswords.ImportModule("Constants.pqm"),
 
     Authentication.GetLoginToken = (host) =>
         let

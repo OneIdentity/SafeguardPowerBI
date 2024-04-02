@@ -1,10 +1,10 @@
 section TestAdvancedSearch;
 
-AdvancedSearch = Extension.ImportModule("AdvancedSearch.pqm");
+AdvancedSearch = SafeguardSessions.ImportModule("AdvancedSearch.pqm");
 
 AdvancedSearch.AdvancedSearch = AdvancedSearch[AdvancedSearch];
 
-CreateSchema = Extension.ImportFunction("CreateSchema", "SchemaUtils.pqm");
+CreateSchema = SafeguardSessions.ImportFunction("CreateSchema", "SchemaUtils.pqm");
 
 TestSafeguardSessions.Response.First = FakeRawResponse(
     [

@@ -220,63 +220,63 @@ SafeguardSessions.Icons = [
 //
 // Load common library functions
 //
-shared Extension.ImportModule = (name as text) =>
+shared SafeguardSessions.ImportModule = (name as text) =>
     let
         binary = Extension.Contents(name), asText = Text.FromBinary(binary)
     in
         Expression.Evaluate(asText, #shared);
 
-shared Extension.ImportFunction = (function_name as text, module_name as text) =>
-    Record.Field(Extension.ImportModule(module_name), function_name);
+shared SafeguardSessions.ImportFunction = (function_name as text, module_name as text) =>
+    Record.Field(SafeguardSessions.ImportModule(module_name), function_name);
 
-SafeguardSessions.ContentsType = Extension.ImportFunction("ContentsType", "Types.pqm");
+SafeguardSessions.ContentsType = SafeguardSessions.ImportFunction("ContentsType", "Types.pqm");
 
-IsMocked = Extension.ImportFunction("IsMocked", "CommonUtils.pqm");
+IsMocked = SafeguardSessions.ImportFunction("IsMocked", "CommonUtils.pqm");
 
-BuildSPSResult = Extension.ImportFunction("BuildSPSResult", "Utils.pqm");
+BuildSPSResult = SafeguardSessions.ImportFunction("BuildSPSResult", "Utils.pqm");
 
-BaseAuthentication = Extension.ImportModule("BaseAuthentication.pqm");
+BaseAuthentication = SafeguardSessions.ImportModule("BaseAuthentication.pqm");
 
 BaseAuthentication.EncodeCredentials = BaseAuthentication[EncodeCredentials];
 BaseAuthentication.MineSessionIdFromCookie = BaseAuthentication[MineSessionIdFromCookie];
 
-Request.GetAuthParameters = Extension.ImportFunction("GetAuthParameters", "Request.pqm");
-Request.Generate = Extension.ImportFunction("Generate", "Request.pqm");
-Request.GetHeader = Extension.ImportFunction("GetHeader", "CommonRequest.pqm");
+Request.GetAuthParameters = SafeguardSessions.ImportFunction("GetAuthParameters", "Request.pqm");
+Request.Generate = SafeguardSessions.ImportFunction("Generate", "Request.pqm");
+Request.GetHeader = SafeguardSessions.ImportFunction("GetHeader", "CommonRequest.pqm");
 
-Version = Extension.ImportModule("Version.pqm");
+Version = SafeguardSessions.ImportModule("Version.pqm");
 
 Version.GetVersion = Version[GetVersion];
 Version.CheckVersion = Version[CheckVersion];
 
-SupportedVersions = Extension.ImportModule("SupportedVersions.pqm");
+SupportedVersions = SafeguardSessions.ImportModule("SupportedVersions.pqm");
 
 SupportedVersions.Versions = SupportedVersions[Versions];
 
-VersionErrors.NotSupportedVersion = Extension.ImportFunction("NotSupportedVersion", "VersionErrors.pqm");
+VersionErrors.NotSupportedVersion = SafeguardSessions.ImportFunction("NotSupportedVersion", "VersionErrors.pqm");
 
-GetSessionsCount = Extension.ImportModule("GetSessionsCount.pqm");
+GetSessionsCount = SafeguardSessions.ImportModule("GetSessionsCount.pqm");
 
 GetSessionsCount.GetSessionsCount = GetSessionsCount[GetSessionsCount];
 
-OpenSnapshot = Extension.ImportModule("OpenSnapshot.pqm");
+OpenSnapshot = SafeguardSessions.ImportModule("OpenSnapshot.pqm");
 
 OpenSnapshot.OpenSnapshot = OpenSnapshot[OpenSnapshot];
 
-AdvancedSearch = Extension.ImportModule("AdvancedSearch.pqm");
+AdvancedSearch = SafeguardSessions.ImportModule("AdvancedSearch.pqm");
 
 AdvancedSearch.AdvancedSearch = AdvancedSearch[AdvancedSearch];
 
-UrlBuilder = Extension.ImportModule("UrlBuilder.pqm");
+UrlBuilder = SafeguardSessions.ImportModule("UrlBuilder.pqm");
 
 UrlBuilder.GenerateBaseUrl = UrlBuilder[GenerateBaseUrl];
 UrlBuilder.GenerateUrl = UrlBuilder[GenerateUrl];
 UrlBuilder.DefaultQuery = UrlBuilder[DefaultQuery];
 
-Logger.ErrorLog = Extension.ImportFunction("ErrorLog", "CommonLogger.pqm");
+Logger.ErrorLog = SafeguardSessions.ImportFunction("ErrorLog", "CommonLogger.pqm");
 
-Yes = Extension.ImportFunction("Yes", "Constants.pqm");
+Yes = SafeguardSessions.ImportFunction("Yes", "Constants.pqm");
 
-AuthEndpoint = Extension.ImportFunction("AuthEndpoint", "Constants.pqm");
+AuthEndpoint = SafeguardSessions.ImportFunction("AuthEndpoint", "Constants.pqm");
 
-TransformUnexpectedError = Extension.ImportFunction("TransformUnexpectedError", "UnexpectedErrorWrapper.pqm");
+TransformUnexpectedError = SafeguardSessions.ImportFunction("TransformUnexpectedError", "UnexpectedErrorWrapper.pqm");

@@ -1,6 +1,6 @@
 section TestReportUtilities;
 
-ReportUtilities = Extension.ImportModule("ReportUtilities.pqm");
+ReportUtilities = SafeguardPasswords.ImportModule("ReportUtilities.pqm");
 ReportUtilities.GetAssetAccountOwnershipDataTable = ReportUtilities[GetAssetAccountOwnershipDataTable];
 
 TestAssetAccountReportGeneration = () =>
