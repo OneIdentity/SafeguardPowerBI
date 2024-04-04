@@ -1,8 +1,11 @@
 {
-  "ConnectorProjPath": "SafeguardSessions.proj",
-  "TestProjPath": "Test\\SafeguardSessionsTest.proj",
-  "UnitTestsPath": "Test",
-  "ConnectorMezPath": "Deploy\\OneIdentitySafeguard\\Bin\\OneIdentitySafeguard.mez",
-  "TestMezPath": "Deploy\\UnitTestFramework\\Bin\\UnitTestFramework.mez",
-  "ReportTemplatePath": "ReportTemplate\\OneIdentitySafeguard.pbit"
+  "ConnectorProjPath":"SafeguardSessions.proj",
+  "TestProjPath":"Test\\SafeguardSessionsTest.proj",
+  "UnitTestsPath":"Test",
+  "ConnectorMezPath":"Deploy\\OneIdentitySafeguard\\Bin\\OneIdentitySafeguard.mez",
+  "TestMezPath":"Deploy\\UnitTestFramework\\Bin\\UnitTestFramework.mez",
+  "ReportTemplatePath":"ReportTemplates",
+  "ReportTemplates":{
+    "Sessions":"OneIdentitySafeguard.pbit"
+  }
 }
