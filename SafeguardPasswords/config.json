@@ -1,13 +1,15 @@
 {
-    "ConnectorProjPath":  "SafeguardPasswords.proj",
-    "VenvPath":  ".venv",
-    "TestMezPath":  "Deploy\\UnitTestFramework\\Bin\\UnitTestFramework.mez",
-    "AliasesPath":  ".venv\\aliases",
-    "UnitTestsPath":  "Test",
-    "ConnectorMezPath":  "Deploy\\SafeguardPasswords\\Bin\\OneIdentitySafeguardForPrivilegedPasswords.mez",
-    "TestProjPath":  "Test\\SafeguardPasswordsTest.proj",
-    "AccountOwnershipReport":  "ReportTemplates\\AccountOwnershipReport.pbit",
-    "EntitlementReport":  "ReportTemplates\\EntitlementReport.pbit",
-    "AssetOwnershipReport":  "ReportTemplates\\AssetOwnershipReport.pbit",
-    "MetricsReport":  "SafeguardPasswords\\ReportTemplates\\MetricsReport.pbit"
-}
+    "ConnectorProjPath":"SafeguardPasswords.proj",
+    "VenvPath":".venv",
+    "TestMezPath":"Deploy\\UnitTestFramework\\Bin\\UnitTestFramework.mez",
+    "AliasesPath":".venv\\aliases",
+    "UnitTestsPath":"Test",
+    "ConnectorMezPath":"Deploy\\SafeguardPasswords\\Bin\\OneIdentitySafeguardForPrivilegedPasswords.mez",
+    "TestProjPath":"Test\\SafeguardPasswordsTest.proj",
+    "ReportTemplatePaths":{
+      "AccountOwnershipReport":"ReportTemplates\\AccountOwnershipReport.pbit",
+      "EntitlementReport":"ReportTemplates\\EntitlementReport.pbit",
+      "AssetOwnershipReport":"ReportTemplates\\AssetOwnershipReport.pbit",
+      "MetricsReport":"ReportTemplates\\MetricsReport.pbit"
+    }
+  }
