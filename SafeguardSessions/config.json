@@ -4,5 +4,6 @@
   "UnitTestsPath": "Test",
   "ConnectorMezPath": "Deploy\\OneIdentitySafeguard\\Bin\\OneIdentitySafeguard.mez",
   "TestMezPath": "Deploy\\UnitTestFramework\\Bin\\UnitTestFramework.mez",
-  "ReportTemplatePath": "ReportTemplate\\OneIdentitySafeguard.pbit"
+  "ReportTemplatePath": "ReportTemplate\\OneIdentitySafeguard.pbit",
+  "HashFor": ["ConnectorMezPath", "ReportTemplatePath"]
 }

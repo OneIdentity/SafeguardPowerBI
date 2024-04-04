@@ -9,5 +9,8 @@
     "AccountOwnershipReport":  "ReportTemplates\\AccountOwnershipReport.pbit",
     "EntitlementReport":  "ReportTemplates\\EntitlementReport.pbit",
     "AssetOwnershipReport":  "ReportTemplates\\AssetOwnershipReport.pbit",
-    "MetricsReport":  "SafeguardPasswords\\ReportTemplates\\MetricsReport.pbit"
+    "MetricsReport":  "SafeguardPasswords\\ReportTemplates\\MetricsReport.pbit",
+    "HashFor": [
+        "ConnectorMezPath"
+    ]
 }
