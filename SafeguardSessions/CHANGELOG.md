@@ -1,5 +1,15 @@
 # Changelog
 
+## [v2.0.1pre+sps8.0.0] - 2024-08-05
+
+### Compatible SPS Versions
+
+* 7.3.0, 7.4.0, 7.5.0, 8.0.0
+
+### Bug fixes
+
+* Fix shared function name collision among Safeguard Password, Sessions and Common projects that made loading Safeguard for Privileged Password and Safeguard for Privileged Sessions connectors unable to be loaded simultaneously in Power BI Desktop.
+
 ## [v2.0.0+sps7.5.0] - 2024-03-05
 
 ### Compatible SPS Versions
