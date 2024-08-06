@@ -1,5 +1,5 @@
 let
-    SupportedVersions.LatestVersion = "7.5.0", SupportedVersions.Versions = {"7.3", "7.4", "7.5"}
+    SupportedVersions.LatestVersion = "8.0", SupportedVersions.Versions = {"7.3", "7.4", "7.5", "8.0"}
 in
     [
         Versions = SupportedVersions.Versions,
