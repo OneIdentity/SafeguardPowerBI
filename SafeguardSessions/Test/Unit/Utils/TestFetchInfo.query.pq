@@ -9,7 +9,7 @@ TestFetchInfoContainsConnectorVersion = () =>
         actualInfo = Utils.FetchInfo("dummy_status", "dummy_message", null, 0, false, "dummy_url"),
         expectedInfo = #table(
             type table [Url = any, ConnectorVersion = any, Status = any, ExpectedCount = any, Message = any, Failed = any],
-            {{"dummy_url", "v2.0.1pre+sps8.0.0", "dummy_status", 0, "dummy_message", false}}
+            {{"dummy_url", "v2.0.1+sps8.0.0", "dummy_status", 0, "dummy_message", false}}
         )
     in
         TestFetchInfoContentWithoutStartTime(expectedInfo, actualInfo);
