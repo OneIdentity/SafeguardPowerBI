@@ -52,13 +52,13 @@ try {
 
     Write-Output "Installing .NET SDK as a background job"
     if (-Not (Test-Path($(Get-Alias -Name dotnet-install).Definition))) {
-        Invoke-WebRequest -Uri https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.ps1 -OutFile $(Get-Alias -Name dotnet-install).Definition
+        Invoke-WebRequest -Uri https://dot.net/v1/dotnet-install.ps1 -OutFile $(Get-Alias -Name dotnet-install).Definition
     }
 
     $job = Start-Job -Name DotnetInstall -ScriptBlock {
         switch ($input) {
             { $true } {
-                & $_.DotnetInstall -InstallDir $_.InstallDir -NoCdn -NoPath -Verbose -Version $_.Version
+                & $_.DotnetInstall -InstallDir $_.InstallDir -NoPath -Verbose -Version $_.Version
             }
         }
     } -InputObject @{
