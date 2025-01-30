@@ -7,13 +7,13 @@ let
     ResponseHandler.ValidateByStatusCode = SafeguardSessions.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
     UrlBuilder.GenerateUrl = SafeguardSessions.ImportFunction("GenerateUrl", "UrlBuilder.pqm"),
     Version.Separator = ".",
-    Version.GetVersion = (spsUrl as text, sessionId as text, optional mocks as nullable record) as text =>
+    Version.GetVersion = (spsUrl as text, sessionId as text, apiKey as nullable text, optional mocks as nullable record) as text =>
         let
             infoUrl = UrlBuilder.GenerateUrl(spsUrl, InfoEndpoint),
             infoResponse = ResponseHandler.ValidateByStatusCode(
                 Request.Generate(
                     infoUrl,
-                    Request.GetDefaultParameters(sessionId),
+                    Request.GetDefaultParameters(sessionId, apiKey),
                     if IsMocked(mocks, "InfoResponse") then
                         [Response = mocks[InfoResponse]]
                     else

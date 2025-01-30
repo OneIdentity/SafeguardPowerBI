@@ -8,7 +8,7 @@ let
     ),
     ResponseHandler.ValidateByStatusCode = SafeguardSessions.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
     UrlBuilder.GenerateUrl = SafeguardSessions.ImportFunction("GenerateUrl", "UrlBuilder.pqm"),
-    OpenSnapshot.OpenSnapshot = (spsUrl as text, sessionId as text, optional mocks as nullable record) as text =>
+    OpenSnapshot.OpenSnapshot = (spsUrl as text, sessionId as text, apiKey as nullable text, optional mocks as nullable record) as text =>
         let
             openSnapshotUrl = UrlBuilder.GenerateUrl(spsUrl, SessionsSnapshotEndpoint),
             openSnapshotResponse = ResponseHandler.ValidateByStatusCode(
@@ -21,7 +21,7 @@ let
                         ]
                     )
                 else
-                    Request.Generate(openSnapshotUrl, Request.GetDefaultParameters(sessionId))
+                    Request.Generate(openSnapshotUrl, Request.GetDefaultParameters(sessionId, apiKey))
             ),
             snapshot = ResponseHandler.GetDataFromResponse(openSnapshotResponse, "body.snapshot")
         in
