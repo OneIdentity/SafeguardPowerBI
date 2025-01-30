@@ -82,6 +82,7 @@ shared GetData = (
     let
         startTime = DateTimeZone.LocalNow(),
         spsUrl = UrlBuilder.GenerateBaseUrl("https", spsIp),
+        apiKey = Record.FieldOrDefault(credentials, "Key", null),
         authResponse =
             if IsMocked(mocks, "Authenticate") then
                 mocks[Authenticate][Value]
@@ -89,7 +90,13 @@ shared GetData = (
                 Authenticate(spsUrl, credentials, mocks),
         sessionId = ValidateSPSVersion(
             spsUrl,
-            BaseAuthentication.MineSessionIdFromCookie(Request.GetHeader(Value.Metadata(authResponse), "Set-Cookie")),
+            if apiKey <> null then
+                ""
+            else
+                BaseAuthentication.MineSessionIdFromCookie(
+                    Request.GetHeader(Value.Metadata(authResponse), "Set-Cookie")
+                ),
+            apiKey,
             skipVersionCheck,
             mocks
         ),
@@ -97,14 +104,18 @@ shared GetData = (
             if IsMocked(mocks, "FetchData") then
                 mocks[FetchData][Value]
             else
-                FetchData(spsUrl, UrlBuilder.DefaultQuery & query, sessionId, mocks),
+                FetchData(spsUrl, UrlBuilder.DefaultQuery & query, sessionId, apiKey, mocks),
         data = HandleIfThereIsAnError(try (response)),
         result = BuildSPSResult(data, startTime)
     in
         result;
 
 shared ValidateSPSVersion = (
-    spsUrl as text, sessionId as text, skipVersionCheck as nullable text, optional mocks as nullable record
+    spsUrl as text,
+    sessionId as text,
+    apiKey as nullable text,
+    skipVersionCheck as nullable text,
+    optional mocks as nullable record
 ) =>
     let
         sessionIdOrError =
@@ -112,7 +123,7 @@ shared ValidateSPSVersion = (
                 sessionId
             else
                 let
-                    version = Version.GetVersion(spsUrl, sessionId, mocks),
+                    version = Version.GetVersion(spsUrl, sessionId, apiKey, mocks),
                     checkedVersion = try Version.CheckVersion(version, SupportedVersions.Versions),
                     validatedVersion =
                         if checkedVersion[HasError] then
@@ -137,22 +148,19 @@ shared ValidateSPSVersion = (
 shared Authenticate = (spsUrl as text, credentials as record, optional mocks as nullable record) as record =>
     let
         authUrl = UrlBuilder.GenerateUrl(spsUrl, AuthEndpoint),
-        encodedCredentails = BaseAuthentication.EncodeCredentials(credentials[Username], credentials[Password]),
         response =
             if IsMocked(mocks, "AuthResponse") then
-                Request.Generate(
-                    authUrl, Request.GetAuthParameters(encodedCredentails), [Response = mocks[AuthResponse]]
-                )
+                Request.Generate(authUrl, Request.GetAuthParameters(credentials), [Response = mocks[AuthResponse]])
             else
-                Request.Generate(authUrl, Request.GetAuthParameters(encodedCredentails))
+                Request.Generate(authUrl, Request.GetAuthParameters(credentials))
     in
         response;
 
-shared FetchData = (spsUrl as text, queryParams as record, sessionId as text, optional mocks as nullable record) as table =>
+shared FetchData = (spsUrl as text, queryParams as record, sessionId as text, apiKey as nullable text, optional mocks as nullable record) as table =>
     let
-        snapshot = OpenSnapshot.OpenSnapshot(spsUrl, sessionId, mocks),
-        sessions = AdvancedSearch.AdvancedSearch(spsUrl, queryParams, snapshot, sessionId, mocks),
-        expectedSessionsCount = try GetSessionsCount.GetSessionsCount(spsUrl, queryParams, sessionId, mocks),
+        snapshot = OpenSnapshot.OpenSnapshot(spsUrl, sessionId, apiKey, mocks),
+        sessions = AdvancedSearch.AdvancedSearch(spsUrl, queryParams, snapshot, sessionId, apiKey, mocks),
+        expectedSessionsCount = try GetSessionsCount.GetSessionsCount(spsUrl, queryParams, sessionId, apiKey, mocks),
         sessionsWithCountMetadata =
             if expectedSessionsCount[HasError] = true then
                 error expectedSessionsCount[Error]
@@ -188,7 +196,11 @@ shared TestSpsConnection = (dataSourcePath) =>
 SafeguardSessions = [
     TestConnection = TestSpsConnection,
     Authentication = [
-        UsernamePassword = []
+        UsernamePassword = [],
+        Key = [
+            KeyLabel = "User key",
+            Label = "API key"
+        ]
     ],
     Label = Extension.LoadString("DataSourceLabel")
 ];
@@ -237,7 +249,6 @@ BuildSPSResult = SafeguardSessions.ImportFunction("BuildSPSResult", "Utils.pqm")
 
 BaseAuthentication = SafeguardSessions.ImportModule("BaseAuthentication.pqm");
 
-BaseAuthentication.EncodeCredentials = BaseAuthentication[EncodeCredentials];
 BaseAuthentication.MineSessionIdFromCookie = BaseAuthentication[MineSessionIdFromCookie];
 
 Request.GetAuthParameters = SafeguardSessions.ImportFunction("GetAuthParameters", "Request.pqm");

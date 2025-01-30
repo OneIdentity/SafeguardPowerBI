@@ -8,22 +8,22 @@ let
     Schema.GetSchema = SafeguardSessions.ImportFunction("GetSchema", "Schema.pqm"),
     SchemaUtils.ApplySchema = SafeguardSessions.ImportFunction("ApplySchema", "SchemaUtils.pqm"),
     AdvancedSearch.AdvancedSearch = (
-        spsUrl as text, queryParams as record, snapshot as text, sessionId as text, optional mocks as nullable record
+        spsUrl as text, queryParams as record, snapshot as text, sessionId as text, apiKey as nullable text, optional mocks as nullable record
     ) as table =>
         let
             fetchUrl = UrlBuilder.GenerateUrl(spsUrl, SessionsEndpoint, queryParams & [snapshot = snapshot]),
-            result = AdvancedSearch.GetAllPagesByNextLink(spsUrl, fetchUrl, sessionId, mocks),
+            result = AdvancedSearch.GetAllPagesByNextLink(spsUrl, fetchUrl, sessionId, apiKey, mocks),
             resultWithMetadata = Value.ReplaceMetadata(result, [RequestUrl = fetchUrl])
         in
             resultWithMetadata,
     AdvancedSearch.GetAllPagesByNextLink = (
-        spsUrl as text, start_url as text, sessionId as text, optional mocks as nullable record
+        spsUrl as text, start_url as text, sessionId as text, apiKey as nullable text, optional mocks as nullable record
     ) as table =>
         AdvancedSearch.GenerateByPage(
             (previous) =>
                 let
                     nextUrl = if (previous = null) then start_url else AdvancedSearch.GetNextUrl(spsUrl, previous),
-                    page = if (nextUrl <> null) then AdvancedSearch.GetPage(nextUrl, sessionId, mocks) else null
+                    page = if (nextUrl <> null) then AdvancedSearch.GetPage(nextUrl, sessionId, apiKey, mocks) else null
                 in
                     page
         ),
@@ -33,7 +33,7 @@ let
             nextUrl = if nextLink <> null then UrlBuilder.GenerateUrl(spsUrl, nextLink) else null
         in
             nextUrl,
-    AdvancedSearch.GetPage = (url as text, sessionId as text, optional mocks as nullable record) as table =>
+    AdvancedSearch.GetPage = (url as text, sessionId as text, apiKey as nullable text, optional mocks as nullable record) as table =>
         let
             response = ResponseHandler.ValidateByStatusCode(
                 if IsMocked(mocks, "GetPageResponseMap") then
@@ -45,7 +45,7 @@ let
                         ]
                     )
                 else
-                    Request.Generate(url, Request.GetDefaultParameters(sessionId))
+                    Request.Generate(url, Request.GetDefaultParameters(sessionId, apiKey))
             ),
             nextLink = response[meta][next]?,
             schema =

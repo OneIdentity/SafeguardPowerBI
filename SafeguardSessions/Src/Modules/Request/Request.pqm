@@ -3,12 +3,18 @@ let
     InfoLog = SafeguardSessions.ImportFunction("InfoLog", "CommonLogger.pqm"),
     ErrorCodes = SafeguardSessions.ImportFunction("ErrorCodes", "RequestErrors.pqm"),
     ValidateByStatusCode = SafeguardSessions.ImportFunction("ValidateByStatusCode", "ResponseHandler.pqm"),
-    Request.GetAuthParameters = (encodedCredentails as text) as record =>
+    EncodeCredentials = SafeguardSessions.ImportFunction("EncodeCredentials", "BaseAuthentication.pqm"),
+    Request.GetAuthParameters = (credentials as record) as record =>
         let
+            authHeader = Text.Combine(
+                {"Basic", EncodeCredentials(credentials[Username], credentials[Password])}, " "
+            ),
             parameters = [
                 Query = [return = "/api/authentication", login_method = "local"],
                 Headers = [
-                    #"Authorization" = Text.Combine({"Basic ", encodedCredentails}),
+                    #"Authorization" = Text.Combine(
+                        {"Basic", EncodeCredentials(credentials[Username], credentials[Password])}, " "
+                    ),
                     #"Accept" = "*/*",
                     #"Connection" = "keep-alive",
                     #"Cache-Control" = "no-cache, no-store, must-revalidate"
@@ -17,14 +23,18 @@ let
             ]
         in
             parameters,
-    Request.GetDefaultParameters = (sessionId as text) as record =>
+    Request.GetDefaultParameters = (sessionId as nullable text, optional apiKey as text) as record =>
         let
+            defaultFiels = [
+                #"Accept" = "application/json",
+                #"Connection" = "keep-alive"
+            ],
+            cookie = [#"Cookie" = sessionId],
             parameters = [
-                Headers = [
-                    #"Accept" = "application/json",
-                    #"Connection" = "keep-alive",
-                    #"Cookie" = sessionId
-                ],
+                Headers = if apiKey <> null then
+                    Record.AddField(defaultFiels, "Authorization", Text.Combine({"apikey", apiKey}, " "))
+                else
+                    Record.Combine({defaultFiels, cookie}),
                 IsRetry = true
             ]
         in
