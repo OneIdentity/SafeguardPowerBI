@@ -1,4 +1,6 @@
 Param(
+    [Parameter(Mandatory = $true)]
+    [string]$Project,
     [switch]$Verify
 )
 
@@ -7,7 +9,7 @@ $ErrorActionPreference = "Stop"
 $scriptpath = $MyInvocation.MyCommand.Path
 $dir = Split-Path $scriptpath
 
-. $dir\PreCheck.ps1
+. $dir\PreCheck.ps1 -Project $Project
 
 function CalculateChecksum {
     param (
@@ -43,14 +45,14 @@ function VerifyChecksum {
     Write-Host $(Split-Path $File -leaf) : $(If ($readHash -eq $calculatedHash) { "OK" } Else { "Different" })
 }
 
+$reportTemplates = @{}
+$config.ReportTemplatePaths.psobject.properties | ForEach-Object { $reportTemplates[$_.Name] = $_.Value }
 
 if ($Verify -eq $true) {
     Write-Host "Verifying checksums"
-    VerifyChecksum -File $config.ConnectorMezPath
-    VerifyChecksum -File $config.ReportTemplatePath
+    $reportTemplates.Values + $config.ConnectorMezPath | ForEach-Object { VerifyChecksum -File $_ }
 }
 else {
     Write-Host "Calculating checksums"
-    CalculateChecksum -File $config.ConnectorMezPath -Persist -Verbose
-    CalculateChecksum -File $config.ReportTemplatePath -Persist -Verbose
+    $reportTemplates.Values + $config.ConnectorMezPath | ForEach-Object { CalculateChecksum -File $_ -Persist -Verbose }
 }
