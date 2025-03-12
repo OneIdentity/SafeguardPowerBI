@@ -449,7 +449,7 @@ TestGetDataReturnsWithErrorInCaseOfUnsupportedSPSVersion = () =>
             HasError = true,
             Error = [
                 Reason = "Not Supported Version",
-                Message = "Error 10001: Your version of the connector (v2.0.2pre+sps8.1.0) is not compatible with your SPS version (unsupported_version). For a connector version that is compatible with your SPS version, visit the official release page of the connector: https://github.com/OneIdentity/SafeguardPowerBI/releases",
+                Message = "Error 10001: Your version of the connector (v2.0.2sps8.1.0) is not compatible with your SPS version (unsupported_version). For a connector version that is compatible with your SPS version, visit the official release page of the connector: https://github.com/OneIdentity/SafeguardPowerBI/releases",
                 Detail = [
                     Version = "unsupported_version",
                     SupportedVersions = "7.3, 7.4, 7.5, 8.0, 8.1",
