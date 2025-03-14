@@ -137,7 +137,7 @@ See the [Troubleshooting] guide.
 
 ## Release policy
 
-As of now, One Identity releases a new Power BI Connector with each feature release of SPS until 8 LTS.
+One Identity releases a new Power BI Connector with each feature release.
 
 Releases have the following rules:
 
