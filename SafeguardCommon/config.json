@@ -1,0 +1,8 @@
+{
+  "ConnectorProjPath":"SafeguardCommon.proj",
+  "TestProjPath":"Test\\SafeguardCommonTest.proj",
+  "UnitTestsPath":"Test",
+  "ConnectorMezPath":"Deploy\\SafeguardCommon\\Bin\\SafeguardCommon.mez",
+  "TestMezPath":"Deploy\\UnitTestFramework\\Bin\\UnitTestFramework.mez",
+  "ReportTemplatePaths":{}
+}
