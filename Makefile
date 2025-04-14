@@ -12,13 +12,17 @@ $(BOOTSRAP_FINISHED_FLAG):
 
 bootstrap: bs
 
-build-cmn: bs
-	@powershell Environment\Scripts\Build.ps1 -Project $(COMMON)
+.PHONY: SafeguardCommon SafeguardSessions SafeguardPasswords
+SafeguardCommon SafeguardSessions SafeguardPasswords:
+	echo $@ > "active_project"
 
-unit-test-cmn: bs
+build: bs
+	@powershell Environment\Scripts\Build.ps1 -Project $(PROJECT)
+
+unit-test: bs
 	@powershell Environment\Scripts\RunUnitTests.ps1 -Project $(COMMON) -TestFile $(test_file)
 
-unit-tests-cmn: bs
+unit-tests: bs
 	@powershell Environment\Scripts\RunUnitTests.ps1 -Project $(COMMON)
 
 checksum-cmn:
