@@ -17,14 +17,8 @@ let
             asTable,
     Utils.Record.Update = (r as record, field as text, value as any) =>
         Record.AddField(Record.RemoveFields(r, field, MissingField.Ignore), field, value),
-    Utils.GetOption = (options as nullable record, valuePath as text) as any =>
+    Utils.GetOption = (options as nullable record, valuePath as text, optional defaultValue as any) as any =>
         let
-            /*
-                Record.FieldOrDefault uses null by default as default value
-                but we use null explicitely to show that it needs to return
-                null if a field is not present
-            */
-            defaultValue = null,
             optionName = Text.BeforeDelimiter(valuePath, Utils.DelimiterChar, Utils.DelimiterCount),
             newPath = Text.AfterDelimiter(valuePath, Utils.DelimiterChar, Utils.DelimiterCount),
             optionValue = Record.FieldOrDefault(options, optionName, defaultValue)
@@ -35,10 +29,6 @@ let
                 optionValue,
     Utils.SetOption = (options as nullable record, valuePath as text, value as any) as record =>
         let
-            /*
-                If key is not present, add it to the record and keep the others intact
-                If key is present, update value and keep the others intact
-            */
             newOptions =
                 if value is null then
                     options

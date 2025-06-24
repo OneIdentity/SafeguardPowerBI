@@ -71,12 +71,16 @@ TestPaddedTableFromRecordsRaisesError = () =>
 TestGetOption = () =>
     let
         AssertOptionIsReturnedCorrectly = (
-            description as text, options as record, selectedOption as text, expectedOutput as any
+            description as text,
+            options as record,
+            selectedOption as text,
+            expectedOutput as any,
+            optional defaultValue as any
         ) =>
             Fact(
                 Text.Format("#{0}: #{1}", {GetOption.Name, description}),
                 expectedOutput,
-                GetOption(options, selectedOption)
+                GetOption(options, selectedOption, defaultValue)
             ),
         options = [
             a = 1,
@@ -88,7 +92,19 @@ TestGetOption = () =>
             {"Returns first level simple option", options, "a", 1},
             {"Returns first level complex option", options, "b", [c = 2]},
             {"Returns second level option", options, "b.c", 2},
-            {"Returns null if option does not exists", options, "not_existing_option", null}
+            {
+                "Returns null if option does not exist and defaultValue is not provided",
+                options,
+                "not_existing_option",
+                null
+            },
+            {
+                "Returns defaultValue if option does not exists and defaultValue is provided",
+                options,
+                "not_existing_option",
+                "default",
+                "default"
+            }
         },
         facts = ProvideDataForTest(cases, AssertOptionIsReturnedCorrectly)
     in
