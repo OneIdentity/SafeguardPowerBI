@@ -1,5 +1,12 @@
 # Changelog
 
+## [v2.0.3pre+sps8.2.0] - 2025-09-24
+
+### Compatible SPS Versions
+
+* Feature: 7.3.0 - 8.2.0
+* LTS: 8.0.0 - 8.0.2
+
 ## [v2.0.2+sps8.1.0] - 2025-02-11
 
 ### Compatible SPS Versions
