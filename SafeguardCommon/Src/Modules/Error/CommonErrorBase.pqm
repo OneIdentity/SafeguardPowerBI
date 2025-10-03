@@ -15,7 +15,8 @@ let
             error [
                 Reason = reason,
                 Message = message,
-                Detail = detailRecord
+                Detail = detailRecord,
+                ErrorCode = errorCode
             ],
     CommonErrorBase.Error = Value.ReplaceType(ErrorBase.Implementation, ErrorBase.Type)
 in

@@ -79,7 +79,8 @@ TestGetDataFromResponseRaisesError = () =>
                         MissingField = path,
                         RequestUrl = "dummy_url",
                         ErrorCode = 10002
-                    ]
+                    ],
+                    ErrorCode = 10002
                 ]
             ),
         cases = {
