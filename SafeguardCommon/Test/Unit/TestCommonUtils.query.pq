@@ -62,7 +62,8 @@ TestPaddedTableFromRecordsRaisesError = () =>
                 Detail = [
                     Value = "not_a_record",
                     Type = type record
-                ]
+                ],
+                ErrorCode = "10277"
             ]
         )
     in

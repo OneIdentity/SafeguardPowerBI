@@ -19,9 +19,9 @@ TestValidateByStatusCodeRaisesError = () =>
                 Detail = [
                     ManuallyHandled = true,
                     Cause = fakeAuthResponse,
-                    RequestUrl = url,
-                    ErrorCode = 4010
-                ]
+                    RequestUrl = url
+                ],
+                ErrorCode = "4010"
             ]
         )
     in

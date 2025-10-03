@@ -290,9 +290,9 @@ TestGetDataHandlesAuthenticationError = () =>
             Detail = [
                 ManuallyHandled = true,
                 Cause = [#"error" = "value"],
-                RequestUrl = "https://dummy_url/api/authentication",
-                ErrorCode = 4010
+                RequestUrl = "https://dummy_url/api/authentication"
             ],
+            ErrorCode = "4010",
             Message.Format = null,
             Message.Parameters = null
         ],
@@ -368,9 +368,9 @@ TestGetDataHandlesBadRequest = () =>
             Detail = [
                 ManuallyHandled = true,
                 Cause = [#"error" = "reason"],
-                RequestUrl = "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id",
-                ErrorCode = 5000
+                RequestUrl = "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id"
             ],
+            ErrorCode = "5000",
             Message.Format = null,
             Message.Parameters = null
         ],
@@ -409,6 +409,7 @@ TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringAuth = () =>
                 ManuallyHandled = true,
                 Cause = [#"error" = "value"]
             ],
+            ErrorCode = null,
             Message.Format = null,
             Message.Parameters = null
         ],
@@ -437,6 +438,7 @@ TestGetDataHandlesErrorWithoutRequestUrlInErrorDetailDuringDataFetch = () =>
                 ManuallyHandled = true,
                 Cause = [#"error" = "value"]
             ],
+            ErrorCode = null,
             Message.Format = null,
             Message.Parameters = null
         ],
@@ -471,9 +473,9 @@ TestGetDataReturnsWithErrorInCaseOfUnsupportedSPSVersion = () =>
                 Detail = [
                     Version = "unsupported_version",
                     SupportedVersions = "7.3, 7.4, 7.5, 8.0, 8.1, 8.2",
-                    ManuallyHandled = false,
-                    ErrorCode = 10001
+                    ManuallyHandled = false
                 ],
+                ErrorCode = "10001",
                 Message.Format = null,
                 Message.Parameters = null
             ]
@@ -510,9 +512,9 @@ TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringAut
                 Message = "Error 99999: Variable type mismatch error",
                 Detail = [
                     OriginalDetails = "The variable badVariable is of the type text, but it should be of the type number",
-                    ErrorCode = 99999,
                     ManuallyHandled = false
                 ],
+                ErrorCode = "99999",
                 Message.Format = null,
                 Message.Parameters = null
             ]
@@ -550,9 +552,9 @@ TestGetDataReturnWithAnUnexpectedErrorBecauseSomethingUnexpectedHappendDuringDat
                 Message = "Error 99999: Variable type mismatch error",
                 Detail = [
                     OriginalDetails = "The variable badVariable is of the type text, but it should be of the type number",
-                    ErrorCode = 99999,
                     ManuallyHandled = false
                 ],
+                ErrorCode = "99999",
                 Message.Format = null,
                 Message.Parameters = null
             ]
@@ -593,9 +595,9 @@ TestGetDataHandlesSchemaApplyError = () =>
             Detail = [
                 Cause = TestSafeguardSessions.ActualResponseData,
                 RequestUrl = "https://dummy_url/api/audit/sessions?fields=%2A&sort=-start_time&snapshot=dummy_snapshot_id",
-                ManuallyHandled = true,
-                ErrorCode = 10004
+                ManuallyHandled = true
             ],
+            ErrorCode = "10004",
             Message.Format = null,
             Message.Parameters = null
         ],

@@ -20,7 +20,8 @@ let
                 Fact(CaseWrapper(caseName, "Error is raised"), true, err[HasError]),
                 Fact(CaseWrapper(caseName, "Reason is correct"), expectedErrorRecord[Reason], err[Error][Reason]),
                 Fact(CaseWrapper(caseName, "Message is correct"), expectedErrorRecord[Message], err[Error][Message]),
-                Fact(CaseWrapper(caseName, "Detail is correct"), expectedErrorRecord[Detail], err[Error][Detail])
+                Fact(CaseWrapper(caseName, "Detail is correct"), expectedErrorRecord[Detail], err[Error][Detail]),
+                Fact(CaseWrapper(caseName, "Error code is correct"), expectedErrorRecord[ErrorCode]?, err[Error][ErrorCode])
             }
         in
             facts

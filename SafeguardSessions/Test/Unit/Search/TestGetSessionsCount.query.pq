@@ -30,9 +30,9 @@ TestGetSessionsCountRaisesError = () =>
             Cause = [invalid = "response"],
             MissingField = "count",
             RequestUrl = requestUrl,
-            ManuallyHandled = true,
-            ErrorCode = 10002
-        ]
+            ManuallyHandled = true
+        ],
+        expectedErrorCode = "10002"
     in
         AssertError(
             "An error is raised if fields are missing in the response received",
@@ -43,7 +43,8 @@ TestGetSessionsCountRaisesError = () =>
             [
                 Reason = expectedReason,
                 Message = expectedMessage,
-                Detail = expectedDetail
+                Detail = expectedDetail,
+                ErrorCode = expectedErrorCode
             ]
         );
 

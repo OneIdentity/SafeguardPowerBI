@@ -77,9 +77,9 @@ TestGetDataFromResponseRaisesError = () =>
                         ManuallyHandled = true,
                         Cause = fakeResponse,
                         MissingField = path,
-                        RequestUrl = "dummy_url",
-                        ErrorCode = 10002
-                    ]
+                        RequestUrl = "dummy_url"
+                    ],
+                    ErrorCode = "10002"
                 ]
             ),
         cases = {

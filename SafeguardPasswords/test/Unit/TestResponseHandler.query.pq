@@ -21,11 +21,11 @@ TestValidateByStatusCodeRaisesError = () =>
                                                     ],
                                                     RequestUrl = "dummy_url", 
                                                     RelativePath = "fake/relative/path", 
-                                                    ManuallyHandled = true, 
-                                                    ErrorCode = 4060 
+                                                    ManuallyHandled = true 
                                             ],
                                 Message.Format = null, 
-                                Message.Parameters = null 
+                                Message.Parameters = null,
+                                ErrorCode = "4060"
                             ]
                 ],
         fakeResponse = FakeRawResponse([    FakeError = expectedReason, 

@@ -28,11 +28,11 @@ TestGetVersionRaisesError = () =>
         expectedMessage = "Error 10002: The source IP returned a response with missing fields.",
         expectedDetail = [
             ManuallyHandled = true,
-            ErrorCode = 10002,
             Cause = [invalid = "response"],
             MissingField = "body.firmware_version",
             RequestUrl = requestUrl
-        ]
+        ],
+        expectedErrorCode = "10002"
     in
         AssertError(
             "An error is raised if fields are missing in the response received",
@@ -45,7 +45,8 @@ TestGetVersionRaisesError = () =>
             [
                 Reason = expectedReason,
                 Message = expectedMessage,
-                Detail = expectedDetail
+                Detail = expectedDetail,
+                ErrorCode = expectedErrorCode
             ]
         );
 

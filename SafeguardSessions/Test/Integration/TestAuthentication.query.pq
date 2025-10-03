@@ -47,7 +47,7 @@ TestAuthenticateIsSuccessful = () =>
 TestAuthenticateRaisesError = () =>
     let
         AssertAuthenticationFailure = (
-            errorCode as number, statusCode as number, expectedReason as text, expectedMessage as text
+            errorCode as text, statusCode as number, expectedReason as text, expectedMessage as text
         ) =>
             let
                 fakeAuthResponse = FakeRawResponse([#"error" = "reason"], [
@@ -72,25 +72,25 @@ TestAuthenticateRaisesError = () =>
                         Detail = [
                             ManuallyHandled = true,
                             Cause = [#"error" = "reason"],
-                            RequestUrl = "http://dummy_url/api/authentication",
-                            ErrorCode = errorCode
-                        ]
+                            RequestUrl = "http://dummy_url/api/authentication"
+                        ],
+                        ErrorCode = errorCode
                     ]
                 ),
         cases = {
             {
-                4010,
+                "4010",
                 401,
                 "Authentication Error",
                 "Error 4010: The username or password you have specified is invalid."
             },
             {
-                4030,
+                "4030",
                 403,
                 "Authorization Error",
                 "Error 4030: You are not authorized to access the specified resource."
             },
-            {5000, 500, "Server Error", "Error 5000: The source IP responded with a server error."}
+            {"5000", 500, "Server Error", "Error 5000: The source IP responded with a server error."}
         },
         facts = ProvideDataForTest(cases, AssertAuthenticationFailure)
     in

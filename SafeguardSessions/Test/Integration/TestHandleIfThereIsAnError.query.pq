@@ -27,11 +27,11 @@ TestHandleIfThereIsAnError = () =>
                     Message = "Error 99999: Variable type mismatch error",
                     Detail = [
                         OriginalDetails = "The variable badVariable is of the type text, but it should be of the type number",
-                        ManuallyHandled = false,
-                        ErrorCode = 99999
+                        ManuallyHandled = false
                     ],
                     Message.Format = null,
-                    Message.Parameters = null
+                    Message.Parameters = null,
+                    ErrorCode = "99999"
                 ]
             },
             {
@@ -42,15 +42,17 @@ TestHandleIfThereIsAnError = () =>
                             [
                                 Reason = "Filter Field Without Value",
                                 Message = "Error: 10000: There is a field value missing from one or more of your filter fields.",
-                                Detail = [Url = "dummy.url", ManuallyHandled = false, ErrorCode = 10000]
+                                Detail = [Url = "dummy.url", ManuallyHandled = false],
+                                ErrorCode = "10000"
                             ]
                     ),
                 [
                     Reason = "Filter Field Without Value",
                     Message = "Error: 10000: There is a field value missing from one or more of your filter fields.",
-                    Detail = [Url = "dummy.url", ManuallyHandled = false, ErrorCode = 10000],
+                    Detail = [Url = "dummy.url", ManuallyHandled = false],
                     Message.Format = null,
-                    Message.Parameters = null
+                    Message.Parameters = null,
+                    ErrorCode = "10000"
                 ]
             },
             {
@@ -61,7 +63,8 @@ TestHandleIfThereIsAnError = () =>
                             [
                                 Reason = "Bad Request",
                                 Message = "Error 4000: The source IP interpreted a malformed request. Your filter parameter(s) might be invalid.",
-                                Detail = [Url = "dummy.url", ManuallyHandled = true, ErrorCode = 4000]
+                                Detail = [Url = "dummy.url", ManuallyHandled = true],
+                                ErrorCode = "4000"
                             ]
                     ),
                 [
@@ -69,9 +72,10 @@ TestHandleIfThereIsAnError = () =>
                     Error = [
                         Reason = "Bad Request",
                         Message = "Error 4000: The source IP interpreted a malformed request. Your filter parameter(s) might be invalid.",
-                        Detail = [Url = "dummy.url", ManuallyHandled = true, ErrorCode = 4000],
+                        Detail = [Url = "dummy.url", ManuallyHandled = true],
                         Message.Format = null,
-                        Message.Parameters = null
+                        Message.Parameters = null,
+                        ErrorCode = "4000"
                     ]
                 ]
             }

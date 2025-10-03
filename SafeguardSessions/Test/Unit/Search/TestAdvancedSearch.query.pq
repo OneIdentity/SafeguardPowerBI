@@ -149,9 +149,9 @@ TestErrorIsContainedInAdvancedSearchResponse = () =>
         expectedDetail = [
             ManuallyHandled = true,
             Cause = [#"error" = "reason"],
-            RequestUrl = "http://dummy_url/dummy_url_final",
-            ErrorCode = 4040
+            RequestUrl = "http://dummy_url/dummy_url_final"
         ],
+        expectedErrorCode = "4040",
         dataFacts = {
             Fact(
                 "First row contains valid data",
@@ -184,7 +184,8 @@ TestErrorIsContainedInAdvancedSearchResponse = () =>
             [
                 Reason = expectedReason,
                 Message = expectedMessage,
-                Detail = expectedDetail
+                Detail = expectedDetail,
+                ErrorCode = expectedErrorCode
             ]
         )
     in

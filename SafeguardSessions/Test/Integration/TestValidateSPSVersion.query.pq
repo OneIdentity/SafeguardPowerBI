@@ -64,7 +64,8 @@ TestValidateSPSVersionRaisesError = () =>
             fakeInfoResponse as binary,
             expectedReason as text,
             expectedMessage as text,
-            expectedDetail as record
+            expectedDetail as record,
+            expectedErrorCode as text
         ) =>
             AssertError(
                 description,
@@ -82,7 +83,8 @@ TestValidateSPSVersionRaisesError = () =>
                 [
                     Reason = expectedReason,
                     Message = expectedMessage,
-                    Detail = expectedDetail
+                    Detail = expectedDetail,
+                    ErrorCode = expectedErrorCode
                 ]
             ),
         cases = {
@@ -96,9 +98,9 @@ TestValidateSPSVersionRaisesError = () =>
                 [
                     Version = "unsupported_version",
                     SupportedVersions = "7.3, 7.4, 7.5, 8.0, 8.1, 8.2",
-                    ManuallyHandled = false,
-                    ErrorCode = 10001
-                ]
+                    ManuallyHandled = false
+                ],
+                "10001"
             },
             {
                 "An invalid response has been received",
@@ -109,9 +111,9 @@ TestValidateSPSVersionRaisesError = () =>
                     Cause = [invalid = "response"],
                     MissingField = "body.firmware_version",
                     RequestUrl = "http://dummy_url/api/info",
-                    ManuallyHandled = true,
-                    ErrorCode = 10002
-                ]
+                    ManuallyHandled = true
+                ],
+                "10002"
             }
         },
         facts = ProvideDataForTest(cases, AssertValidationError)

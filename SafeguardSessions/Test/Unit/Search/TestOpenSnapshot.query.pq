@@ -18,7 +18,11 @@ TestOpenSnapshotIsSuccessful = () =>
 TestOpenSnapshotRaisesError = () =>
     let
         AssertOpenSnapshotFailure = (
-            fakeSnapshotResponse as binary, expectedReason as text, expectedMessage as text, expectedDetail as record
+            fakeSnapshotResponse as binary,
+            expectedReason as text,
+            expectedMessage as text,
+            expectedDetail as record,
+            expectedErrorCode as text
         ) =>
             let
                 requestUrl = "http://dummy_url/api/audit/sessions/_snapshot"
@@ -32,7 +36,8 @@ TestOpenSnapshotRaisesError = () =>
                     [
                         Reason = expectedReason,
                         Message = expectedMessage,
-                        Detail = expectedDetail & [RequestUrl = requestUrl]
+                        Detail = expectedDetail & [RequestUrl = requestUrl],
+                        ErrorCode = expectedErrorCode
                     ]
                 ),
         cases = {
@@ -43,9 +48,9 @@ TestOpenSnapshotRaisesError = () =>
                 [
                     Cause = [invalid = "response"],
                     MissingField = "body.snapshot",
-                    ManuallyHandled = true,
-                    ErrorCode = 10002
-                ]
+                    ManuallyHandled = true
+                ],
+                "10002"
             },
             {
                 FakeRawResponse([#"error" = "reason"], [
@@ -55,9 +60,9 @@ TestOpenSnapshotRaisesError = () =>
                 "Error 4290: Snapshot quota exceeded.",
                 [
                     Cause = [#"error" = "reason"],
-                    ManuallyHandled = true,
-                    ErrorCode = 4290
-                ]
+                    ManuallyHandled = true
+                ],
+                "4290"
             }
         },
         facts = ProvideDataForTest(cases, AssertOpenSnapshotFailure)

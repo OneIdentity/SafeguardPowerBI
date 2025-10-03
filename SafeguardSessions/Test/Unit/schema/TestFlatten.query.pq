@@ -61,9 +61,9 @@ TestFlattenListsHandlesListWithNonTextValue = () =>
                     Detail = [
                         Cause = "[""3"",4]",
                         RequestUrl = null,
-                        ManuallyHandled = true,
-                        ErrorCode = 10003
-                    ]
+                        ManuallyHandled = true
+                    ],
+                    ErrorCode = "10003"
                 ]
             ),
             Fact(
