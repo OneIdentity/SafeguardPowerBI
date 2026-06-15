@@ -137,7 +137,7 @@ See the [Troubleshooting] guide.
 
 ## Release policy
 
-One Identity releases a new Power BI Connector with each feature release.
+One Identity releases a new Power BI Connector with each new major and minor feature release.
 
 Releases have the following rules:
 
@@ -151,7 +151,9 @@ Releases have the following rules:
 - Examples
     - v1.0.0+sps-7.3.0
     - v1.0.0pre1+sps7.3.0
-    - v1.0.0+sps-8.0.3
+- Unless specified otherwise in the release note, the released connector supports all patch versions of an SPS minor version
+- Example
+    - v1.0.0+sps-7.3.0 supports SPS appliances with version 7.3.z
 - A Report Template of a release is not only compatible with the connector from the same release but also with other connectors having the same major version
 
 When writing a release note, use the following template:
